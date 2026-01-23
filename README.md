@@ -4,16 +4,29 @@ A (second & likely not the last 🐱) rewrite of the DBML parser that tries to a
 
 ## Targets
 
-- Decent architecture and design
-  - Interleaved phases: Implement on-demand, query-based lexing, parsing, name resolution, interpretation, etc. to replace rigid compiler stages (like Rust's `salsa`).
-  - Lossless syntax representation: Implement a Red-Green tree structure to maintain a full-fidelity, lossless CST that elegantly handles trivia (whitespace, comments) and error tokens.
-  - Rust-inspired internals: Research and adopt high-performance patterns for CST and syntax token representation from the Rust compiler.
-- Resilience and error handling
-  - Elegant resilience: Develop a resilient parsing strategy that recovers gracefully from syntax errors without compromising the logic's elegance.
-  - Diagnostic excellence: Implement good error recovery, leveraging best practices for clear error codes and user-friendly diagnostic messages.
-- Performance and Incrementalism:  Ensure the compiler is optimized for modern IDE workloads and multi-core environments.
-  - Efficient incrementalism: Enable incremental parsing with optimized position (re)computation for syntax nodes and tokens to minimize re-work during typing.
-  - Parallel execution: Architect the parser to support parallel execution, maximizing throughput for large-scale codebases.
+Based on the Rust compiler:
+
+- Research & address certain unclear points related to lexing:
+  - What is the ideal way to represent a syntax token? What fields should the token have: source offset/source pointer, token kind, token's processed value (for example, a number for a numeric literal token or an unescaped string for a string literal token)?
+  - Assuming UTF-8, how to handle non-ASCII characters?
+  - How to conveniently and elegantly handle trivial and error tokens in a lossless syntax tree?
+  - How to conveniently and elegantly handle multi-word keywords?
+  - How to conveniently and elegantly handle unreserved keywords?
+  - How to efficiently store/compute the positions of tokens that can support incremental parsing & syntax tree edits well?
+  - Should we use on-demand lexing, instead of lexin all at once?
+- Research & address certain unclear points related to parsing:
+  - What is a good representation for a lossless syntax tree?
+  - Resilience parsing & error recovery techniques.
+  - How to design good error messages?
+  - Incremental parsing & Red-green tree.
+  - How to store error nodes/partial nodes in the lossless syntax tree?
+- Program analysis & query-based compiler:
+  - How to utilize query-based architecture for program analysis (and potentially lexing & parsing)?
+  - Module system features, such as module resolution.
+  - Name resolution.
+- SQL dialect awareness.
+- Interpretation format.
+- Language server.
 
 ## Context
 
@@ -38,10 +51,9 @@ Since the first version of `@dbml/parse`, there has been some impact, but a lot 
 During the first launch, `@dbml/parse` broke a lot of user's code, mainly because the Peg.js parser was too lax that it allowed undocumented/legacy syntax I was not aware of.
 
 Since then, I encountered a lot of pain arising from my poor design choices and the way I wrote tests:
-- Fragile snapshot testing: Using snapshots as a shortcut for unit tests led to capturing entire CSTs. This created brittle, 2,000+ line test files where trivial internal changes triggered massive diffs, making genuine regression detection nearly impossible.
-- Poor abstraction/Misuse of design patterns: Forcing name resolution and validation into a Template Method pattern created tight coupling. The base class became a bloated, incomprehensible mess of "hooks" and "configs" to handle slight variations in logic across unrelated components.
-- Excessive type assertions: Heavy reliance on TypeScript as assertions bypassed the type system, leading to avoidable runtime bugs that the compiler should have caught.
-- Lack of type-driven validation (Parse, not validate): The parser was too lax, yielding a generic CST rather than a refined IR. Because validation didn't transform the data into a "known-good" structure, subsequent phases were forced to re-validate or rely on unsafe type assertions.
+- Fragile snapshot testing: I though snapshots were a shortcut for generating unit tests. This eventually led to me capturing entire CSTs, which created brittle, 2,000+ line test files where trivial internal changes triggered massive diffs. Genuine regression detection was nearly impossible.
+- Poor abstraction/Misuse of design patterns: I made the noobie mistake of "the more reuse, the better". I decided to force name resolution and validation phases of the parser into a Template Method pattern. This design choice created tight coupling via a shared component. The base class became a bloated, incomprehensible mess of "hooks" and "configs" to handle slight variations in logic across unrelated components.
+- Lack of type-driven validation (Parse, not validate): The parser was too lax, yielding a generic CST rather than a refined IR. Because the CST validation phase didn't transform the data into a "known-good" structure, subsequent phases were forced to re-validate or rely on unsafe type assertions.
 - The syntax tokens and nodes positions are precomputed, making CST patches almost always invalidate the positions & incremental parsing partly impossible.
 
 Some are minor issues:
