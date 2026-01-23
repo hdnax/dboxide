@@ -5,7 +5,7 @@
 - [Research](./research.md)
   - [Research Plan](./research/research_plan.md)
   - [Resources](./research/resources.md)
-    - [`rust-analyzer`](./research/resources/rust-analyzer.md)
+    - [`rust-analyzer`](./research/resources/rust-analyzer/SUMMARY.md)
   - [Glossary](./research/glossary.md)
 - [High-Level Design](./high_level_design.md)
 - [Detailed Design](./detailed_design.md)
