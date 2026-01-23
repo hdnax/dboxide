@@ -1,0 +1,3 @@
+[alias]
+doc-dev = "bin mdbook serve --open"
+doc-build = "bin mdbook build"
