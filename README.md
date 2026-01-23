@@ -4,7 +4,7 @@ A (second & likely not the last 🐱) rewrite of the DBML parser that tries to a
 
 ## Targets
 
-Based on the Rust compiler:
+Based on the Rust toolchains (like `salsa` and `rust-analyzer`):
 
 - Research & address certain unclear points related to lexing:
   - What is the ideal way to represent a syntax token? What fields should the token have: source offset/source pointer, token kind, token's processed value (for example, a number for a numeric literal token or an unescaped string for a string literal token)?
