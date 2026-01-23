@@ -12,6 +12,7 @@ Based on the Rust compiler:
   - How to conveniently and elegantly handle trivial and error tokens in a lossless syntax tree?
   - How to conveniently and elegantly handle multi-word keywords?
   - How to conveniently and elegantly handle unreserved keywords?
+  - How to handle ambiguous tokens? For example, is `<` a less than sign or a left angle bracket as in generic types.
   - How to efficiently store/compute the positions of tokens that can support incremental parsing & syntax tree edits well?
   - Should we use on-demand lexing, instead of lexin all at once?
 - Research & address certain unclear points related to parsing:
@@ -21,12 +22,12 @@ Based on the Rust compiler:
   - Incremental parsing & Red-green tree.
   - How to store error nodes/partial nodes in the lossless syntax tree?
 - Program analysis & query-based compiler:
-  - How to utilize query-based architecture for program analysis (and potentially lexing & parsing)?
+  - How to utilize the query-based architecture for program analysis (and potentially lexing & parsing)?
   - Module system features, such as module resolution.
-  - Name resolution.
+  - Name resolution & related problems.
+- Language server implementation.
+- Parallelism in compilation?
 - SQL dialect awareness.
-- Interpretation format.
-- Language server.
 
 ## Context
 
