@@ -26,6 +26,7 @@ Based on the Rust toolchains (like `salsa` and `rust-analyzer`):
   - Module system features, such as module resolution.
   - Name resolution & related problems.
 - Language server implementation.
+- Compilation cancellation.
 - Parallelism in compilation?
 - SQL dialect awareness.
 
