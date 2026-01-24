@@ -1,4 +1,4 @@
-# Architecture
+# High-Level Architecture & Conventions
 
 This section describes the architecture of `rust-analyzer`.
 
@@ -214,16 +214,16 @@ Based on [`libsyntax-2.0`](../../libsyntax/SUMMARY.md).
   * Old threads checking the counter notice the mismatch and **panic** with a special `Canceled` token.
 * The `ide` boundary catches this panic and converts it into a `Result<T, Canceled>`.
 
-### Testing strategy
+### Testing Strategy
 
 * Tests are concentrated on three system boundaries:
   * Outer (`rust-analyzer` crate): "Heavy" integration tests via LSP/stdio. Validates the protocol but is slow (reads real files).
   * Middle (`ide` crate): The most important layer. Tests `AnalysisHost` (simulating an editor) against expectations.
   * Inner (`hir` crate): Tests semantic models using rich types and **snapshot testing** (via the `expect` crate).
 
-### Key Testing Invariants
+#### Key Testing Invariants
 
-* Data-driven: Tests use string fixtures (representing multiple files) rather than calling API setup functions manually.
+* Data-driven: Tests use string fixtures (representing multiple files) rather than calling API setup functions manually. This allows significant API refactorings.
 * No `libstd`: Tests do not link to `libstd`/`libcore` to ensure speed; all necessary code is defined within the test fixture.
 
 ### Error Handling
@@ -232,7 +232,12 @@ Based on [`libsyntax-2.0`](../../libsyntax/SUMMARY.md).
 * Panic resilience: Since bugs are inevitable, every LSP request is wrapped in `catch_unwind` so a crash in one feature doesn't kill the server.
 * Macros: Uses `always!` and `never!` macros to handle impossible states gracefully.
 
-### Observability & Serialization
+### Observability
 
 * Profiling: Includes a custom low-overhead hierarchical profiler (`hprof`) enabled via env vars (`RA_PROFILE`).
-* Serialization: Internal types are **not** serializable by design. This prevents internal structures from accidentally becoming part of the public API/IPC boundary. Serialization is the responsibility of the client layer (e.g., LSP).
+
+### Serialization
+
+* The trap of ease: While `#[derive(Serialize)]` is easy to add, it creates rigid IPC boundaries (backward compatibility contracts) that are extremely difficult to change later.
+* To strictly preserve internal flexibility, types in core crates like `ide` and `base_db` are not serializable by design.
+* Serialization is forced to the "edge" (the client). External clients must define their own stable schemas (e.g., `rust-project.json`) and manually convert them into internal structures, isolating the core compiler from protocol versioning issues.

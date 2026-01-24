@@ -1,7 +1,9 @@
 # `rust-analyzer`
 
-- [Introduction](./introduction.md)
-- [Architecture](./architecture.md)
-- [Code model](./code_model/README.md)
-  - [Syntax trees (CSTs)](./code_model/syntax_trees.md)
-  - [HIR (High-level Intermediate Representation)](./code_model/hir.md)
+This section contains resources and notes about the `rust-analyzer` project.
+
+`rust-analyzer` is an LSP implement for Rust for many code editors.
+
+Official site: [Link](https://rust-analyzer.github.io/).
+
+- [High-Level Architecture & Conventions](./high_level_architecture_and_conventions.md)
