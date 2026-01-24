@@ -1,5 +1,9 @@
 # Research Summary
 
+## Operations
+
+1. Learning contribution guidelines of other big projects can be enlightening.
+
 ## Compiler Architecture
 
 1. `rust-analyzer`'s high-level architecture, from low-level to higher-level<sup>[1](#1)</sup>:
