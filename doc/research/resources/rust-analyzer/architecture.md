@@ -1,4 +1,8 @@
-# High-Level Overview
+# Architecture
+
+This section describes the architecture of `rust-analyzer`.
+
+Official site: [Link](https://rust-analyzer.github.io/book/contributing/architecture.html).
 
 - `rust-analyzer` input/output:
   - Input (Ground state): Source code data from the client. Everything is kept in memory.
