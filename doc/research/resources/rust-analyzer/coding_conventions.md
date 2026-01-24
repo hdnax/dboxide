@@ -102,3 +102,19 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
 - Principle: Only maintain one mark per test and one mark per code branch.
 - Never place multiple marks in a single test, and never reuse the same mark across different tests.
 - Rationale: This ensures that searching for a mark immediately reveals the single canonical test responsible for verifying that specific code branch, eliminating ambiguity.
+
+### `#[should_panic]`
+
+- `#[should_panic]` is prohibited - `None` and `Err` should be explicitly checked.
+- Rationale:
+  - `#[should_panic]` is a tool for library authors to make sure that the API does not fail silently when misused.
+  - `rust-analyzer` is a long-running server, not a library. It must handle all input gracefully, even invalid input (returning `Err` or `None`). It should never intentionally crash.
+  - Expected panics still dump stack traces into the test logs. This "noise" creates confusion, making it difficult to distinguish between a test verifying a panic and an actual bug causing a crash.
+  - Expected panics still dump stack traces into the test logs. This "noise" creates confusion, making it difficult to distinguish between a test verifying a panic and an actual bug causing a crash.
+
+### `#[ignore]`
+
+- Never ignore tests. Explicitly assert the wrong behavor and add a `FIXME` comment.
+- Rationale:
+  - Visibility: It ensures the test fails immediately if the bug is accidentally fixed (alerting you to update the test).
+  - Safety: It proves the bug causes incorrect output rather than a server crash (panic), which is a critical distinction for a long-running service.
