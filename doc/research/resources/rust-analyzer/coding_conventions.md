@@ -37,3 +37,21 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
 - Review standard: Rare & dangerous.
   - These break encapsulation.
   - Even an innocent-looking `pub use` can accidentally degrade the architecture by leaking abstractions across boundaries.
+
+## Crates.io Dependencies
+
+- Restrict external dependencies: Be extremely conservative with `crates.io` usage to minimize compile times and breakage risks.
+- Do not use small "helper" libraries (allowed exceptions: `itertools`, `either`).
+- Internalize utilities: Place general, reusable logic into the internal `stdx` crate rather than adding a dependency.
+- Audit dependency tree: Periodically review `Cargo.lock` to prune irrational transitive dependencies.
+
+### Rationale
+
+- Compilation speed:
+  - Rust compiles dependencies from source.
+  - Avoiding bloat is the best way to keep build times and feedback loops fast.
+- Transitive bloat:
+  - Small "helper" crates often pull in deep chains of hidden dependencies (the "iceberg" effect).
+- Stability & Security:
+  - Reduce the risk of upstream abandonment, breaking changes, or supply chain attacks.
+- Self-reliance: If logic is simple enough for a micro-crate, it belongs in the internal `stdx` library, not as an external liability.
