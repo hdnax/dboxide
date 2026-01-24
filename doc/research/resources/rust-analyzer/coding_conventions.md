@@ -118,3 +118,76 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
 - Rationale:
   - Visibility: It ensures the test fails immediately if the bug is accidentally fixed (alerting you to update the test).
   - Safety: It proves the bug causes incorrect output rather than a server crash (panic), which is a critical distinction for a long-running service.
+
+### Function Preconditions
+
+#### Type Encoding
+
+- Function's assumptions should be expressed in types.
+- The caller must be enforced to provide them.
+
+```rust
+// GOOD
+fn is_zero(n: i32) -> bool {
+  ...
+}
+
+// BAD
+fn is_zero(n: Option<i32>) -> bool {
+   let n = match n {
+       Some(it) => ...,
+       None => ...,
+   };
+}
+```
+
+- Rationale:
+  - The caller has more context as to why to the callee's assumptions do not hold.
+  - The control flow is therefore more explicit at the call site.
+
+#### Parse, Don't Validate
+
+- Bad practice:
+  - One function validates that the data is valid (validate the assumption).
+  - Another function uses that data based on the assumptions.
+- Good practice: Validate and immediately use the data in the same place (like `match` instead of bare `if`).
+
+- Reasons:
+  - The bad practice is prone to decay over time. The maintainer has to memorize the assumptions and make sure refactoring efforts of checks actually verify the assumptions.
+  - The good practice always ensure that the assumptions hold when manipulating the data.
+
+- Example from `rust-analyzer`
+  ```rust
+  // GOOD
+  fn main() {
+      let s: &str = ...;
+      if let Some(contents) = string_literal_contents(s) {
+  
+      }
+  }
+  
+  fn string_literal_contents(s: &str) -> Option<&str> {
+      if s.starts_with('"') && s.ends_with('"') {
+          Some(&s[1..s.len() - 1])
+      } else {
+          None
+      }
+  }
+  
+  // BAD
+  fn main() {
+      let s: &str = ...;
+      if is_string_literal(s) {
+          let contents = &s[1..s.len() - 1];
+      }
+  }
+  
+  fn is_string_literal(s: &str) -> bool {
+      s.starts_with('"') && s.ends_with('"')
+  }
+  ```
+
+- Remarks:
+  - This pattern perfectly illustrates Robert Harper's concept of "Boolean Blindness". By reducing a complex check to a simple bool (true/false), we discard the proof of validity. The compiler sees a "true" flag, but it doesn't see the "valid data," forcing us to rely on faith later in the code.
+  - I learned this the hard way while building a DBML parser. I designed a system where the "validation phase" was separate from the "execution phase". Because the validation step didn't return a new, safe type (it just returned true), the execution phase had to blindly trust that the validation had run correctly.
+  - While systems like TypeScript uses Flow Typing to mitigate this (by inferring types inside `if` blocks), that safety is often local only. As soon as you pass that variable into a different function, the "flow context" is lost unless explicitly redefined.
