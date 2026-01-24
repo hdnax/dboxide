@@ -1,5 +1,7 @@
 # dboxide
 
+![Status](https://img.shields.io/badge/status-active-brightblue)
+
 ![DBML](./assets/dbml.png)
 
 A (second & likely not the last 🐱) rewrite of the DBML parser that tries to apply the past experiences with the noobie `@dbml/parse` package.
