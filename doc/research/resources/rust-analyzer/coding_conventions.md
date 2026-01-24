@@ -82,3 +82,15 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
 ## Linting
 
 - Clippy is used.
+
+## Code
+
+### Minimal Tests
+
+- Tests must use the absolute minimum code necessary to reproduce the case. Aggressively strip "noise" from copy-pasted real-world code.
+- Format declarative code densely (e.g., `enum E { A, B }` on a single line) to keep the test concise, provided it remains readable.
+- Unindented raw strings: Use `r#...#` literals for multiline fixtures. Ensure the content is unindented (starts at column `0`) so that character offsets in the test match the actual file positions exactly.
+- Rationale:
+  - Reduce visual noise and scrolling, making the actual test case immediately obvious.
+  - Lower execution time and keeps debug logs clean.
+  - Unindented formatting allows you to use your editor's "selection character count" to verify byte offsets directly, without needing to manually subtract indentation whitespace.
