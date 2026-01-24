@@ -191,3 +191,48 @@ Based on [`libsyntax-2.0`](../../libsyntax/SUMMARY.md).
 - `db`-independent: Unlike `salsa`'s integer IDs, `Interned<T>` owns its data, allowing access and inspection without needing a reference to the compiler database (`db`).
 * Interning enables instant equality checks by comparing memory pointers instead of scanning content, which is critical for frequently compared items like file paths.
 * Interning serves as a lower-level optimization layer for static, immutable data that doesn't require the full overhead of incremental dependency tracking.
+
+## Architectural Policies
+
+### Stability Guarantees
+
+* `rust-analyzer` avoids new stability guarantees to move fast.
+* The internal `ide` API is explicitly unstable.
+* Stability is only guaranteed at the **LSP** level (managed by the protocol) and **input** level (Rust language/Cargo).
+* De-facto stability: `rust-project.json` became stable implicitly by virtue of having users — a lesson to explicitly mark APIs as unstable/opt-in before release.
+
+### Code Generation
+
+* The API for syntax trees (`syntax::ast`) and manual sections (features, assists, config) are generated automatically.
+* To simplify builds, `rust-analyzer` does not use itself for codegen. It uses `syn` and manual string parsing instead.
+
+### 3. Cancellation (Concurrency)
+
+* The problem: If the user types while the IDE is computing (e.g., highlighting), the result is immediately stale.
+* The solution: The **salsa** database maintains a global revision counter.
+  * When input changes, the counter is bumped.
+  * Old threads checking the counter notice the mismatch and **panic** with a special `Canceled` token.
+* The `ide` boundary catches this panic and converts it into a `Result<T, Canceled>`.
+
+### Testing strategy
+
+* Tests are concentrated on three system boundaries:
+  * Outer (`rust-analyzer` crate): "Heavy" integration tests via LSP/stdio. Validates the protocol but is slow (reads real files).
+  * Middle (`ide` crate): The most important layer. Tests `AnalysisHost` (simulating an editor) against expectations.
+  * Inner (`hir` crate): Tests semantic models using rich types and **snapshot testing** (via the `expect` crate).
+
+### Key Testing Invariants
+
+* Data-driven: Tests use string fixtures (representing multiple files) rather than calling API setup functions manually.
+* No `libstd`: Tests do not link to `libstd`/`libcore` to ensure speed; all necessary code is defined within the test fixture.
+
+### Error Handling
+
+* No IO in core: Internal crates (`ide`, `hir`) are pure and never fail (no `Result`). They return partial data plus errors: `(T, Vec<Error>)`.
+* Panic resilience: Since bugs are inevitable, every LSP request is wrapped in `catch_unwind` so a crash in one feature doesn't kill the server.
+* Macros: Uses `always!` and `never!` macros to handle impossible states gracefully.
+
+### Observability & Serialization
+
+* Profiling: Includes a custom low-overhead hierarchical profiler (`hprof`) enabled via env vars (`RA_PROFILE`).
+* Serialization: Internal types are **not** serializable by design. This prevents internal structures from accidentally becoming part of the public API/IPC boundary. Serialization is the responsibility of the client layer (e.g., LSP).
