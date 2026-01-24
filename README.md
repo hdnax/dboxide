@@ -6,6 +6,8 @@
 
 A (second & likely not the last 🐱) rewrite of the DBML parser that tries to apply the past experiences with the noobie `@dbml/parse` package.
 
+This is meant to be a companion project alongside [type-theory](https://github.com/hdnax/type-theory).
+
 ## Targets
 
 Based on the Rust toolchains (like `salsa` and `rust-analyzer`):
