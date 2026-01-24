@@ -78,3 +78,7 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
   - Title prefix: `feat:`, `fix:`, `internal:`, or `minor:` (e.g., `feat: Add hover support`).
   - Magic comment: `changelog [fix] Description here in the PR body`.
 - Visuals: For UI changes, include a GIF in the description to demonstrate the feature.
+
+## Linting
+
+- Clippy is used.
