@@ -19,7 +19,7 @@
 
 ## Testing
 
-1. Tests can be data-driven, avoiding complex API setups to insulate tests from API changes.
+1. Tests can be data-driven, avoiding complex API setups to insulate tests from API changes<sup>[1](#1)</sup>.
 
 ## References
 
