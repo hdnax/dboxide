@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-a102674d.js";
+            window.path_to_searchindex_js = "searchindex-4bcf080d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -896,6 +896,16 @@ fn is_string_literal(s: &amp;str) -&gt; bool {
 <li>While systems like TypeScript uses Flow Typing to mitigate this (by inferring types inside <code>if</code> blocks), that safety is often local only. As soon as you pass that variable into a different function, the “flow context” is lost unless explicitly redefined.</li>
 </ul>
 </li>
+</ul>
+<h3 id="control-flow"><a class="header" href="#control-flow">Control Flow</a></h3>
+<ul>
+<li>Push “if“s up and “for“s down.</li>
+</ul>
+<h3 id="assertions"><a class="header" href="#assertions">Assertions</a></h3>
+<ul>
+<li>Use <code>stdx::never!</code> instead of <code>assert!</code>.</li>
+<li><code>never!</code> checks a condition and logs a backtrace if it fails, but returns a <code>bool</code> instead of crashing. This allows you to write: <code>if stdx::never!(condition) { return; }</code>.</li>
+<li>Rationale: <code>rust-analyzer</code> is a long-running server. A bug in a minor feature (like a specific completion) should <strong>log an error</strong> and bail out of that specific request, not <strong>crash</strong> the entire IDE session.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
