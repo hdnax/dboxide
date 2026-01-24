@@ -191,3 +191,13 @@ fn is_zero(n: Option<i32>) -> bool {
   - This pattern perfectly illustrates Robert Harper's concept of "Boolean Blindness". By reducing a complex check to a simple bool (true/false), we discard the proof of validity. The compiler sees a "true" flag, but it doesn't see the "valid data," forcing us to rely on faith later in the code.
   - I learned this the hard way while building a DBML parser. I designed a system where the "validation phase" was separate from the "execution phase". Because the validation step didn't return a new, safe type (it just returned true), the execution phase had to blindly trust that the validation had run correctly.
   - While systems like TypeScript uses Flow Typing to mitigate this (by inferring types inside `if` blocks), that safety is often local only. As soon as you pass that variable into a different function, the "flow context" is lost unless explicitly redefined.
+
+### Control Flow
+
+- Push "if"s up and "for"s down.
+
+### Assertions
+
+- Use `stdx::never!` instead of `assert!`.
+- `never!` checks a condition and logs a backtrace if it fails, but returns a `bool` instead of crashing. This allows you to write: `if stdx::never!(condition) { return; }`.
+- Rationale: `rust-analyzer` is a long-running server. A bug in a minor feature (like a specific completion) should **log an error** and bail out of that specific request, not **crash** the entire IDE session.
