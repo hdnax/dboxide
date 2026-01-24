@@ -94,3 +94,11 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
   - Reduce visual noise and scrolling, making the actual test case immediately obvious.
   - Lower execution time and keeps debug logs clean.
   - Unindented formatting allows you to use your editor's "selection character count" to verify byte offsets directly, without needing to manually subtract indentation whitespace.
+
+### Marked Tests
+
+- Marked test: A technique used to verify that a specific, often hard-to-reach line of code was actually executed during a test.
+- Use `cov_mark::hit!` (in code) and `cov_mark::check!` (in tests) to create a strictly unique link between a specific edge case in the implementation and its corresponding test.
+- Principle: Only maintain one mark per test and one mark per code branch.
+- Never place multiple marks in a single test, and never reuse the same mark across different tests.
+- Rationale: This ensures that searching for a mark immediately reveals the single canonical test responsible for verifying that specific code branch, eliminating ambiguity.
