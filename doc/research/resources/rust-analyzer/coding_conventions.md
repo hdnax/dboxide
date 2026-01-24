@@ -55,3 +55,26 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
 - Stability & Security:
   - Reduce the risk of upstream abandonment, breaking changes, or supply chain attacks.
 - Self-reliance: If logic is simple enough for a micro-crate, it belongs in the internal `stdx` library, not as an external liability.
+
+## Commit Style
+
+- Document for changelogs to avoid release burden on the maintainers.
+- Changelogs > Clean history.
+
+### Git History
+
+- Clean git history is strongly encouraged but not mandated.
+- Use a rebase workflow. It is explicitly acceptable to rewrite history (force push) during the PR review process.
+- Before the final merge, use interactive rebase to squash small "fixup" commits into logical units.
+
+### Commit Message & PR Description
+
+- Do not `@mention` users in commit messages or PR descriptions.
+  - Reason: Rebasing re-commits the message, spamming the mentioned user with duplicate notifications.
+- User-centric titles: Write PR titles/descriptions describing the user benefit, not the implementation details.
+  - Good: "Make goto definition work inside macros".
+  - Bad: "Use original span for `FileId`".
+- Changelog automation: You must categorize PRs so release notes can be auto-generated. Use one of two methods:
+  - Title prefix: `feat:`, `fix:`, `internal:`, or `minor:` (e.g., `feat: Add hover support`).
+  - Magic comment: `changelog [fix] Description here in the PR body`.
+- Visuals: For UI changes, include a GIF in the description to demonstrate the feature.
