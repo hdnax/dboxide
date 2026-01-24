@@ -165,6 +165,11 @@ Based on [`libsyntax-2.0`](../../libsyntax/SUMMARY.md).
 
 - The server is stateless, in the sense that it doesn't know about the previous requests.
 
+## Utilities - `stdx` Crate
+
+- `rust-analyzer` avoids small helper crates.
+- `stdx` is the crate to store all small reusable utilities.
+
 ## Macro Crates
 
 - Core abstraction (`tt`): Macros are defined purely as `TokenTree` → `TokenTree` transforms, isolated from other compiler parts. The `tt` crate defines this structure (single tokens or delimited sequences).
