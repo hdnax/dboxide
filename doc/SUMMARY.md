@@ -7,6 +7,7 @@
   - [Resources](./research/resources.md)
     - [`rust-analyzer`](./research/resources/rust-analyzer/SUMMARY.md)
       - [High-Level Architecture & Conventions](./research/resources/rust-analyzer/high_level_architecture_and_conventions.md)
+      - [Coding Conventions](./research/resources/rust-analyzer/coding_conventions.md)
     - [`libsyntax`](./research/resources/libsyntax/SUMMARY.md)
   - [Research Summary](./research/research_summary.md)
   - [Glossary](./research/glossary.md)

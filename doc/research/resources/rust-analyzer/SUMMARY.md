@@ -7,3 +7,4 @@ This section contains resources and notes about the `rust-analyzer` project.
 Official site: [Link](https://rust-analyzer.github.io/).
 
 - [High-Level Architecture & Conventions](./high_level_architecture_and_conventions.md)
+- [Coding Convention](./coding_convention.md)
