@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-4bcf080d.js";
+            window.path_to_searchindex_js = "searchindex-7da56149.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -903,9 +903,58 @@ fn is_string_literal(s: &amp;str) -&gt; bool {
 </ul>
 <h3 id="assertions"><a class="header" href="#assertions">Assertions</a></h3>
 <ul>
-<li>Use <code>stdx::never!</code> instead of <code>assert!</code>.</li>
+<li>Use <code>stdx::never!</code> liberally instead of <code>assert!</code>.</li>
 <li><code>never!</code> checks a condition and logs a backtrace if it fails, but returns a <code>bool</code> instead of crashing. This allows you to write: <code>if stdx::never!(condition) { return; }</code>.</li>
 <li>Rationale: <code>rust-analyzer</code> is a long-running server. A bug in a minor feature (like a specific completion) should <strong>log an error</strong> and bail out of that specific request, not <strong>crash</strong> the entire IDE session.</li>
+</ul>
+<h3 id="getters--setters"><a class="header" href="#getters--setters">Getters &amp; Setters</a></h3>
+<ul>
+<li>
+<p>Two cases to consider:</p>
+<ul>
+<li>No invariants: If a field can hold any value safely, just make it <code>pub</code>. Don’t write boilerplate code.</li>
+<li>Invariants exist: If the data has rules (e.g., “cannot be empty”), make the field private, enforce the rule in the Constructor, and provide a Getter.</li>
+</ul>
+</li>
+<li>
+<p>Never provide setters. If data needs to change, it should likely be done via a specific behavior method or by creating a new instance, ensuring invariants are never bypassed.</p>
+</li>
+<li>
+<p>Getters should return borrowed data. <code>rust-analyzer</code>’s example:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Person {
+  // Invariant: never empty
+  first_name: String,
+  middle_name: Option&lt;String&gt;
+}
+
+// GOOD
+impl Person {
+    fn first_name(&amp;self) -&gt; &amp;str { self.first_name.as_str() }
+    fn middle_name(&amp;self) -&gt; Option&lt;&amp;str&gt; { self.middle_name.as_ref() }
+}
+
+// BAD
+impl Person {
+    fn first_name(&amp;self) -&gt; String { self.first_name.clone() }
+    fn middle_name(&amp;self) -&gt; &amp;Option&lt;String&gt; { &amp;self.middle_name }
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>The APIs are internal so (internal) breaking changes can be allowed to move fast:
+<ul>
+<li>Using a <code>pub</code> field (with no invariants) introduces less boilerplate but may be breaking if the <code>pub</code> field is suddenly imposed an invariant and has to be changed to private.</li>
+<li>Using an accessor can prevent breaking changes, but it means implicitly promising a contract and imposing some maintenance boilerplate.</li>
+</ul>
+</li>
+<li>Privacy helps make invariants local to prevent code rot.</li>
+<li>A type that is too specific (borrow owned types like <code>&amp;String</code>) leaks irrelevant details (neither right nor wrong), which creates noise and the client may accidentally rely on those irrelevent details.</li>
+</ul>
+</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
