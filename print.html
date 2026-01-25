@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-d6e3beba.js";
+            window.path_to_searchindex_js = "searchindex-62d22738.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -1024,7 +1024,7 @@ impl Default for Buffer {
         Self {
             // 2. Use Vec::new() instead of vec![] (Strength Reduction)
             // It is semantically lighter (function vs macro) and more uniform.
-            data: Vec::new(), 
+            data: Vec::new(),
         }
     }
 }
@@ -1035,7 +1035,7 @@ struct OptionsBad {
 }
 
 impl OptionsBad {
-    // 3. Avoid zero-arg new(). 
+    // 3. Avoid zero-arg new().
     // It forces users to remember "Do I call new() or default() for this type?"
     fn new() -&gt; Self {
         Self { check_on_save: false }
@@ -1075,6 +1075,79 @@ pub fn do_thing(arg1: Arg1, arg2: Arg2) -&gt; Res {
     ctx.run()
 }
 <span class="boring">}</span></code></pre>
+<h3 id="functions-with-many-parameters"><a class="header" href="#functions-with-many-parameters">Functions with many parameters</a></h3>
+<ul>
+<li>
+<p>Use <code>Config</code> struct:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD (Call site is confusing)
+fn annotations(db, file_id, true, false, true);
+
+// GOOD (Call site is explicit and flexible)
+fn annotations(db, file_id, AnnotationConfig {
+    binary_target: true,
+    annotate_runnables: false,
+    annotate_impls: true,
+});
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>Call site is clearer.</li>
+<li>Encapsulating volatile parameters in a struct shields intermediate functions from breaking changes, allowing you to add new options without updating the signature of every function in the call chain.</li>
+</ul>
+</li>
+<li>
+<p>No <code>Default</code> for <code>Config</code>: Do not implement <code>Default</code>. Force the caller to provide explicit context.</p>
+<ul>
+<li>Rationale: They know better than the struct what the initial state should be.</li>
+</ul>
+</li>
+<li>
+<p>Pass configuration as an argument to the function, do not store it in the object’s state.</p>
+<ul>
+<li>Rationale: This allows the same object to handle multiple requests with different configurations dynamically.</li>
+</ul>
+</li>
+<li>
+<p><code>Command</code> pattern: If a set of parameters can yield different return types (e.g., <code>Vec&lt;T&gt;</code> vs <code>Option&lt;T&gt;</code>), wrap parameters in a “Command” struct.</p>
+<ul>
+<li>Rationale: This avoids creating multiple top-level functions (<code>query_all</code>, <code>query_first</code>) with identical argument lists.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD (Command Pattern)
+// Captures arguments once, offers multiple execution paths
+pub struct Query {
+    pub name: String,
+    pub case_sensitive: bool,
+}
+
+impl Query {
+    // Return type A
+    pub fn all(self) -&gt; Vec&lt;Item&gt; { ... }
+    // Return type B
+    pub fn first(self) -&gt; Option&lt;Item&gt; { ... }
+}
+
+// BAD (Parameter Duplication)
+// Requires repeating arguments for every variation of the result
+fn query_all(name: String, case_sensitive: bool) -&gt; Vec&lt;Item&gt; { ... }
+fn query_first(name: String, case_sensitive: bool) -&gt; Option&lt;Item&gt; { ... }
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Remarks: Does the <code>Command</code> rule conflict with the rule “Do not store <code>Config</code> in state”?
+<ul>
+<li>The <code>Config</code> rule applies to long-lived services (e.g., <code>Database</code>). These should remain stateless so they can handle diverse requests without needing to be reset.</li>
+<li>The <code>Command</code> rule applies to short-lived tasks (e.g., <code>Query</code>). These objects exist solely to bundle parameters for a single operation and are discarded immediately after use.</li>
+<li>Relationship: The “Command” is effectively a temporary container that you pass to (or use with) the “Service”.</li>
+</ul>
+</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
