@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-7da56149.js";
+            window.path_to_searchindex_js = "../../../searchindex-2fbcc9b3.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -480,6 +480,92 @@ impl Person {
 </ul>
 </li>
 </ul>
+<h3 id="useless-types"><a class="header" href="#useless-types">Useless Types</a></h3>
+<ul>
+<li>Prefer general types.</li>
+<li>If generality is not important, consistency is important.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD      BAD
+&amp;[T]         &amp;Vec&lt;T&gt;
+&amp;str         &amp;String
+Option&lt;&amp;T&gt;   &amp;Option&lt;T&gt;
+&amp;Path        &amp;PathBuf
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Rationale:
+<ul>
+<li>General types are more flexible.</li>
+<li>General types leak fewer irrelevant details (which the client may accidentally rely on).</li>
+</ul>
+</li>
+</ul>
+<h3 id="constructors"><a class="header" href="#constructors">Constructors</a></h3>
+<ul>
+<li>If a <code>new</code> function accepts zero arguments, then use the <code>Default</code> trait (either derive or manually implemented).
+<ul>
+<li>Rationale:
+<ul>
+<li>Less boilerplate.</li>
+<li>Consistent: Less cognitive load for the caller - “Should I call <code>new()</code> or <code>default()</code>?”</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Use <code>Vec::new</code> instead of <code>vec![]</code>.
+<ul>
+<li>Rationale:
+<ul>
+<li>Strength reduction.</li>
+<li>Uniformity.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Do not provide <code>Default</code> if the type doesn’t have sensible default value (many possible defaults or defaults that has invalid states).
+<ul>
+<li>Preserve invariants.</li>
+<li>The user does not need to wonder if the provided default is their desired initial values.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD
+#[derive(Default)] // 1. Best case: Derive it automatically
+struct Options {
+    check_on_save: bool,
+}
+
+// GOOD (Manual Implementation)
+struct Buffer {
+    data: Vec&lt;u8&gt;,
+}
+
+impl Default for Buffer {
+    fn default() -&gt; Self {
+        Self {
+            // 2. Use Vec::new() instead of vec![] (Strength Reduction)
+            // It is semantically lighter (function vs macro) and more uniform.
+            data: Vec::new(), 
+        }
+    }
+}
+
+// BAD
+struct OptionsBad {
+    check_on_save: bool,
+}
+
+impl OptionsBad {
+    // 3. Avoid zero-arg new(). 
+    // It forces users to remember "Do I call new() or default() for this type?"
+    fn new() -&gt; Self {
+        Self { check_on_save: false }
+    }
+}
+<span class="boring">}</span></code></pre>
 
                     </main>
 
