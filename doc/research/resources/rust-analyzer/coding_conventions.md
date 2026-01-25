@@ -235,3 +235,70 @@ fn is_zero(n: Option<i32>) -> bool {
     - Using an accessor can prevent breaking changes, but it means implicitly promising a contract and imposing some maintenance boilerplate.
   - Privacy helps make invariants local to prevent code rot.
   - A type that is too specific (borrow owned types like `&String`) leaks irrelevant details (neither right nor wrong), which creates noise and the client may accidentally rely on those irrelevent details.
+
+### Useless Types
+
+- Prefer general types.
+- If generality is not important, consistency is important.
+
+```rust
+// GOOD      BAD
+&[T]         &Vec<T>
+&str         &String
+Option<&T>   &Option<T>
+&Path        &PathBuf
+```
+
+- Rationale:
+  - General types are more flexible.
+  - General types leak fewer irrelevant details (which the client may accidentally rely on).
+
+### Constructors
+
+- If a `new` function accepts zero arguments, then use the `Default` trait (either derive or manually implemented).
+  - Rationale:
+    - Less boilerplate.
+    - Consistent: Less cognitive load for the caller - "Should I call `new()` or `default()`?"
+- Use `Vec::new` instead of `vec![]`.
+  - Rationale:
+    - Strength reduction.
+    - Uniformity.
+- Do not provide `Default` if the type doesn't have sensible default value (many possible defaults or defaults that has invalid states).
+  - Preserve invariants.
+  - The user does not need to wonder if the provided default is their desired initial values.
+
+```rust
+// GOOD
+#[derive(Default)] // 1. Best case: Derive it automatically
+struct Options {
+    check_on_save: bool,
+}
+
+// GOOD (Manual Implementation)
+struct Buffer {
+    data: Vec<u8>,
+}
+
+impl Default for Buffer {
+    fn default() -> Self {
+        Self {
+            // 2. Use Vec::new() instead of vec![] (Strength Reduction)
+            // It is semantically lighter (function vs macro) and more uniform.
+            data: Vec::new(), 
+        }
+    }
+}
+
+// BAD
+struct OptionsBad {
+    check_on_save: bool,
+}
+
+impl OptionsBad {
+    // 3. Avoid zero-arg new(). 
+    // It forces users to remember "Do I call new() or default() for this type?"
+    fn new() -> Self {
+        Self { check_on_save: false }
+    }
+}
+```
