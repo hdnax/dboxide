@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-ef1b2738.js";
+            window.path_to_searchindex_js = "searchindex-33bfdf22.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -1181,6 +1181,60 @@ fn process_data(is_fast: bool) {
 <p>Remark: This <a href="https://github.com/holistics/dbml/pull/530">binder-refactoring PR</a> is a hard lesson for me illustrating this point, both the problem and the solution (splitting into separate classes &amp; extract common helpers). Although there is still lots of room for improvement, this is already significantly better.</p>
 </li>
 </ul>
+<h3 id="appropriate-string-types"><a class="header" href="#appropriate-string-types">Appropriate String Types</a></h3>
+<ul>
+<li>
+<p>When calling OS APIs (file systems, env vars, arguments), use <code>OsString</code> and <code>&amp;OsStr</code>, never <code>String</code> or <code>&amp;str</code>.</p>
+</li>
+<li>
+<p>Rust <code>String</code> guarantees valid UTF-8. Operating Systems do not.</p>
+<ul>
+<li>Linux/Unix: Paths are arbitrary byte sequences (except <code>null</code>).</li>
+<li>Windows: Paths are potentially ill-formed UTF-16 sequences.</li>
+</ul>
+</li>
+<li>
+<p>Rationale: This creates a strict type-level boundary.</p>
+<ul>
+<li>If you hold a <code>String</code>, you know it is safe, clean text.</li>
+<li>If you hold an <code>OsString</code>, you know it is “dirty” data from the outside world.</li>
+<li>Using <code>OsString</code> prevents accidental panics or data corruption when encountering a file named with invalid encoding.</li>
+</ul>
+</li>
+<li>
+<p>Avoid the standard <code>std::Path</code>, use the custom <code>AbsPathBuf</code> and <code>AbsPath</code> wrapper that guarantees the path inside is absolute.</p>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>CWD is global mutable state.</li>
+<li>If you use a relative path like <code>Path::new("src/main.rs")</code>, the OS resolves it relative to where the <em>server binary</em> started, not where the <em>project</em> is.</li>
+</ul>
+</li>
+</ul>
+<h2 id="premature-pessimization"><a class="header" href="#premature-pessimization">Premature Pessimization</a></h2>
+<h3 id="avoid-allocations"><a class="header" href="#avoid-allocations">Avoid Allocations</a></h3>
+<ul>
+<li>Zero-allocation default: Prefer stack-based structures (iterators) over heap-based collections (<code>Vec</code>, <code>String</code>) unless you specifically need ownership or long-term storage.</li>
+<li>Lazy vs eager: <code>collect::&lt;Vec&gt;()</code> eagerly processes the entire sequence and allocates memory immediately. Iterators are lazy and compute items only on demand.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use itertools::Itertools;
+
+// BAD (Heavy)
+// 1. Allocates heap memory. 2. Processes entire string. 3. Frees memory.
+let parts: Vec&lt;&amp;str&gt; = text.split(',').collect();
+if parts.len() == 3 {
+    process(parts[0], parts[1], parts[2]);
+}
+
+// GOOD (Light)
+// 1. No allocation. 2. Stops after 3 items. 3. Stores ptrs on Stack.
+if let Some((a, b, c)) = text.split(',').collect_tuple() {
+    process(a, b, c);
+}
+<span class="boring">}</span></code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
