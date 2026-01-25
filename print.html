@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-2fbcc9b3.js";
+            window.path_to_searchindex_js = "searchindex-d6e3beba.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -1040,6 +1040,39 @@ impl OptionsBad {
     fn new() -&gt; Self {
         Self { check_on_save: false }
     }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="functions-over-objects"><a class="header" href="#functions-over-objects">Functions Over Objects</a></h3>
+<ul>
+<li>Public API: Prefer simple functions (<code>do_thing()</code>) over transient objects that exist only to execute one method (<code>ThingDoer::new().do()</code>).</li>
+<li>Internal logic: It is acceptable (and encouraged) to use “Context” structs <em>inside</em> the function to manage complex state or arguments during execution.</li>
+<li>Rationale:
+<ul>
+<li>The “Iceberg” pattern: The user sees a simple function interface; the developer uses a structured object implementation behind the scenes.</li>
+<li>Implementor API is not mixed with user API.</li>
+</ul>
+</li>
+<li>Middle ground: If a struct is preferred for namespacing, provide a static <code>do()</code> helper method that handles the instantiation and execution in one step.</li>
+<li>Rationale:
+<ul>
+<li>Reduce boilerplate for the caller.</li>
+<li>Prevent implementation details (like temporary state management) from leaking into the public API.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD (Caller has to build and run)
+ThingDoer::new(arg1, arg2).do();
+
+// GOOD (Caller just acts)
+do_thing(arg1, arg2);
+
+// ACCEPTABLE INTERNAL IMPLEMENTATION (Using a struct to organize code)
+pub fn do_thing(arg1: Arg1, arg2: Arg2) -&gt; Res {
+    // The struct is an implementation detail, hidden from the user
+    let mut ctx = Ctx { arg1, arg2 };
+    ctx.run()
 }
 <span class="boring">}</span></code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
