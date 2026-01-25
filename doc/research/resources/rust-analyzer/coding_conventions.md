@@ -157,15 +157,16 @@ fn is_zero(n: Option<i32>) -> bool {
   - The good practice always ensure that the assumptions hold when manipulating the data.
 
 - Example from `rust-analyzer`
+
   ```rust
   // GOOD
   fn main() {
       let s: &str = ...;
       if let Some(contents) = string_literal_contents(s) {
-  
+
       }
   }
-  
+
   fn string_literal_contents(s: &str) -> Option<&str> {
       if s.starts_with('"') && s.ends_with('"') {
           Some(&s[1..s.len() - 1])
@@ -173,7 +174,7 @@ fn is_zero(n: Option<i32>) -> bool {
           None
       }
   }
-  
+
   // BAD
   fn main() {
       let s: &str = ...;
@@ -181,7 +182,7 @@ fn is_zero(n: Option<i32>) -> bool {
           let contents = &s[1..s.len() - 1];
       }
   }
-  
+
   fn is_string_literal(s: &str) -> bool {
       s.starts_with('"') && s.ends_with('"')
   }
@@ -210,25 +211,27 @@ fn is_zero(n: Option<i32>) -> bool {
 - Never provide setters. If data needs to change, it should likely be done via a specific behavior method or by creating a new instance, ensuring invariants are never bypassed.
 
 - Getters should return borrowed data. `rust-analyzer`'s example:
+
   ```rust
   struct Person {
     // Invariant: never empty
     first_name: String,
     middle_name: Option<String>
   }
-  
+
   // GOOD
   impl Person {
       fn first_name(&self) -> &str { self.first_name.as_str() }
       fn middle_name(&self) -> Option<&str> { self.middle_name.as_ref() }
   }
-  
+
   // BAD
   impl Person {
       fn first_name(&self) -> String { self.first_name.clone() }
       fn middle_name(&self) -> &Option<String> { &self.middle_name }
   }
   ```
+
 - Rationale:
   - The APIs are internal so (internal) breaking changes can be allowed to move fast:
     - Using a `pub` field (with no invariants) introduces less boilerplate but may be breaking if the `pub` field is suddenly imposed an invariant and has to be changed to private.
@@ -284,7 +287,7 @@ impl Default for Buffer {
         Self {
             // 2. Use Vec::new() instead of vec![] (Strength Reduction)
             // It is semantically lighter (function vs macro) and more uniform.
-            data: Vec::new(), 
+            data: Vec::new(),
         }
     }
 }
@@ -295,7 +298,7 @@ struct OptionsBad {
 }
 
 impl OptionsBad {
-    // 3. Avoid zero-arg new(). 
+    // 3. Avoid zero-arg new().
     // It forces users to remember "Do I call new() or default() for this type?"
     fn new() -> Self {
         Self { check_on_save: false }
@@ -306,7 +309,7 @@ impl OptionsBad {
 ### Functions Over Objects
 
 - Public API: Prefer simple functions (`do_thing()`) over transient objects that exist only to execute one method (`ThingDoer::new().do()`).
-- Internal logic: It is acceptable (and encouraged) to use "Context" structs *inside* the function to manage complex state or arguments during execution.
+- Internal logic: It is acceptable (and encouraged) to use "Context" structs _inside_ the function to manage complex state or arguments during execution.
 - Rationale:
   - The "Iceberg" pattern: The user sees a simple function interface; the developer uses a structured object implementation behind the scenes.
   - Implementor API is not mixed with user API.
@@ -329,3 +332,58 @@ pub fn do_thing(arg1: Arg1, arg2: Arg2) -> Res {
     ctx.run()
 }
 ```
+
+### Functions With Many Parameters
+
+- Use `Config` struct:
+
+  ```rust
+  // BAD (Call site is confusing)
+  fn annotations(db, file_id, true, false, true);
+
+  // GOOD (Call site is explicit and flexible)
+  fn annotations(db, file_id, AnnotationConfig {
+      binary_target: true,
+      annotate_runnables: false,
+      annotate_impls: true,
+  });
+  ```
+
+- Rationale:
+  - Call site is clearer.
+  - Encapsulating volatile parameters in a struct shields intermediate functions from breaking changes, allowing you to add new options without updating the signature of every function in the call chain.
+
+- No `Default` for `Config`: Do not implement `Default`. Force the caller to provide explicit context.
+  - Rationale: They know better than the struct what the initial state should be.
+
+- Pass configuration as an argument to the function, do not store it in the object's state.
+  - Rationale: This allows the same object to handle multiple requests with different configurations dynamically.
+
+- `Command` pattern: If a set of parameters can yield different return types (e.g., `Vec<T>` vs `Option<T>`), wrap parameters in a "Command" struct.
+  - Rationale: This avoids creating multiple top-level functions (`query_all`, `query_first`) with identical argument lists.
+
+```rust
+// GOOD (Command Pattern)
+// Captures arguments once, offers multiple execution paths
+pub struct Query {
+    pub name: String,
+    pub case_sensitive: bool,
+}
+
+impl Query {
+    // Return type A
+    pub fn all(self) -> Vec<Item> { ... }
+    // Return type B
+    pub fn first(self) -> Option<Item> { ... }
+}
+
+// BAD (Parameter Duplication)
+// Requires repeating arguments for every variation of the result
+fn query_all(name: String, case_sensitive: bool) -> Vec<Item> { ... }
+fn query_first(name: String, case_sensitive: bool) -> Option<Item> { ... }
+```
+
+- Remarks: Does the `Command` rule conflict with the rule "Do not store `Config` in state"?
+  - The `Config` rule applies to long-lived services (e.g., `Database`). These should remain stateless so they can handle diverse requests without needing to be reset.
+  - The `Command` rule applies to short-lived tasks (e.g., `Query`). These objects exist solely to bundle parameters for a single operation and are discarded immediately after use.
+  - Relationship: The "Command" is effectively a temporary container that you pass to (or use with) the "Service".
