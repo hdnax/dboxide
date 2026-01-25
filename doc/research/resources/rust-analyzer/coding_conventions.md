@@ -302,3 +302,30 @@ impl OptionsBad {
     }
 }
 ```
+
+### Functions Over Objects
+
+- Public API: Prefer simple functions (`do_thing()`) over transient objects that exist only to execute one method (`ThingDoer::new().do()`).
+- Internal logic: It is acceptable (and encouraged) to use "Context" structs *inside* the function to manage complex state or arguments during execution.
+- Rationale:
+  - The "Iceberg" pattern: The user sees a simple function interface; the developer uses a structured object implementation behind the scenes.
+  - Implementor API is not mixed with user API.
+- Middle ground: If a struct is preferred for namespacing, provide a static `do()` helper method that handles the instantiation and execution in one step.
+- Rationale:
+  - Reduce boilerplate for the caller.
+  - Prevent implementation details (like temporary state management) from leaking into the public API.
+
+```rust
+// BAD (Caller has to build and run)
+ThingDoer::new(arg1, arg2).do();
+
+// GOOD (Caller just acts)
+do_thing(arg1, arg2);
+
+// ACCEPTABLE INTERNAL IMPLEMENTATION (Using a struct to organize code)
+pub fn do_thing(arg1: Arg1, arg2: Arg2) -> Res {
+    // The struct is an implementation detail, hidden from the user
+    let mut ctx = Ctx { arg1, arg2 };
+    ctx.run()
+}
+```
