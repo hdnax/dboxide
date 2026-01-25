@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-e1539079.js";
+            window.path_to_searchindex_js = "../../../searchindex-ef1b2738.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -670,6 +670,39 @@ fn query_first(name: String, case_sensitive: bool) -&gt; Option&lt;Item&gt; { ..
 <li>The <code>Command</code> rule applies to short-lived tasks (e.g., <code>Query</code>). These objects exist solely to bundle parameters for a single operation and are discarded immediately after use.</li>
 <li>Relationship: The “Command” is effectively a temporary container that you pass to (or use with) the “Service”.</li>
 </ul>
+</li>
+</ul>
+<h3 id="prefer-separate-functions-over-parameters"><a class="header" href="#prefer-separate-functions-over-parameters">Prefer Separate Functions Over Parameters</a></h3>
+<ul>
+<li>
+<p>Split “flag” arguments: If a function is solely invoked with hardcoded literals (<code>true</code>/<code>None</code>), refactor it into distinct named functions (e.g., <code>process_fast()</code> vs <code>process_full()</code>) to eliminate internal branching and “false sharing” of unrelated logic.</p>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>Functions with flag arguments often display false sharing. There’s often <code>if</code> branching to distinguish between different cases.
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Caller
+process_data(true);
+process_data(false);
+
+// Callee
+fn process_data(is_fast: bool) {
+    if is_fast {
+        // Fast algorithm
+    } else {
+        // Accurate algorithm
+    }
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>These functions seem to share logic and are related and it seems that it makes sense to merge them into 1 function. However, over time, they diverge. Therefore, splitting the control flows into separate functions simplify the logic &amp; eliminate irrelevant details (such as the maintainer would fail to see the cross-dependencies between the <code>if</code> branches).</li>
+<li>Split the common code of the <code>if</code> branches into a common helper instead.</li>
+</ul>
+</li>
+<li>
+<p>Remark: This <a href="https://github.com/holistics/dbml/pull/530">binder-refactoring PR</a> is a hard lesson for me illustrating this point, both the problem and the solution (splitting into separate classes &amp; extract common helpers). Although there is still lots of room for improvement, this is already significantly better.</p>
 </li>
 </ul>
 
