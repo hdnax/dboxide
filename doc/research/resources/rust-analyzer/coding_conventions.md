@@ -412,3 +412,43 @@ fn query_first(name: String, case_sensitive: bool) -> Option<Item> { ... }
   - Split the common code of the `if` branches into a common helper instead.
 
 - Remark: This [binder-refactoring PR](https://github.com/holistics/dbml/pull/530) is a hard lesson for me illustrating this point, both the problem and the solution (splitting into separate classes & extract common helpers). Although there is still lots of room for improvement, this is already significantly better.
+
+### Appropriate String Types
+
+- When calling OS APIs (file systems, env vars, arguments), use `OsString` and `&OsStr`, never `String` or `&str`.
+- Rust `String` guarantees valid UTF-8. Operating Systems do not.
+  - Linux/Unix: Paths are arbitrary byte sequences (except `null`).
+  - Windows: Paths are potentially ill-formed UTF-16 sequences.
+- Rationale: This creates a strict type-level boundary.
+  - If you hold a `String`, you know it is safe, clean text.
+  - If you hold an `OsString`, you know it is "dirty" data from the outside world.
+  - Using `OsString` prevents accidental panics or data corruption when encountering a file named with invalid encoding.
+
+- Avoid the standard `std::Path`, use the custom `AbsPathBuf` and `AbsPath` wrapper that guarantees the path inside is absolute.
+- Rationale:
+  - CWD is global mutable state.
+  - If you use a relative path like `Path::new("src/main.rs")`, the OS resolves it relative to where the *server binary* started, not where the *project* is.
+
+## Premature Pessimization
+
+### Avoid Allocations
+
+- Zero-allocation default: Prefer stack-based structures (iterators) over heap-based collections (`Vec`, `String`) unless you specifically need ownership or long-term storage.
+- Lazy vs eager: `collect::<Vec>()` eagerly processes the entire sequence and allocates memory immediately. Iterators are lazy and compute items only on demand.
+
+```rust
+use itertools::Itertools;
+
+// BAD (Heavy)
+// 1. Allocates heap memory. 2. Processes entire string. 3. Frees memory.
+let parts: Vec<&str> = text.split(',').collect();
+if parts.len() == 3 {
+    process(parts[0], parts[1], parts[2]);
+}
+
+// GOOD (Light)
+// 1. No allocation. 2. Stops after 3 items. 3. Stores ptrs on Stack.
+if let Some((a, b, c)) = text.split(',').collect_tuple() {
+    process(a, b, c);
+}
+```
