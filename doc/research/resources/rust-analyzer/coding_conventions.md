@@ -198,6 +198,40 @@ fn is_zero(n: Option<i32>) -> bool {
 
 ### Assertions
 
-- Use `stdx::never!` instead of `assert!`.
+- Use `stdx::never!` liberally instead of `assert!`.
 - `never!` checks a condition and logs a backtrace if it fails, but returns a `bool` instead of crashing. This allows you to write: `if stdx::never!(condition) { return; }`.
 - Rationale: `rust-analyzer` is a long-running server. A bug in a minor feature (like a specific completion) should **log an error** and bail out of that specific request, not **crash** the entire IDE session.
+
+### Getters & Setters
+
+- Two cases to consider:
+  - No invariants: If a field can hold any value safely, just make it `pub`. Don't write boilerplate code.
+  - Invariants exist: If the data has rules (e.g., "cannot be empty"), make the field private, enforce the rule in the Constructor, and provide a Getter.
+- Never provide setters. If data needs to change, it should likely be done via a specific behavior method or by creating a new instance, ensuring invariants are never bypassed.
+
+- Getters should return borrowed data. `rust-analyzer`'s example:
+  ```rust
+  struct Person {
+    // Invariant: never empty
+    first_name: String,
+    middle_name: Option<String>
+  }
+  
+  // GOOD
+  impl Person {
+      fn first_name(&self) -> &str { self.first_name.as_str() }
+      fn middle_name(&self) -> Option<&str> { self.middle_name.as_ref() }
+  }
+  
+  // BAD
+  impl Person {
+      fn first_name(&self) -> String { self.first_name.clone() }
+      fn middle_name(&self) -> &Option<String> { &self.middle_name }
+  }
+  ```
+- Rationale:
+  - The APIs are internal so (internal) breaking changes can be allowed to move fast:
+    - Using a `pub` field (with no invariants) introduces less boilerplate but may be breaking if the `pub` field is suddenly imposed an invariant and has to be changed to private.
+    - Using an accessor can prevent breaking changes, but it means implicitly promising a contract and imposing some maintenance boilerplate.
+  - Privacy helps make invariants local to prevent code rot.
+  - A type that is too specific (borrow owned types like `&String`) leaks irrelevant details (neither right nor wrong), which creates noise and the client may accidentally rely on those irrelevent details.
