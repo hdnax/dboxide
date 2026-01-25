@@ -387,3 +387,28 @@ fn query_first(name: String, case_sensitive: bool) -> Option<Item> { ... }
   - The `Config` rule applies to long-lived services (e.g., `Database`). These should remain stateless so they can handle diverse requests without needing to be reset.
   - The `Command` rule applies to short-lived tasks (e.g., `Query`). These objects exist solely to bundle parameters for a single operation and are discarded immediately after use.
   - Relationship: The "Command" is effectively a temporary container that you pass to (or use with) the "Service".
+
+### Prefer Separate Functions Over Parameters
+
+- Split "flag" arguments: If a function is solely invoked with hardcoded literals (`true`/`None`), refactor it into distinct named functions (e.g., `process_fast()` vs `process_full()`) to eliminate internal branching and "false sharing" of unrelated logic.
+
+- Rationale:
+  - Functions with flag arguments often display false sharing. There's often `if` branching to distinguish between different cases.
+    ```rust
+    // Caller
+    process_data(true);
+    process_data(false);
+    
+    // Callee
+    fn process_data(is_fast: bool) {
+        if is_fast {
+            // Fast algorithm
+        } else {
+            // Accurate algorithm
+        }
+    }
+    ```
+  - These functions seem to share logic and are related and it seems that it makes sense to merge them into 1 function. However, over time, they diverge. Therefore, splitting the control flows into separate functions simplify the logic & eliminate irrelevant details (such as the maintainer would fail to see the cross-dependencies between the `if` branches).
+  - Split the common code of the `if` branches into a common helper instead.
+
+- Remark: This [binder-refactoring PR](https://github.com/holistics/dbml/pull/530) is a hard lesson for me illustrating this point, both the problem and the solution (splitting into separate classes & extract common helpers). Although there is still lots of room for improvement, this is already significantly better.
