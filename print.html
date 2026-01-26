@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-a2d82fb2.js";
+            window.path_to_searchindex_js = "searchindex-c6aa2e7f.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -1309,6 +1309,24 @@ fn main() {
 </li>
 <li>Re-exports: Place <code>pub use</code> after all imports, as they are treated as item definitions.</li>
 <li>Rationale: Ensures consistency, improves readability for new contributors, and highlights dependencies clearly.</li>
+</ul>
+<h3 id="import-style"><a class="header" href="#import-style">Import Style</a></h3>
+<ul>
+<li>Qualify layer types: Always qualify items from <code>hir</code> and <code>ast</code> to prevent ambiguity and clarify the architectural layer.
+<ul>
+<li>Good: <code>use syntax::ast; ... func: hir::Function</code></li>
+<li>Bad: <code>use hir::Function; ... func: Function</code></li>
+</ul>
+</li>
+<li>Trait implementations: Import the module (e.g., <code>std::fmt</code>), not the trait itself, when implementing standard traits.
+<ul>
+<li>Good: <code>impl fmt::Display for ...</code></li>
+</ul>
+</li>
+<li>Rationale: Reduces typing and clearly distinguishes implementation from usage.</li>
+<li>Avoid local globs: Do not use use <code>MyEnum::*;</code> inside functions.</li>
+<li>Absolute paths: Prefer <code>use crate::foo</code> over relative paths like <code>super::</code> or <code>self::</code> for consistency.</li>
+<li>No re-exports: Avoid re-exports in non-library code to prevent multiple access paths and maintain consistency.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
