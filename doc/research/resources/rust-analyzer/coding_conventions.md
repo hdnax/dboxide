@@ -726,3 +726,36 @@ Ok(_) => {}  // <--- Block style breaks the visual rhythm
     - Why: You have to read the entire chain until the very end to figure out what type is actually being produced.
   - No placeholders (`_`): Avoid `let x: Vec<_> = ...`.
 - Rationale: If the compiler struggles to infer the type (forcing you to add a hint), a human reader will likely struggle too. Be kind to the reader and write the full type `Vec<i32>`.
+
+### Helper Functions
+
+- Avoid single-Use helpers: Do not create a separate function if it is only called once.
+- Alternative: Use a block `{ ... }`.
+- Rationale: This isolates the scope but keeps access to the context variables.
+- Exception: Create a function if you need early returns (`return`) or error propagation (`?`).
+
+- Local helpers: Place nested helper functions at the end of the enclosing function.
+  - Structure: Main logic → `return result;` → `fn helper() { ... }`.
+  - Limit: Do not nest more than 1 level deep.
+
+### Helper Variables
+
+- Create boolean helper variables for complex conditions (e.g., inside match guards).
+- Rationale:
+  - Act as a "cognitively cheap" abstraction (names the logic without hiding the context).
+  - Make debugging easier (you can inspect/print the variable).
+
+### Syntax Macros
+
+- Tokens: Use the `T![token]` macro instead of `SyntaxKind::TOKEN_KW`.
+- Example: `T![true]` instead of `SyntaxKind::TRUE_KW`.
+- Rationale: Familiar syntax, avoids ambiguity (e.g., `{` vs `[`).
+
+### Documentation
+
+- Comments: Write proper sentences. Start with a capital, end with a dot `.`.
+- Markdown: Use sentence-per-line. Do not wrap lines hard; press Enter after every sentence.
+- Rationale:
+  - Makes diffs cleaner and editing easier.
+  - Formatting a comment as a sentence (capital + period) forces the brain to switch from "scribbling notes" to "explaining thoughts."
+  - Context dump: It tricks you into emptying your "mental RAM" (assumptions, constraints) into the code, rather than leaving vague fragments like `// fix this`.
