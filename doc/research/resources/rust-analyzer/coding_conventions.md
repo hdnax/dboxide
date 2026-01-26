@@ -468,3 +468,55 @@ if let Some((a, b, c)) = text.split(',').collect_tuple() {
 ### Avoid Intermediate Collections
 
 - Use an accumulator parameter (list, set, map) as the first parameter to collect values.
+
+### Avoid Monomorphization
+
+- Minimize generics: Avoid heavy generic logic at crate boundaries to prevent compile-time bloat caused by monomorphization (code duplication).
+- "Inner dyn" pattern: Use thin generic wrappers that immediately delegate to private, non-generic functions using dynamic dispatch (`dyn Trait`).
+- Concrete types: Avoid `AsRef` polymorphism; prefer concrete types like `&Path` unless writing a widely-used library.
+- Rationale: Optimize for compile speed by default; runtime performance only matters for the "hot" 20% of code, but compilation costs affect 100%.
+
+```rust
+use std::fmt::Display;
+
+// --- 1. The Wrapper (Generic) ---
+// This function is "monomorphized" (duplicated) for every type T.
+// But since it's only 1 line, the duplication cost is negligible.
+pub fn log_message<T: Display>(msg: T) {
+    // Coerce the specific type T into a trait object (&dyn Display)
+    log_message_impl(&msg);
+}
+
+// --- 2. The Implementation (Dynamic) ---
+// This function is compiled ONLY ONCE. 
+// It handles the heavy lifting via dynamic dispatch (vtable).
+fn log_message_impl(msg: &dyn Display) {
+    // Imagine 500 lines of complex logging logic here...
+    println!("Timestamp: [INFO] {}", msg);
+    // ... extensive I/O, formatting, or network calls ...
+}
+
+fn main() {
+    log_message("Hello");       // T is &str -> Wrapper created for &str
+    log_message(42);            // T is i32  -> Wrapper created for i32
+    log_message(3.14);          // T is f64  -> Wrapper created for f64
+    
+    // Result: 3 tiny wrappers, but the heavy `log_message_impl` exists only once.
+}
+```
+
+## Style
+
+### Order of Imports
+
+- Modules first: Declare modules (`mod x;`) at the top, before any imports, ordered by "suggested reading."
+- Import structure:
+  - Grouping: Use one `use` statement per crate (group items inside `{ ... }`).
+  - Spacing: Separate different groups with blank lines.
+  - Import order:
+    1. `std`: Standard library (`use std::...`).
+    2. External: Third-party and workspace crates.
+    3. Local: Current crate (use `crate::...`).
+    4. Relative: Parent/child modules (use `super::...`), though `crate::` is preferred.
+- Re-exports: Place `pub use` after all imports, as they are treated as item definitions.
+- Rationale: Ensures consistency, improves readability for new contributors, and highlights dependencies clearly.
