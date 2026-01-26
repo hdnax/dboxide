@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-4026fbfa.js";
+            window.path_to_searchindex_js = "../../../searchindex-a2d82fb2.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -779,6 +779,60 @@ if let Some((a, b, c)) = text.split(',').collect_tuple() {
 <h3 id="avoid-intermediate-collections"><a class="header" href="#avoid-intermediate-collections">Avoid Intermediate Collections</a></h3>
 <ul>
 <li>Use an accumulator parameter (list, set, map) as the first parameter to collect values.</li>
+</ul>
+<h3 id="avoid-monomorphization"><a class="header" href="#avoid-monomorphization">Avoid Monomorphization</a></h3>
+<ul>
+<li>Minimize generics: Avoid heavy generic logic at crate boundaries to prevent compile-time bloat caused by monomorphization (code duplication).</li>
+<li>“Inner dyn” pattern: Use thin generic wrappers that immediately delegate to private, non-generic functions using dynamic dispatch (<code>dyn Trait</code>).</li>
+<li>Concrete types: Avoid <code>AsRef</code> polymorphism; prefer concrete types like <code>&amp;Path</code> unless writing a widely-used library.</li>
+<li>Rationale: Optimize for compile speed by default; runtime performance only matters for the “hot” 20% of code, but compilation costs affect 100%.</li>
+</ul>
+<pre class="playground"><code class="language-rust">use std::fmt::Display;
+
+// --- 1. The Wrapper (Generic) ---
+// This function is "monomorphized" (duplicated) for every type T.
+// But since it's only 1 line, the duplication cost is negligible.
+pub fn log_message&lt;T: Display&gt;(msg: T) {
+    // Coerce the specific type T into a trait object (&amp;dyn Display)
+    log_message_impl(&amp;msg);
+}
+
+// --- 2. The Implementation (Dynamic) ---
+// This function is compiled ONLY ONCE. 
+// It handles the heavy lifting via dynamic dispatch (vtable).
+fn log_message_impl(msg: &amp;dyn Display) {
+    // Imagine 500 lines of complex logging logic here...
+    println!("Timestamp: [INFO] {}", msg);
+    // ... extensive I/O, formatting, or network calls ...
+}
+
+fn main() {
+    log_message("Hello");       // T is &amp;str -&gt; Wrapper created for &amp;str
+    log_message(42);            // T is i32  -&gt; Wrapper created for i32
+    log_message(3.14);          // T is f64  -&gt; Wrapper created for f64
+    
+    // Result: 3 tiny wrappers, but the heavy `log_message_impl` exists only once.
+}</code></pre>
+<h2 id="style"><a class="header" href="#style">Style</a></h2>
+<h3 id="order-of-imports"><a class="header" href="#order-of-imports">Order of Imports</a></h3>
+<ul>
+<li>Modules first: Declare modules (<code>mod x;</code>) at the top, before any imports, ordered by “suggested reading.”</li>
+<li>Import structure:
+<ul>
+<li>Grouping: Use one <code>use</code> statement per crate (group items inside <code>{ ... }</code>).</li>
+<li>Spacing: Separate different groups with blank lines.</li>
+<li>Import order:
+<ol>
+<li><code>std</code>: Standard library (<code>use std::...</code>).</li>
+<li>External: Third-party and workspace crates.</li>
+<li>Local: Current crate (use <code>crate::...</code>).</li>
+<li>Relative: Parent/child modules (use <code>super::...</code>), though <code>crate::</code> is preferred.</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>Re-exports: Place <code>pub use</code> after all imports, as they are treated as item definitions.</li>
+<li>Rationale: Ensures consistency, improves readability for new contributors, and highlights dependencies clearly.</li>
 </ul>
 
                     </main>
