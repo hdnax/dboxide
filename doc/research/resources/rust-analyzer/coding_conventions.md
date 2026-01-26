@@ -646,3 +646,13 @@ apply_changes(&context, |item| {
 - Spelling & acronyms:
   - Use American spelling (`color`).
   - Avoid ad-hoc acronyms; stick to common ones (`db`, `ctx`).
+
+### Error Handling Trivia
+
+- Use `anyhow::Result` instead of the bare `Result`.
+  - Rationale: Makes the return type immediately clear without checking imports.
+- Macro choice: Prefer `anyhow::format_err!` over `anyhow::anyhow`.
+  - Rationale: More "boring" (standard), consistent, and avoids the stuttering of `anyhow::anyhow`.
+- Message formatting:
+  - There are no strict rules on message structure. Rust standard library uses lowecase, while `anyhow` uses uppercase.
+  - Do not end error or context messages with a period (`.`).
