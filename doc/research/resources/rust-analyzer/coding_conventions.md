@@ -621,3 +621,28 @@ apply_changes(&context, |item| {
     item.finalize()
 }); // <--- Clean, standard closure syntax
 ```
+
+### Variable Naming
+
+- Prioritize verbose & boring but clear names: prefer long names that mirror the type (e.g., g`lobal_state: GlobalState`). Rely on code completion, not brevity.
+- Standard variables:
+  - `res`: Function result.
+  - `it`: Generic item (when identity is irrelevant).
+  - `n_foos`: Count (preferred over `foo_count`).
+  - `foo_idx`: Index.
+- Keyword collisions: Avoid `r#ident` syntax. Use these consistent replacements:
+
+    | Keyword | Replacement |
+    | :--- | :--- |
+    | `crate` | `krate` |
+    | `enum` | `enum_` |
+    | `fn` | `func` |
+    | `impl` | `imp` |
+    | `macro` | `mac` |
+    | `mod` | `module` |
+    | `struct` | `strukt` |
+    | `trait` | `trait_` |
+    | `type` | `ty` |
+- Spelling & acronyms:
+  - Use American spelling (`color`).
+  - Avoid ad-hoc acronyms; stick to common ones (`db`, `ctx`).
