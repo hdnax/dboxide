@@ -532,3 +532,12 @@ fn main() {
 - Avoid local globs: Do not use use `MyEnum::*;` inside functions.
 - Absolute paths: Prefer `use crate::foo` over relative paths like `super::` or `self::` for consistency.
 - No re-exports: Avoid re-exports in non-library code to prevent multiple access paths and maintain consistency.
+
+### Order of Items
+
+- Public API first: Always place public items (`pub` or `pub(crate)`) at the very top, before any private helpers or implementation details.
+- Types before logic: Define data structures (`struct`, `enum`) before functions and `impl` blocks.
+- Top-down: Order type definitions by dependency, place the "parent" container before the "child" component it contains.
+- Rationale:
+  - Optimize for a new reader scanning top-to-bottom.
+  - When code is folded, the file structure should read like API documentation.
