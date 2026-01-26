@@ -672,3 +672,57 @@ apply_changes(&context, |item| {
 - Rationale:
   - Spatial intuition: Corresponds to the real number line where values increase from left to right (`0→∞`).
   - Visual ordering: `lo <= x && x <= hi` visually places `x` in the middle, whereas `x >= lo` forces a mental "flip."
+
+### If-let
+
+- Prefer `match` over `if let ... else`: When you need to handle both the "success" and "failure" cases, use a full match statement.
+- Rationale:
+  - Compactness: `match` is usually cleaner and requires less syntax for simple alternatives.
+  - `Precision`: The else block in `if let` is implicit (it covers everything else). `match` forces you, or allows you, to be explicit about what the negative case is (e.g., `None` vs `Err(_)`), making the code more robust to type changes.
+
+### Match Ergonomics
+
+- Avoid `ref`: Do not use the `ref` keyword in patterns.
+
+Rationale:
+  - Obsolescence: `ref` is largely redundant due to "match ergonomics" (introduced in recent Rust editions).
+  - Simplicity: Relying on `match` ergonomics is cleaner and avoids mixing legacy syntax with modern style.
+
+### Empty Match Arms
+
+- Use the unit value `()`, for empty match arms, rather than an empty block `{}`.
+
+```rust
+
+// GOOD
+Err(err) => error!("{}", err),
+Ok(_) => (), // <--- Clean, single-line comma style
+
+// BAD
+Err(err) => error!("{}", err),
+Ok(_) => {}  // <--- Block style breaks the visual rhythm
+```
+
+- Rationale:
+  - In Rust, `()` is the value "nothing," while `{}` is a block of code that evaluates to nothing.
+  - While they are functionally identical here, using `=> ()`, keeps the match arm visibly distinct as a "value" rather than a "scope," maintaining a consistent visual rhythm in long match statements.
+
+### Functional Combinators
+
+- Use functional combinators (`map`, `and_then`) only when they fit naturally.
+- Prefer imperative control flow (`if`, `for`, `match`) over "forced" combinators like `bool::then` or `Option::filter`.
+- The philosophy: Code should be dense in computation (doing work) but sparse in structure (fewer indirections per line).
+- Rationale:
+  - Rust has strong support for imperative flow (loops, early returns).
+  - Rust functions are "less first-class" because of effects like `?` (try-operator) and `.await`. These do not compose well inside long chains of closures (e.g., trying to `?` inside a `filter` closure is painful).
+
+### Turbofish
+
+- Prefer explicit type ascription (`let x: Vec<i32> = ...`) over the "turbofish" syntax (`...collect::<Vec<i32>>()`).
+- Rationale: We want to able to read everything from left-to-right without maintaining to much context:
+  - Good: `let names: Vec<String> = users.iter().map(...).collect();`
+    - Why: When you read the line left-to-right, you immediately know what is being built (Vec<String>). This context helps you understand the complex iterator chain that follows.
+  - Bad: `let names = users.iter().map(...).collect::<Vec<String>>();`
+    - Why: You have to read the entire chain until the very end to figure out what type is actually being produced.
+  - No placeholders (`_`): Avoid `let x: Vec<_> = ...`.
+- Rationale: If the compiler struggles to infer the type (forcing you to add a hint), a human reader will likely struggle too. Be kind to the reader and write the full type `Vec<i32>`.
