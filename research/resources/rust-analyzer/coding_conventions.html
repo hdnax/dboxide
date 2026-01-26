@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-4260609f.js";
+            window.path_to_searchindex_js = "../../../searchindex-5dbff438.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -998,6 +998,47 @@ apply_changes(&amp;context, |item| {
 <ul>
 <li>Use American spelling (<code>color</code>).</li>
 <li>Avoid ad-hoc acronyms; stick to common ones (<code>db</code>, <code>ctx</code>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="error-handling-trivia"><a class="header" href="#error-handling-trivia">Error Handling Trivia</a></h3>
+<ul>
+<li>Use <code>anyhow::Result</code> instead of the bare <code>Result</code>.
+<ul>
+<li>Rationale: Makes the return type immediately clear without checking imports.</li>
+</ul>
+</li>
+<li>Macro choice: Prefer <code>anyhow::format_err!</code> over <code>anyhow::anyhow</code>.
+<ul>
+<li>Rationale: More “boring” (standard), consistent, and avoids the stuttering of <code>anyhow::anyhow</code>.</li>
+</ul>
+</li>
+<li>Message formatting:
+<ul>
+<li>There are no strict rules on message structure. Rust standard library uses lowecase, while <code>anyhow</code> uses uppercase.</li>
+<li>Do not end error or context messages with a period (<code>.</code>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="early-returns"><a class="header" href="#early-returns">Early Returns</a></h3>
+<ul>
+<li>Handle negative cases immediately with an early return rather than wrapping the “happy path” inside a large if/else block.</li>
+<li>Rationale: Flattens code nesting and reduces “cognitive stack usage” (mental load).</li>
+<li>Explicit error returns: Use <code>return Err(e)</code> to exit with an error. Avoid using <code>Err(e)?</code> to simulate a throw.</li>
+<li>Rationale: <code>return</code> evaluates to the “never type” (<code>!</code>), which allows the compiler to strictly identify dead code, whereas <code>?</code> resolves to a generic type that can mask unreachable code.</li>
+</ul>
+<h3 id="comparisons"><a class="header" href="#comparisons">Comparisons</a></h3>
+<ul>
+<li>Prefer less-than:
+<ul>
+<li>Always use <code>&lt;</code> or <code>&lt;=</code> comparisons.</li>
+<li>Avoid <code>&gt;</code> or <code>&gt;=</code>.</li>
+</ul>
+</li>
+<li>Rationale:
+<ul>
+<li>Spatial intuition: Corresponds to the real number line where values increase from left to right (<code>0→∞</code>).</li>
+<li>Visual ordering: <code>lo &lt;= x &amp;&amp; x &lt;= hi</code> visually places <code>x</code> in the middle, whereas <code>x &gt;= lo</code> forces a mental “flip.”</li>
 </ul>
 </li>
 </ul>
