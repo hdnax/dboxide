@@ -520,3 +520,15 @@ fn main() {
     4. Relative: Parent/child modules (use `super::...`), though `crate::` is preferred.
 - Re-exports: Place `pub use` after all imports, as they are treated as item definitions.
 - Rationale: Ensures consistency, improves readability for new contributors, and highlights dependencies clearly.
+
+### Import Style
+
+- Qualify layer types: Always qualify items from `hir` and `ast` to prevent ambiguity and clarify the architectural layer.
+  - Good: `use syntax::ast; ... func: hir::Function`
+  - Bad: `use hir::Function; ... func: Function`
+- Trait implementations: Import the module (e.g., `std::fmt`), not the trait itself, when implementing standard traits.
+  - Good: `impl fmt::Display for ...`
+- Rationale: Reduces typing and clearly distinguishes implementation from usage.
+- Avoid local globs: Do not use use `MyEnum::*;` inside functions.
+- Absolute paths: Prefer `use crate::foo` over relative paths like `super::` or `self::` for consistency.
+- No re-exports: Avoid re-exports in non-library code to prevent multiple access paths and maintain consistency.
