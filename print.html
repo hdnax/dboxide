@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-f45c5e2e.js";
+            window.path_to_searchindex_js = "searchindex-4026fbfa.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -1235,6 +1235,27 @@ if let Some((a, b, c)) = text.split(',').collect_tuple() {
     process(a, b, c);
 }
 <span class="boring">}</span></code></pre>
+<h3 id="push-allocations-to-the-call-site"><a class="header" href="#push-allocations-to-the-call-site">Push Allocations to the Call Site</a></h3>
+<ul>
+<li>Rationale: The cost of calling a function becomes more explicit.</li>
+</ul>
+<h3 id="collection-types"><a class="header" href="#collection-types">Collection Types</a></h3>
+<ul>
+<li>
+<p><code>rustc_hash</code>’s map and set are preferred over those in <code>std::collections</code>.</p>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>Faster hasher.</li>
+<li>Slightly reduce code size if applied consistently.</li>
+</ul>
+</li>
+</ul>
+<h3 id="avoid-intermediate-collections"><a class="header" href="#avoid-intermediate-collections">Avoid Intermediate Collections</a></h3>
+<ul>
+<li>Use an accumulator parameter (list, set, map) as the first parameter to collect values.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
