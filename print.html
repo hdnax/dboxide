@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c6aa2e7f.js";
+            window.path_to_searchindex_js = "searchindex-db6b8715.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-71845487.js"></script>
@@ -1327,6 +1327,18 @@ fn main() {
 <li>Avoid local globs: Do not use use <code>MyEnum::*;</code> inside functions.</li>
 <li>Absolute paths: Prefer <code>use crate::foo</code> over relative paths like <code>super::</code> or <code>self::</code> for consistency.</li>
 <li>No re-exports: Avoid re-exports in non-library code to prevent multiple access paths and maintain consistency.</li>
+</ul>
+<h3 id="order-of-items"><a class="header" href="#order-of-items">Order of Items</a></h3>
+<ul>
+<li>Public API first: Always place public items (<code>pub</code> or <code>pub(crate)</code>) at the very top, before any private helpers or implementation details.</li>
+<li>Types before logic: Define data structures (<code>struct</code>, <code>enum</code>) before functions and <code>impl</code> blocks.</li>
+<li>Top-down: Order type definitions by dependency, place the “parent” container before the “child” component it contains.</li>
+<li>Rationale:
+<ul>
+<li>Optimize for a new reader scanning top-to-bottom.</li>
+<li>When code is folded, the file structure should read like API documentation.</li>
+</ul>
+</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
