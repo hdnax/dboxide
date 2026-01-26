@@ -656,3 +656,10 @@ apply_changes(&context, |item| {
 - Message formatting:
   - There are no strict rules on message structure. Rust standard library uses lowecase, while `anyhow` uses uppercase.
   - Do not end error or context messages with a period (`.`).
+
+### Early Returns
+
+- Handle negative cases immediately with an early return rather than wrapping the "happy path" inside a large if/else block.
+- Rationale: Flattens code nesting and reduces "cognitive stack usage" (mental load).
+- Explicit error returns: Use `return Err(e)` to exit with an error. Avoid using `Err(e)?` to simulate a throw.
+- Rationale: `return` evaluates to the "never type" (`!`), which allows the compiler to strictly identify dead code, whereas `?` resolves to a generic type that can mask unreachable code.
