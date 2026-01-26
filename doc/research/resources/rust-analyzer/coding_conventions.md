@@ -14,7 +14,7 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/style.ht
 
 - Generally, small & focused PRs are preferred; but sometimes, that isn't possible.
 
-- `rust-analyzer` categories PRs into 3 groups.
+- `rust-analyzer` categorizes PRs into 3 groups.
 
 ### Internal Changes (Low Risk)
 
