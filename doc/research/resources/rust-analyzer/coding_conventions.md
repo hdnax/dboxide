@@ -452,3 +452,19 @@ if let Some((a, b, c)) = text.split(',').collect_tuple() {
     process(a, b, c);
 }
 ```
+
+### Push Allocations to the Call Site
+
+- Rationale: The cost of calling a function becomes more explicit.
+
+### Collection Types
+
+- `rustc_hash`'s map and set are preferred over those in `std::collections`.
+
+- Rationale:
+  - Faster hasher.
+  - Slightly reduce code size if applied consistently.
+
+### Avoid Intermediate Collections
+
+- Use an accumulator parameter (list, set, map) as the first parameter to collect values.
