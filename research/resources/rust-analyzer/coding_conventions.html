@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-23d821a4.js";
+            window.path_to_searchindex_js = "../../../searchindex-54981947.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -1115,6 +1115,56 @@ Ok(_) =&gt; {}  // &lt;--- Block style breaks the visual rhythm
 </ul>
 </li>
 <li>Rationale: If the compiler struggles to infer the type (forcing you to add a hint), a human reader will likely struggle too. Be kind to the reader and write the full type <code>Vec&lt;i32&gt;</code>.</li>
+</ul>
+<h3 id="helper-functions"><a class="header" href="#helper-functions">Helper Functions</a></h3>
+<ul>
+<li>
+<p>Avoid single-Use helpers: Do not create a separate function if it is only called once.</p>
+</li>
+<li>
+<p>Alternative: Use a block <code>{ ... }</code>.</p>
+</li>
+<li>
+<p>Rationale: This isolates the scope but keeps access to the context variables.</p>
+</li>
+<li>
+<p>Exception: Create a function if you need early returns (<code>return</code>) or error propagation (<code>?</code>).</p>
+</li>
+<li>
+<p>Local helpers: Place nested helper functions at the end of the enclosing function.</p>
+<ul>
+<li>Structure: Main logic → <code>return result;</code> → <code>fn helper() { ... }</code>.</li>
+<li>Limit: Do not nest more than 1 level deep.</li>
+</ul>
+</li>
+</ul>
+<h3 id="helper-variables"><a class="header" href="#helper-variables">Helper Variables</a></h3>
+<ul>
+<li>Create boolean helper variables for complex conditions (e.g., inside match guards).</li>
+<li>Rationale:
+<ul>
+<li>Act as a “cognitively cheap” abstraction (names the logic without hiding the context).</li>
+<li>Make debugging easier (you can inspect/print the variable).</li>
+</ul>
+</li>
+</ul>
+<h3 id="syntax-macros"><a class="header" href="#syntax-macros">Syntax Macros</a></h3>
+<ul>
+<li>Tokens: Use the <code>T![token]</code> macro instead of <code>SyntaxKind::TOKEN_KW</code>.</li>
+<li>Example: <code>T![true]</code> instead of <code>SyntaxKind::TRUE_KW</code>.</li>
+<li>Rationale: Familiar syntax, avoids ambiguity (e.g., <code>{</code> vs <code>[</code>).</li>
+</ul>
+<h3 id="documentation"><a class="header" href="#documentation">Documentation</a></h3>
+<ul>
+<li>Comments: Write proper sentences. Start with a capital, end with a dot <code>.</code>.</li>
+<li>Markdown: Use sentence-per-line. Do not wrap lines hard; press Enter after every sentence.</li>
+<li>Rationale:
+<ul>
+<li>Makes diffs cleaner and editing easier.</li>
+<li>Formatting a comment as a sentence (capital + period) forces the brain to switch from “scribbling notes” to “explaining thoughts.”</li>
+<li>Context dump: It tricks you into emptying your “mental RAM” (assumptions, constraints) into the code, rather than leaving vague fragments like <code>// fix this</code>.</li>
+</ul>
+</li>
 </ul>
 
                     </main>
