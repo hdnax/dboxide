@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-db6b8715.js";
+            window.path_to_searchindex_js = "../../../searchindex-9aa6110d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -864,6 +864,100 @@ fn main() {
 </ul>
 </li>
 </ul>
+<h3 id="context-parameters"><a class="header" href="#context-parameters">Context Parameters</a></h3>
+<ul>
+<li>Context-first: Always pass “context” parameters (invariant data threaded through many calls) as the <strong>first</strong> arguments.
+<ul>
+<li>Rationale:
+<ul>
+<li>This creates a visual hierarchy: “setting”  “actors”.</li>
+<li>It mimics the <code>self</code> convention in OOP (where the context/object always comes first).</li>
+<li>When scanning a function call, you immediately see <em>where</em> the operation is happening (the context) before seeing <em>what</em> is being processed (the variable data).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Context (db) is hidden at the end.
+// In a long list of arguments, you might miss which 'db' is being used.
+fn transform_data(data: String, id: usize, force: bool, db: &amp;Database) { ... }
+
+// Usage
+transform_data(raw_input, 42, true, &amp;primary_db);
+
+// GOOD: Context (db) is front and center.
+// It establishes the environment immediately.
+fn transform_data(db: &amp;Database, data: String, id: usize, force: bool) { ... }
+
+// Usage
+transform_data(&amp;primary_db, raw_input, 42, true);
+
+<span class="boring">}</span></code></pre>
+<ul>
+<li>If there are multiple context parameters, bundle them into a struct and pass it as <code>&amp;self</code>.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Parameter explosion.
+// Every helper function needs to accept all three context items.
+fn parse(db: &amp;Db, cfg: &amp;Config, cache: &amp;Cache, text: &amp;str) {
+    validate(db, cfg, cache, text); // Tedious repetition
+}
+
+// GOOD: Packed Context.
+struct ParseCtx&lt;'a&gt; {
+    db: &amp;'a Db,
+    cfg: &amp;'a Config,
+    cache: &amp;'a Cache,
+}
+
+impl&lt;'a&gt; ParseCtx&lt;'a&gt; {
+    // The signature is clean. Context is implicit in `&amp;self`.
+    fn parse(&amp;self, text: &amp;str) {
+        self.validate(text);
+    }
+    
+    fn validate(&amp;self, text: &amp;str) { ... }
+}
+
+<span class="boring">}</span></code></pre>
+<ul>
+<li>The “dangling argument” problem:
+<ul>
+<li>Context-first works better when non-context parameters are lambdas (closures).</li>
+<li>Rationale:
+<ul>
+<li>Rust closures often span multiple lines.</li>
+<li>If the context parameter is placed <em>after</em> the closure, it ends up “dangling” after the closing brace <code>}</code>. This is visually confusing and looks like a syntax error or a forgotten fragment.</li>
+<li>Placing context <em>first</em> ensures the closure body is the last thing the eye sees, resulting in a clean termination of the statement.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Context Last
+// The `&amp;context` argument is easy to miss or looks like it belongs
+// to a different statement because it follows a large code block.
+apply_changes(|item| {
+    // ... complex multi-line logic ...
+    // ... complex multi-line logic ...
+    item.finalize()
+}, &amp;context); // &lt;--- The "Dangler"
+
+
+// GOOD: Context First
+// The statement starts with the context, and the closure flows naturally
+// until the end of the function call.
+apply_changes(&amp;context, |item| {
+    // ... complex multi-line logic ...
+    // ... complex multi-line logic ...
+    item.finalize()
+}); // &lt;--- Clean, standard closure syntax
+<span class="boring">}</span></code></pre>
 
                     </main>
 
