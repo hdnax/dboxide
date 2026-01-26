@@ -663,3 +663,12 @@ apply_changes(&context, |item| {
 - Rationale: Flattens code nesting and reduces "cognitive stack usage" (mental load).
 - Explicit error returns: Use `return Err(e)` to exit with an error. Avoid using `Err(e)?` to simulate a throw.
 - Rationale: `return` evaluates to the "never type" (`!`), which allows the compiler to strictly identify dead code, whereas `?` resolves to a generic type that can mask unreachable code.
+
+### Comparisons
+
+- Prefer less-than:
+  - Always use `<` or `<=` comparisons.
+  - Avoid `>` or `>=`.
+- Rationale:
+  - Spatial intuition: Corresponds to the real number line where values increase from left to right (`0→∞`).
+  - Visual ordering: `lo <= x && x <= hi` visually places `x` in the middle, whereas `x >= lo` forces a mental "flip."
