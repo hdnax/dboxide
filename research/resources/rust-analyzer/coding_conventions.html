@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-5dbff438.js";
+            window.path_to_searchindex_js = "../../../searchindex-23d821a4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -1041,6 +1041,80 @@ apply_changes(&amp;context, |item| {
 <li>Visual ordering: <code>lo &lt;= x &amp;&amp; x &lt;= hi</code> visually places <code>x</code> in the middle, whereas <code>x &gt;= lo</code> forces a mental “flip.”</li>
 </ul>
 </li>
+</ul>
+<h3 id="if-let"><a class="header" href="#if-let">If-let</a></h3>
+<ul>
+<li>Prefer <code>match</code> over <code>if let ... else</code>: When you need to handle both the “success” and “failure” cases, use a full match statement.</li>
+<li>Rationale:
+<ul>
+<li>Compactness: <code>match</code> is usually cleaner and requires less syntax for simple alternatives.</li>
+<li><code>Precision</code>: The else block in <code>if let</code> is implicit (it covers everything else). <code>match</code> forces you, or allows you, to be explicit about what the negative case is (e.g., <code>None</code> vs <code>Err(_)</code>), making the code more robust to type changes.</li>
+</ul>
+</li>
+</ul>
+<h3 id="match-ergonomics"><a class="header" href="#match-ergonomics">Match Ergonomics</a></h3>
+<ul>
+<li>Avoid <code>ref</code>: Do not use the <code>ref</code> keyword in patterns.</li>
+</ul>
+<p>Rationale:</p>
+<ul>
+<li>Obsolescence: <code>ref</code> is largely redundant due to “match ergonomics” (introduced in recent Rust editions).</li>
+<li>Simplicity: Relying on <code>match</code> ergonomics is cleaner and avoids mixing legacy syntax with modern style.</li>
+</ul>
+<h3 id="empty-match-arms"><a class="header" href="#empty-match-arms">Empty Match Arms</a></h3>
+<ul>
+<li>Use the unit value <code>()</code>, for empty match arms, rather than an empty block <code>{}</code>.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>
+// GOOD
+Err(err) =&gt; error!("{}", err),
+Ok(_) =&gt; (), // &lt;--- Clean, single-line comma style
+
+// BAD
+Err(err) =&gt; error!("{}", err),
+Ok(_) =&gt; {}  // &lt;--- Block style breaks the visual rhythm
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Rationale:
+<ul>
+<li>In Rust, <code>()</code> is the value “nothing,” while <code>{}</code> is a block of code that evaluates to nothing.</li>
+<li>While they are functionally identical here, using <code>=&gt; ()</code>, keeps the match arm visibly distinct as a “value” rather than a “scope,” maintaining a consistent visual rhythm in long match statements.</li>
+</ul>
+</li>
+</ul>
+<h3 id="functional-combinators"><a class="header" href="#functional-combinators">Functional Combinators</a></h3>
+<ul>
+<li>Use functional combinators (<code>map</code>, <code>and_then</code>) only when they fit naturally.</li>
+<li>Prefer imperative control flow (<code>if</code>, <code>for</code>, <code>match</code>) over “forced” combinators like <code>bool::then</code> or <code>Option::filter</code>.</li>
+<li>The philosophy: Code should be dense in computation (doing work) but sparse in structure (fewer indirections per line).</li>
+<li>Rationale:
+<ul>
+<li>Rust has strong support for imperative flow (loops, early returns).</li>
+<li>Rust functions are “less first-class” because of effects like <code>?</code> (try-operator) and <code>.await</code>. These do not compose well inside long chains of closures (e.g., trying to <code>?</code> inside a <code>filter</code> closure is painful).</li>
+</ul>
+</li>
+</ul>
+<h3 id="turbofish"><a class="header" href="#turbofish">Turbofish</a></h3>
+<ul>
+<li>Prefer explicit type ascription (<code>let x: Vec&lt;i32&gt; = ...</code>) over the “turbofish” syntax (<code>...collect::&lt;Vec&lt;i32&gt;&gt;()</code>).</li>
+<li>Rationale: We want to able to read everything from left-to-right without maintaining to much context:
+<ul>
+<li>Good: <code>let names: Vec&lt;String&gt; = users.iter().map(...).collect();</code>
+<ul>
+<li>Why: When you read the line left-to-right, you immediately know what is being built (Vec<string>). This context helps you understand the complex iterator chain that follows.</string></li>
+</ul>
+</li>
+<li>Bad: <code>let names = users.iter().map(...).collect::&lt;Vec&lt;String&gt;&gt;();</code>
+<ul>
+<li>Why: You have to read the entire chain until the very end to figure out what type is actually being produced.</li>
+</ul>
+</li>
+<li>No placeholders (<code>_</code>): Avoid <code>let x: Vec&lt;_&gt; = ...</code>.</li>
+</ul>
+</li>
+<li>Rationale: If the compiler struggles to infer the type (forcing you to add a hint), a human reader will likely struggle too. Be kind to the reader and write the full type <code>Vec&lt;i32&gt;</code>.</li>
 </ul>
 
                     </main>
