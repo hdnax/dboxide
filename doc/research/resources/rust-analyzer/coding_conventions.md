@@ -541,3 +541,83 @@ fn main() {
 - Rationale:
   - Optimize for a new reader scanning top-to-bottom.
   - When code is folded, the file structure should read like API documentation.
+
+### Context Parameters
+
+- Context-first: Always pass "context" parameters (invariant data threaded through many calls) as the **first** arguments.
+  - Rationale:
+    - This creates a visual hierarchy: "setting"  "actors".
+    - It mimics the `self` convention in OOP (where the context/object always comes first).
+    - When scanning a function call, you immediately see *where* the operation is happening (the context) before seeing *what* is being processed (the variable data).
+
+```rust
+// BAD: Context (db) is hidden at the end.
+// In a long list of arguments, you might miss which 'db' is being used.
+fn transform_data(data: String, id: usize, force: bool, db: &Database) { ... }
+
+// Usage
+transform_data(raw_input, 42, true, &primary_db);
+
+// GOOD: Context (db) is front and center.
+// It establishes the environment immediately.
+fn transform_data(db: &Database, data: String, id: usize, force: bool) { ... }
+
+// Usage
+transform_data(&primary_db, raw_input, 42, true);
+
+```
+
+- If there are multiple context parameters, bundle them into a struct and pass it as `&self`.
+
+```rust
+// BAD: Parameter explosion.
+// Every helper function needs to accept all three context items.
+fn parse(db: &Db, cfg: &Config, cache: &Cache, text: &str) {
+    validate(db, cfg, cache, text); // Tedious repetition
+}
+
+// GOOD: Packed Context.
+struct ParseCtx<'a> {
+    db: &'a Db,
+    cfg: &'a Config,
+    cache: &'a Cache,
+}
+
+impl<'a> ParseCtx<'a> {
+    // The signature is clean. Context is implicit in `&self`.
+    fn parse(&self, text: &str) {
+        self.validate(text);
+    }
+    
+    fn validate(&self, text: &str) { ... }
+}
+
+```
+
+- The "dangling argument" problem:
+  - Context-first works better when non-context parameters are lambdas (closures).
+  - Rationale:
+    - Rust closures often span multiple lines.
+    - If the context parameter is placed *after* the closure, it ends up "dangling" after the closing brace `}`. This is visually confusing and looks like a syntax error or a forgotten fragment.
+    - Placing context *first* ensures the closure body is the last thing the eye sees, resulting in a clean termination of the statement.
+
+```rust
+// BAD: Context Last
+// The `&context` argument is easy to miss or looks like it belongs
+// to a different statement because it follows a large code block.
+apply_changes(|item| {
+    // ... complex multi-line logic ...
+    // ... complex multi-line logic ...
+    item.finalize()
+}, &context); // <--- The "Dangler"
+
+
+// GOOD: Context First
+// The statement starts with the context, and the closure flows naturally
+// until the end of the function call.
+apply_changes(&context, |item| {
+    // ... complex multi-line logic ...
+    // ... complex multi-line logic ...
+    item.finalize()
+}); // <--- Clean, standard closure syntax
+```
