@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-9aa6110d.js";
+            window.path_to_searchindex_js = "../../../searchindex-4260609f.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-71845487.js"></script>
@@ -958,6 +958,49 @@ apply_changes(&amp;context, |item| {
     item.finalize()
 }); // &lt;--- Clean, standard closure syntax
 <span class="boring">}</span></code></pre>
+<h3 id="variable-naming"><a class="header" href="#variable-naming">Variable Naming</a></h3>
+<ul>
+<li>
+<p>Prioritize verbose &amp; boring but clear names: prefer long names that mirror the type (e.g., g<code>lobal_state: GlobalState</code>). Rely on code completion, not brevity.</p>
+</li>
+<li>
+<p>Standard variables:</p>
+<ul>
+<li><code>res</code>: Function result.</li>
+<li><code>it</code>: Generic item (when identity is irrelevant).</li>
+<li><code>n_foos</code>: Count (preferred over <code>foo_count</code>).</li>
+<li><code>foo_idx</code>: Index.</li>
+</ul>
+</li>
+<li>
+<p>Keyword collisions: Avoid <code>r#ident</code> syntax. Use these consistent replacements:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Keyword</th><th style="text-align: left">Replacement</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>crate</code></td><td style="text-align: left"><code>krate</code></td></tr>
+<tr><td style="text-align: left"><code>enum</code></td><td style="text-align: left"><code>enum_</code></td></tr>
+<tr><td style="text-align: left"><code>fn</code></td><td style="text-align: left"><code>func</code></td></tr>
+<tr><td style="text-align: left"><code>impl</code></td><td style="text-align: left"><code>imp</code></td></tr>
+<tr><td style="text-align: left"><code>macro</code></td><td style="text-align: left"><code>mac</code></td></tr>
+<tr><td style="text-align: left"><code>mod</code></td><td style="text-align: left"><code>module</code></td></tr>
+<tr><td style="text-align: left"><code>struct</code></td><td style="text-align: left"><code>strukt</code></td></tr>
+<tr><td style="text-align: left"><code>trait</code></td><td style="text-align: left"><code>trait_</code></td></tr>
+<tr><td style="text-align: left"><code>type</code></td><td style="text-align: left"><code>ty</code></td></tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<p>Spelling &amp; acronyms:</p>
+<ul>
+<li>Use American spelling (<code>color</code>).</li>
+<li>Avoid ad-hoc acronyms; stick to common ones (<code>db</code>, <code>ctx</code>).</li>
+</ul>
+</li>
+</ul>
 
                     </main>
 
