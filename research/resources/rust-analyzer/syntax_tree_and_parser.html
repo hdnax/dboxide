@@ -35,7 +35,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-21b378c3.js";
+            window.path_to_searchindex_js = "../../../searchindex-d8258609.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-ba81baf7.js"></script>
@@ -338,7 +338,7 @@ struct Token {
 <li>This offers a simple, intuitive API but introduces complex <strong>thread-safety issues</strong> (requires read/write locks) since the data changes under the feet of other readers.</li>
 </ul>
 </li>
-<li>Immutable trees (Rust-analyzer):** Allow <strong>Functional</strong> editing.
+<li>Immutable trees (Rust-analyzer):** Allow **Functional** editing.
 <ul>
 <li>You cannot change a node; you must use a <code>Builder</code> or <code>Rewriter</code> to schedule changes and generate a <strong>brand new tree</strong> (path copying).</li>
 <li>This makes the API verbose (“annoying”) but trivializes concurrency, as background threads can safely analyze old snapshots while edits happen on a new one.</li>
@@ -351,10 +351,10 @@ struct Token {
 // Direct, in-place modification. Simple but requires locking.
 for bound in bounds {
     // The tree changes immediately
-    bound.delete(); 
+    bound.delete();
 }
 
-// IMMUTABLE (Rust-Analyzer Style)
+// IMMUTABLE (rust-analyzer Style)
 // Indirect. Must collect edits and rebuild the tree structure.
 let mut builder = tree.edit();
 for bound in bounds {
@@ -368,7 +368,7 @@ let new_tree_root = builder.apply();
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th style="text-align: left">Feature</th><th style="text-align: left">Mutable Trees (IntelliJ)</th><th style="text-align: left">Immutable Trees (Rust-Analyzer)</th></tr>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Mutable Trees (IntelliJ)</th><th style="text-align: left">Immutable Trees (<code>rust-analyzer</code>)</th></tr>
 </thead>
 <tbody>
 <tr><td style="text-align: left"><strong>Editing API</strong></td><td style="text-align: left"><strong>Simple</strong> (Direct <code>node.delete()</code>)</td><td style="text-align: left"><strong>Verbose</strong> (Requires <code>Builder</code> / rewriting spine)</td></tr>
@@ -379,6 +379,129 @@ let new_tree_root = builder.apply();
 </table>
 </div>
 <h3 id="layer-2-syntaxnode-the-cursor--rednode"><a class="header" href="#layer-2-syntaxnode-the-cursor--rednode">Layer 2: SyntaxNode (The Cursor / RedNode)</a></h3>
+<ul>
+<li>
+<p>The GreenNode API is a bit inconvenient:</p>
+<ul>
+<li>No parent pointer.</li>
+<li>Identity issue: Reused green nodes from different parts of the trees are treated equally.</li>
+</ul>
+</li>
+<li>
+<p>SyntaxNode/RedNode (also called cursors/<a href="https://en.wikipedia.org/wiki/Zipper_(data_structure)">zippers</a>): Add parent pointers.to green nodes.</p>
+</li>
+<li>
+<p>Conceptual (unoptimized) example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>type SyntaxNode = Arc&lt;SyntaxData&gt;;
+
+struct SyntaxData {
+    offset: usize,
+    parent: Option&lt;SyntaxNode&gt;,
+    green: Arc&lt;GreenNode&gt;,
+}
+
+impl SyntaxNode {
+    fn new_root(root: Arc&lt;GreenNode&gt;) -&gt; SyntaxNode {
+        Arc::new(SyntaxData {
+            offset: 0,
+            parent: None,
+            green: root,
+        })
+    }
+    fn parent(&amp;self) -&gt; Option&lt;SyntaxNode&gt; {
+        self.parent.clone()
+    }
+    fn children(&amp;self) -&gt; impl Iterator&lt;Item = SyntaxNode&gt; {
+        let mut offset = self.offset;
+        self.green.children().map(|green_child| {
+            let child_offset = offset;
+            offset += green_child.text_len;
+            Arc::new(SyntaxData {
+                offset: child_offset,
+                parent: Some(Arc::clone(self)),
+                green: Arc::clone(green_child),
+            })
+        })
+    }
+}
+
+impl PartialEq for SyntaxNode {
+    fn eq(&amp;self, other: &amp;SyntaxNode) -&gt; bool {
+        self.offset == other.offset
+            &amp;&amp; Arc::ptr_eq(&amp;self.green, &amp;other.green)
+    }
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h4 id="optimizations-1"><a class="header" href="#optimizations-1">Optimizations</a></h4>
+<ul>
+<li>Tree traversal is common and should be optimized.
+<ul>
+<li>Atomic avoidance (<code>Rc</code> over <code>Arc</code>): Traversals are strictly single-threaded, so <code>rowan</code> uses <code>Rc</code> (non-atomic reference counting) for parent pointers. This eliminates the CPU overhead of atomic synchronization during tree walking.</li>
+<li>Thread movement: Since <code>SyntaxNode</code> is <code>!Sync</code>, you cannot send it across threads. Instead, you send a “coordinate”: <code>(GreenNode, TextRange)</code> or lighter <code>(FileId, TextRange)</code>. The receiving thread “hydrates” this into a real node by traversing from the root to that range.</li>
+</ul>
+</li>
+<li>Transient trees: <code>rust-analyzer</code> rarely stores full trees (<code>GreenNode</code>). It prefers storing the <code>(FileId, TextRange)</code> and reparsing on demand.
+<ul>
+<li>Pros: Prevent memory exhaustion from holding thousands of syntax trees.</li>
+<li>Cons: Trade-off CPU.</li>
+</ul>
+</li>
+<li>Root-only <code>Arc</code>:
+<ul>
+<li>Only the root <code>SyntaxNode</code> holds the expensive <code>Arc&lt;GreenNode&gt;</code>, serving as the single anchor for the entire tree’s memory.</li>
+<li>All descendant nodes hold a raw pointer to their data (for speed) and an owning <code>Rc</code> to their parent (for safety).</li>
+<li>Explanation: As long as a child node is alive, its <code>Rc</code> keeps the parent alive, bubbling up to the root, which keeps the <code>Arc</code> alive, ensuring the raw pointers never dangle.</li>
+<li>Result: Traversing the tree requires only fast, non-atomic <code>Rc</code> increments, incurring the cost of an atomic <code>Arc</code> bump only once (when creating the root).</li>
+</ul>
+</li>
+<li>Object pooling:
+<ul>
+<li>Since <code>SyntaxNode</code> is <code>!Sync</code> (single-threaded), rowan maintains a thread-local “free list” of unused node objects.</li>
+<li>Instead of asking the OS for memory (<code>malloc</code>) for every node visited, the traversal simply pops an existing object from the pool and overwrites its fields.</li>
+<li>The pool size only needs to match the depth of the traversal, meaning a few dozen pre-allocated slots can handle massive trees without a single heap allocation during the walk.</li>
+<li>This allows the API to yield “owned” nodes (which are easier to use than references) for the negligible cost of a pointer move.</li>
+</ul>
+</li>
+</ul>
+<h4 id="alternative-designs-1"><a class="header" href="#alternative-designs-1">Alternative Designs</a></h4>
+<h5 id="memoized-rednodes"><a class="header" href="#memoized-rednodes">Memoized RedNodes</a></h5>
+<ul>
+<li>Memoized nodes (C#/Swift): Each <code>SyntaxNode</code> is a heavy, heap-allocated object (<code>Arc</code>) that permanently stores its offset, parent, and a cached list of all children.
+<ul>
+<li>This enables <strong>true pointer equality</strong> (checking if two nodes are the same is instant) but <strong>doubles memory usage</strong> because the entire tree is duplicated in the “Red” layer. C# uses weak references to try to reclaim this space.</li>
+</ul>
+</li>
+<li>Cursor approach (<code>rust-analyzer</code>):** Reject memoization in favor of “Cursors”—transient views that calculate positions on the fly. This keeps memory usage proportional to **traversal depth** (stack-like) rather than the total size of the syntax tree.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Memoized Design (C# / Swift)
+// Persistent, heavy wrapper around the data.
+struct SyntaxData {
+    offset: usize,
+    parent: Option&lt;SyntaxNode&gt;, // Back-link
+    // Caches children forever. High memory cost.
+    children: Vec&lt;OnceCell&lt;SyntaxNode&gt;&gt;,
+}
+
+<span class="boring">}</span></code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Memoized Nodes (C#/Swift)</th><th style="text-align: left">Cursors (<code>rust-analyzer</code>)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Node Identity</strong></td><td style="text-align: left"><strong>Pointer Equality</strong> (Fast)</td><td style="text-align: left"><strong>Range Check</strong> (Slower)</td></tr>
+<tr><td style="text-align: left"><strong>Memory Cost</strong></td><td style="text-align: left"><strong>High</strong> (Doubles tree size)</td><td style="text-align: left"><strong>Low</strong> (Proportional to depth)</td></tr>
+<tr><td style="text-align: left"><strong>Child Access</strong></td><td style="text-align: left">Cached (Immediate)</td><td style="text-align: left">Computed (On-demand)</td></tr>
+<tr><td style="text-align: left"><strong>Persistence</strong></td><td style="text-align: left">Long-lived Objects</td><td style="text-align: left">Transient / Re-created</td></tr>
+</tbody>
+</table>
+</div>
 <h3 id="layer-3-ast-the-api"><a class="header" href="#layer-3-ast-the-api">Layer 3: AST (The API)</a></h3>
 
                     </main>
