@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-8dac4b43.js";
+            window.path_to_searchindex_js = "searchindex-21b378c3.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-71845487.js"></script>
+        <script src="toc-ba81baf7.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -303,6 +303,7 @@
 <ul>
 <li><a href="#high-level-architecture--conventions">High-Level Architecture &amp; Conventions</a></li>
 <li><a href="#coding-conventions">Coding Conventions</a></li>
+<li><a href="#syntax-tree--parser">Syntax Tree &amp; Parser</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="high-level-architecture--conventions"><a class="header" href="#high-level-architecture--conventions">High-Level Architecture &amp; Conventions</a></h1>
@@ -1642,6 +1643,213 @@ Ok(_) =&gt; {}  // &lt;--- Block style breaks the visual rhythm
 </ul>
 </li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="syntax-tree--parser"><a class="header" href="#syntax-tree--parser">Syntax Tree &amp; Parser</a></h1>
+<p>Official site: <a href="https://rust-analyzer.github.io/book/contributing/syntax.html">Link</a>.</p>
+<p>Commit link: <a href="https://github.com/rust-lang/rust-analyzer/tree/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6">2020-01-09</a></p>
+<h2 id="architectural-overview"><a class="header" href="#architectural-overview">Architectural Overview</a></h2>
+<ul>
+<li>The syntax subsystem is divided into three isolated components:
+<ul>
+<li><a href="https://github.com/rust-analyzer/rowan/tree/v0.15.10"><code>rowan</code></a>: A generic, language-agnostic library for immutable syntax trees (based on the Red-Green tree model).</li>
+</ul>
+</li>
+<li><a href="https://github.com/rust-lang/rust-analyzer/tree/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax"><code>syntax</code> (crate)</a>: Wraps <code>rowan</code> to provide a <code>rust-analyzer</code>-specific API. This is the only crate that knows about <code>rowan</code>.</li>
+<li><a href="https://github.com/rust-lang/rust-analyzer/tree/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser"><code>parser</code> (crate)</a>: A standalone recursive descent parser that outputs events. It knows nothing about the syntax tree structure.</li>
+</ul>
+<h2 id="design-goals"><a class="header" href="#design-goals">Design Goals</a></h2>
+<ul>
+<li>Lossless (full fidelity): Preserve all whitespace, comments, and invalid tokens.</li>
+<li>Semantic-less: Purely structural; no type checking, name resolution, or hygiene attached.</li>
+<li>Context-free: Syntax trees are simple value types that can exist without external context (like a database or compiler session).</li>
+<li>Resilient: Always produce a tree, even for invalid input, which means syntax nodes may be partial.</li>
+<li>Performance: Prioritize memory/CPU efficiency (uses <code>unsafe</code> for optimizations).</li>
+<li>Decoupled: The parser logic and the syntax tree structure are isolated, allowing them to evolve independently.</li>
+<li>Intuitive traversal: The API should support easy navigation (parent, children, siblings).</li>
+</ul>
+<h2 id="the-three-layer-syntax-tree"><a class="header" href="#the-three-layer-syntax-tree">The Three-Layer Syntax Tree</a></h2>
+<p>The core data structure is a “Red-Green Tree” (inspired by C#’s Roslyn compiler). It splits the tree into three distinct layers to balance memory usage with ergonomic API access.</p>
+<ul>
+<li>Syntax trees are <em>semi-transient</em>: They do not always exist in memory for all files. They are lowered to a lossy but compact representation. However, they can be converted back to a syntax tree.</li>
+</ul>
+<h3 id="layer-1-greennode-the-storage"><a class="header" href="#layer-1-greennode-the-storage">Layer 1: GreenNode (The Storage)</a></h3>
+<ul>
+<li>
+<p>GreenNode is the actual data storage.</p>
+<ul>
+<li>Purely functional.</li>
+<li>Have an arbitrary arity.</li>
+<li>Immutable.</li>
+<li>Persistent.</li>
+</ul>
+</li>
+<li>
+<p>Conceptual (unoptimized) example - from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Runtime tag for a Node/Token
+// Nodes and tokens both use the same tag kind?
+#[derive(PartialEq, Eq, Clone, Copy)]
+struct SyntaxKind(u16);
+
+#[derive(PartialEq, Eq, Clone)]
+struct Node {
+    kind: SyntaxKind,
+    // Only the byte-length is stored, offset is not stored
+    text_len: usize,
+    // A generic node with a sequence of children nodes and tokens
+    // `Arc` is used, so it allows for multithreading
+    children: Vec&lt;Arc&lt;Either&lt;Node, Token&gt;&gt;&gt;,
+}
+
+#[derive(PartialEq, Eq, Clone)]
+struct Token {
+    kind: SyntaxKind,
+    text: String,
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>In this sense of representation, <code>Token</code> is a type of leaf <code>Node</code>, while a <code>Node</code> itself is an interior <code>Node</code>.</p>
+</li>
+<li>
+<p>Notable points:</p>
+<ul>
+<li>Only one generic node with a generic structure - other than that, tree nodes are untyped (with a runtime type tag).</li>
+<li>The original text is the aggregation of all children’s texts.</li>
+<li>To access a child of a particular type, a linear traversal of the children is generally required.</li>
+<li>The maximum cost of modifying a tree grows linearly with the tree’s height.</li>
+<li>An invalid input would be wrapped an <code>ERROR</code> node.</li>
+<li>Errors are not incorporated into the syntax tree.</li>
+</ul>
+</li>
+</ul>
+<p>The following optimizations are mostly attributed to <a href="https://github.com/cad97">CAD97</a>.</p>
+<h4 id="optimizations"><a class="header" href="#optimizations">Optimizations</a></h4>
+<pre><code class="language-text">[ RefCount | Kind | TextLen | N_Children | Child_1 | Child_2 | ... | Child_N ]
+&lt;------------------------- Single Heap Allocation -------------------------&gt;
+</code></pre>
+<ul>
+<li>Idea:
+<ul>
+<li>A standard struct with a <code>Vec</code> of children would require at least two separate allocations: one for the node, one for the vector’s buffer.</li>
+<li>Use a dynamically sized type (DST) for <code>GreenNode</code>.</li>
+</ul>
+</li>
+<li>Mechanism:
+<ul>
+<li>The node header (ref count, kind, length) and the array of children are stored contiguously in a single memory block.</li>
+<li>Instead of <code>Arc&lt;Either&lt;Node, Token&gt;&gt;</code>, a single pointer is used with a tag in the last bit to differentiate between <code>Node</code> and <code>Token</code> (pointers to dynamically allocated memory are typically word-aligned so the last bit is unused anyways).</li>
+</ul>
+</li>
+<li>Interning: Tokens are reused instead of being allocated on the heap every time: <code>1 + 1</code> would contain only one token for <code>1</code>. The interned result is an <code>Arc&lt;Node&gt;</code> instead of an index to the interning table, so that the syntax tree is self-contained.</li>
+<li>The length of the text is represented by the type <code>TextSize</code>, which is an opaque (newtyped) <code>u32</code>.</li>
+<li><code>SmolStr</code>: String wrapper that stores small strings (like keywords <code>fn</code>, <code>if</code>) inline on the stack (without heap allocation).
+<ul>
+<li><em>Note: The text suggests moving this data directly into the interned token allocation in the future.</em></li>
+</ul>
+</li>
+</ul>
+<h4 id="alternative-designs"><a class="header" href="#alternative-designs">Alternative Designs</a></h4>
+<h5 id="dealing-with-trivia"><a class="header" href="#dealing-with-trivia">Dealing With Trivia</a></h5>
+<ul>
+<li>
+<p>Explicit nodes (Rowan/IntelliJ): Trivia (whitespace) exists as a standard sibling node, creating a “lossless” concrete tree that is easy to modify but “noisy” to traverse.</p>
+</li>
+<li>
+<p>Attached trivia (Roslyn/Swift): Trivia is hidden as “leading/trailing” properties inside tokens, ensuring the tree structure contains only logical elements.</p>
+</li>
+<li>
+<p>Linked list (Dart): A hybrid approach that maintains a clean semantic tree alongside a parallel, doubly-linked list of all tokens to separate logic from formatting.</p>
+</li>
+<li>
+<p>Remarks:</p>
+<ul>
+<li>There is no standard approach to this.</li>
+<li><code>@dbml/parse</code> uses the “attached trivia” approach.</li>
+</ul>
+</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Strategy</th><th style="text-align: left">Pros</th><th style="text-align: left">Cons</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Explicit Nodes</strong><br>(Rowan, IntelliJ, rust-analyzer)</td><td style="text-align: left"><strong>Uniformity:</strong> Everything is a node; simple data model.<br><strong>Fidelity:</strong> Lossless representation of text.<br><strong>Refactoring:</strong> Moving a branch naturally moves its formatting.</td><td style="text-align: left"><strong>Noise:</strong> Tree traversal requires manual filtering of whitespace.<br><strong>Memory:</strong> Higher node count (every space is an object).</td></tr>
+<tr><td style="text-align: left"><strong>Attached Trivia</strong><br>(Roslyn, Swift)</td><td style="text-align: left"><strong>Clarity:</strong> Tree contains <em>only</em> logical code.<br><strong>Iteration:</strong> Iterating children yields immediate semantic tokens.</td><td style="text-align: left"><strong>Complexity:</strong> “Re-stitching” text during refactoring is hard.<br><strong>Ownership:</strong> Ambiguous whether a comment belongs to the previous or next token.</td></tr>
+<tr><td style="text-align: left"><strong>Linked List</strong><br>(Dart)</td><td style="text-align: left"><strong>Dual View:</strong> Optimized for both semantic analysis (Tree) and formatting (List).<br><strong>Scanning:</strong> Linear access to tokens is very fast.</td><td style="text-align: left"><strong>Syncing:</strong> High maintenance cost to keep the Tree and List in perfect sync.<br><strong>Overhead:</strong> Requires managing parallel data structures.</td></tr>
+</tbody>
+</table>
+</div>
+<h5 id="accessing-children"><a class="header" href="#accessing-children">Accessing Children</a></h5>
+<ul>
+<li><strong>Linear Scan (IntelliJ/Rowan):</strong> Stores children in a dynamic list, including trivia. To find a specific node (e.g., function body), you must iterate past all preceding siblings, resulting in <strong>O(N)</strong> access but <strong>minimal memory overhead</strong> since missing nodes take zero space.</li>
+<li><strong>Fixed Slots (Roslyn/Swift):</strong> Assigns a permanent index to every possible child defined by the grammar (e.g., “Return Type” is always at index 7). This grants <strong>O(1)</strong> random access but increases <strong>memory usage</strong> by allocating slots for optional nodes that aren’t present (<code>None</code>) and requires removing trivia from the tree structure to maintain index stability.</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Linear Scan (IntelliJ)</th><th style="text-align: left">Fixed Slots (Roslyn/Swift)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Access Speed</strong></td><td style="text-align: left"><strong>O(N)</strong> (Must iterate/skip)</td><td style="text-align: left"><strong>O(1)</strong> (Direct Index)</td></tr>
+<tr><td style="text-align: left"><strong>Memory Usage</strong></td><td style="text-align: left"><strong>Compact</strong> (Only stores present data)</td><td style="text-align: left"><strong>Sparse</strong> (Allocates slots for <code>None</code>)</td></tr>
+<tr><td style="text-align: left"><strong>Missing Nodes</strong></td><td style="text-align: left">Implicitly absent</td><td style="text-align: left">Explicitly stored as <code>Option::None</code></td></tr>
+<tr><td style="text-align: left"><strong>Trivia</strong></td><td style="text-align: left">Included as sibling nodes</td><td style="text-align: left">Removed or attached to tokens</td></tr>
+</tbody>
+</table>
+</div>
+<h5 id="mutable-trees"><a class="header" href="#mutable-trees">Mutable Trees</a></h5>
+<ul>
+<li>Mutable trees (IntelliJ): Allow <strong>Imperative</strong> editing.
+<ul>
+<li>You locate a node and modify it directly in-place (<code>node.delete()</code>).</li>
+<li>This offers a simple, intuitive API but introduces complex <strong>thread-safety issues</strong> (requires read/write locks) since the data changes under the feet of other readers.</li>
+</ul>
+</li>
+<li>Immutable trees (Rust-analyzer):** Allow <strong>Functional</strong> editing.
+<ul>
+<li>You cannot change a node; you must use a <code>Builder</code> or <code>Rewriter</code> to schedule changes and generate a <strong>brand new tree</strong> (path copying).</li>
+<li>This makes the API verbose (“annoying”) but trivializes concurrency, as background threads can safely analyze old snapshots while edits happen on a new one.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// MUTABLE (IntelliJ Style)
+// Direct, in-place modification. Simple but requires locking.
+for bound in bounds {
+    // The tree changes immediately
+    bound.delete(); 
+}
+
+// IMMUTABLE (Rust-Analyzer Style)
+// Indirect. Must collect edits and rebuild the tree structure.
+let mut builder = tree.edit();
+for bound in bounds {
+    // Schedule deletion on the 'builder', not the node itself
+    builder.delete(bound);
+}
+// Apply generates a completely new root node
+let new_tree_root = builder.apply();
+
+<span class="boring">}</span></code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Mutable Trees (IntelliJ)</th><th style="text-align: left">Immutable Trees (Rust-Analyzer)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Editing API</strong></td><td style="text-align: left"><strong>Simple</strong> (Direct <code>node.delete()</code>)</td><td style="text-align: left"><strong>Verbose</strong> (Requires <code>Builder</code> / rewriting spine)</td></tr>
+<tr><td style="text-align: left"><strong>Concurrency</strong></td><td style="text-align: left"><strong>Hard</strong> (Needs complex R/W locks)</td><td style="text-align: left"><strong>Easy</strong> (Snapshots are thread-safe)</td></tr>
+<tr><td style="text-align: left"><strong>Mental Model</strong></td><td style="text-align: left">“DOM Manipulation”</td><td style="text-align: left">“Version Control” / Persistent Data Structures</td></tr>
+<tr><td style="text-align: left"><strong>Performance</strong></td><td style="text-align: left">Fast small edits</td><td style="text-align: left">Slower (allocates new nodes for the path to root)</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="layer-2-syntaxnode-the-cursor--rednode"><a class="header" href="#layer-2-syntaxnode-the-cursor--rednode">Layer 2: SyntaxNode (The Cursor / RedNode)</a></h3>
+<h3 id="layer-3-ast-the-api"><a class="header" href="#layer-3-ast-the-api">Layer 3: AST (The API)</a></h3>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
