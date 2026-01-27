@@ -3,3 +3,10 @@ title = "dboxide"
 authors = ["Huy-DNA"]
 language = "en"
 src = "doc"
+
+[output.html]
+smart-punctuation = true
+mathjax-support = true
+git-repository-url = "https://github.com/hdnax/dboxide/tree/main/doc"
+edit-url-template = "https://github.com/hdnax/dboxide/tree/main/doc"
+hash-files = true

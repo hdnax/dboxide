@@ -8,3 +8,4 @@ Official site: [Link](https://rust-analyzer.github.io/).
 
 - [High-Level Architecture & Conventions](./high_level_architecture_and_conventions.md)
 - [Coding Conventions](./coding_conventions.md)
+- [Syntax Tree & Parser](./syntax_tree_and_parser.md)
