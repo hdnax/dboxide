@@ -22,6 +22,11 @@
             rustup
             rust-analyzer
             cargo-run-bin
+            mdbook
+            mdbook-mermaid
+            mdbook-toc
+            mdbook-cmdrun
+            just
           ];
         };
       }

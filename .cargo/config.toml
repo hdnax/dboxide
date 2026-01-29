@@ -1,3 +1,0 @@
-[alias]
-doc-dev = "bin mdbook watch --open"
-doc-build = "bin mdbook build"
