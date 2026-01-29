@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-95c7f0de.js";
+            window.path_to_searchindex_js = "searchindex-6831474f.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ba81baf7.js"></script>
@@ -2145,6 +2145,60 @@ pub fn parse(
 <ul>
 <li>Green trees make modifications cheap—you can “patch” by swapping a single node pointer with a freshly parsed subtree. No external state needed.</li>
 <li>Block heuristic: Edits get isolated to the smallest <code>{}</code> block that contains them. This works because the parser keeps braces balanced even in broken code, giving you stable anchor points.</li>
+</ul>
+<details>
+<summary><strong>Q&amp;A: How does the parser maintain balanced braces in broken code?</strong></summary>
+<p><strong>Q: How can braces be “balanced” when users type unmatched <code>{</code> or <code>}</code>?</strong></p>
+<p>A: The <strong>tree structure</strong> maintains balanced braces, not the source text. The parser uses error recovery to ensure every <code>start_node(BLOCK)</code> has a matching <code>finish_node()</code>.</p>
+<p><strong>Q: What happens when a closing brace is missing?</strong></p>
+<p>A: The parser inserts an <strong>implicit/phantom closing brace</strong>. For example:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn foo() {
+    let x = 1;
+// EOF - missing }
+<span class="boring">}</span></code></pre>
+<p>The tree structure acts as if the <code>}</code> exists at EOF, even though it’s not in the source text. This is implemented in the parser’s <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/grammar/expressions/atom.rs#L501-L508">block parsing logic</a>, which automatically closes unclosed blocks at EOF or when encountering incompatible tokens.</p>
+<p><strong>Q: What if there’s an unexpected token inside a block?</strong></p>
+<p>A: The parser uses <strong>early block termination</strong>. For example:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn foo() {
+    let x = 1;
+fn bar() {  // unexpected fn - shouldn't be here
+<span class="boring">}</span></code></pre>
+<p>The parser:</p>
+<ul>
+<li>Realizes <code>fn</code> shouldn’t be inside <code>foo</code>’s block</li>
+<li>Inserts an implicit <code>}</code> to close <code>foo</code></li>
+<li>Continues parsing <code>bar</code> at the outer level</li>
+<li>Wraps the malformed content in an <code>ERROR</code> node</li>
+</ul>
+<p>This is part of the “panic mode” error recovery strategy implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/event.rs#L20-L132">event-based parser</a>.</p>
+<p><strong>Q: What about extra closing braces?</strong></p>
+<p>A: Unmatched <code>}</code> tokens are:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn foo() {
+}
+}  // extra closing brace
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Treated as error tokens</li>
+<li>Wrapped in an <code>ERROR</code> node</li>
+<li>Not matched with anything</li>
+<li>The structural tree still has balanced blocks</li>
+</ul>
+<p><strong>Q: How does this enable the block heuristic?</strong></p>
+<p>A: Because braces are always structurally balanced, the parser can reliably:</p>
+<ul>
+<li>Find the smallest enclosing <code>{}</code> block around any edit</li>
+<li>Use these blocks as stable anchor points</li>
+<li>Reparse just that subtree instead of the entire file</li>
+</ul>
+<p>This is implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/reparsing.rs#L19-L146">incremental reparsing logic</a> in the <code>syntax</code> crate, particularly the <code>incremental_reparse</code> function and <code>is_balanced</code> check.</p>
+</details>
+<ul>
 <li>In practice though, incremental reparsing often isn’t worth it. Modern parsers are fast enough to just reparse the whole file from scratch.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
