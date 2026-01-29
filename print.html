@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-5b6ce4e7.js";
+            window.path_to_searchindex_js = "searchindex-8ed4105e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ba81baf7.js"></script>
@@ -1935,7 +1935,7 @@ impl PartialEq for SyntaxNode {
 </li>
 <li>Object pooling:
 <ul>
-<li>Since <code>SyntaxNode</code> is <code>!Sync</code> (single-threaded), rowan maintains a thread-local “free list” of unused node objects.</li>
+<li>Since <code>SyntaxNode</code> is <code>!Sync</code> (single-threaded), <code>rowan</code> maintains a thread-local “free list” of unused node objects.</li>
 <li>Instead of asking the OS for memory (<code>malloc</code>) for every node visited, the traversal simply pops an existing object from the pool and overwrites its fields.</li>
 <li>The pool size only needs to match the depth of the traversal, meaning a few dozen pre-allocated slots can handle massive trees without a single heap allocation during the walk.</li>
 <li>This allows the API to yield “owned” nodes (which are easier to use than references) for the negligible cost of a pointer move.</li>
@@ -1950,7 +1950,7 @@ impl PartialEq for SyntaxNode {
 <li>This enables <strong>true pointer equality</strong> (checking if two nodes are the same is instant) but <strong>doubles memory usage</strong> because the entire tree is duplicated in the “Red” layer. C# uses weak references to try to reclaim this space.</li>
 </ul>
 </li>
-<li>Cursor approach (<code>rust-analyzer</code>):** Reject memoization in favor of “Cursors”—transient views that calculate positions on the fly. This keeps memory usage proportional to **traversal depth** (stack-like) rather than the total size of the syntax tree.</li>
+<li>Cursor approach (<code>rust-analyzer</code>): Reject memoization in favor of “Cursors”—transient views that calculate positions on the fly. This keeps memory usage proportional to <strong>traversal depth</strong> (stack-like) rather than the total size of the syntax tree.</li>
 </ul>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
