@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-d8258609.js";
+            window.path_to_searchindex_js = "searchindex-5b6ce4e7.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ba81baf7.js"></script>
@@ -1978,6 +1978,123 @@ struct SyntaxData {
 </table>
 </div>
 <h3 id="layer-3-ast-the-api"><a class="header" href="#layer-3-ast-the-api">Layer 3: AST (The API)</a></h3>
+<ul>
+<li>
+<p>A strongly typed API offers more convenience for the user compared to GreenNodes, as they are untyped (but they are naturally suitable for error nodes and trivial nodes).</p>
+</li>
+<li>
+<p>Example: A class syntax node would be more convenient if it is typed with well-known methods.</p>
+</li>
+<li>
+<p>Example <code>AstNode</code> trait (from <code>rust-analyzer</code>):</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait AstNode {
+  fn cast(syntax: SyntaxNode) -&gt; Option&lt;Self&gt;
+  where
+      Self: Sized;
+
+  fn syntax(&amp;self) -&gt; &amp;SyntaxNode;
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>The classes are auto-generated. One example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FnDef {
+    syntax: SyntaxNode,
+}
+
+impl AstNode for FnDef {
+    fn cast(syntax: SyntaxNode) -&gt; Option&lt;Self&gt; {
+        match syntax.kind {
+            SyntaxKind::FN =&gt; Some(FnDef { syntax }),
+            _ =&gt; None,
+        }
+    }
+    fn syntax(&amp;self) -&gt; &amp;SyntaxNode {
+        &amp;self.syntax
+    }
+}
+
+impl FnDef {
+    pub fn param_list(&amp;self) -&gt; Option&lt;ParamList&gt; {
+        self.syntax.children().find_map(ParamList::cast)
+    }
+    pub fn ret_type(&amp;self) -&gt; Option&lt;RetType&gt; {
+        self.syntax.children().find_map(RetType::cast)
+    }
+    pub fn body(&amp;self) -&gt; Option&lt;BlockExpr&gt; {
+        self.syntax.children().find_map(BlockExpr::cast)
+    }
+    // ...
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Variants such as expressions are represented as <code>enum</code>s. One example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AssocItem {
+    FnDef(FnDef),
+    TypeAliasDef(TypeAliasDef),
+    ConstDef(ConstDef),
+}
+
+impl AstNode for AssocItem {
+    ...
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Shared syntactic elements (like names, loop bodies, or doc comments) are modeled via traits:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>trait HasName: AstNode {
+    fn name(&amp;self) -&gt; Option&lt;Name&gt;;
+}
+
+impl HasName for FnDef {
+    fn name(&amp;self) -&gt; Option&lt;Name&gt; {
+        self.syntax.children().find_map(Name::cast)
+    }
+}
+impl HasName for StructDef {
+    fn name(&amp;self) -&gt; Option&lt;Name&gt; {
+        self.syntax.children().find_map(Name::cast)
+    }
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h4 id="alternative-designs-2"><a class="header" href="#alternative-designs-2">Alternative Designs</a></h4>
+<h5 id="semantic-full-ast"><a class="header" href="#semantic-full-ast">Semantic Full AST</a></h5>
+<ul>
+<li>IntelliJ’s PSI (Program Structure Interface) is a “rich” AST that abstracts over the origin of the code.
+<ul>
+<li>A <code>PsiMethod</code> object looks and behaves identically whether it comes from a user’s source file (<code>.java</code>) or a compiled dependency (<code>.jar</code>).</li>
+<li>This hides the complexity from the plugin developer.</li>
+</ul>
+</li>
+<li>Attached semantics: Unlike a pure AST which only describes text, PSI nodes carry logic. They include methods like <code>resolve()</code> or <code>getSuperClass()</code>, allowing direct semantic queries on the tree nodes themselves.</li>
+<li>To optimize memory, a PSI element is initially backed by a lightweight “stub” (serialized metadata from indices). It transparently inflates into a full, heavy AST only when the user actually opens the file or accesses the method body.</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Pure AST (Rust-Analyzer)</th><th style="text-align: left">Semantic PSI (IntelliJ)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Scope</strong></td><td style="text-align: left">Source code structure only</td><td style="text-align: left">Source + Compiled Libraries</td></tr>
+<tr><td style="text-align: left"><strong>Backing</strong></td><td style="text-align: left">Always AST</td><td style="text-align: left"><strong>Dynamic</strong> (index stub -&gt; full tree)</td></tr>
+<tr><td style="text-align: left"><strong>Logic</strong></td><td style="text-align: left">External (analysis passes)</td><td style="text-align: left"><strong>Internal</strong> (methods on nodes)</td></tr>
+<tr><td style="text-align: left"><strong>Memory</strong></td><td style="text-align: left">Low (transient cursors)</td><td style="text-align: left">High (rich objects), mitigated by stubs</td></tr>
+</tbody>
+</table>
+</div>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
