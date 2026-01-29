@@ -1,7 +1,7 @@
 # Introduction
 
 <p align="center">
-  <img src="../assets/dbml.png" alt="dboxide logo" width="200"/>
+  <img src="assets/dbml.png" alt="dboxide logo" width="200"/>
 </p>
 
 This repository, [`dboxide`](https://github.com/hdnax/dboxide), is a rewrite of a DBML parser. It is a learning project to explore concepts in language theory, inspired by the work in the [`type-theory`](https://github.com/hdnax/type-theory) repository. The project builds on lessons learned from a previous parser, `@dbml/parse`.

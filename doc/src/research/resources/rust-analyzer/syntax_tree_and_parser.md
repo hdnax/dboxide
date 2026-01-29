@@ -478,3 +478,74 @@ This is implemented in the [incremental reparsing logic](https://github.com/rust
 </details>
 
 - In practice though, incremental reparsing often isn't worth it. Modern parsers are fast enough to just reparse the whole file from scratch.
+
+## Parsing Algorithm
+
+- Recursive descent: Each grammar rule maps to a function that calls other functions recursively to parse sub-expressions. This makes the parser easy to understand and debug.
+- Pratt parsing: Handle operator precedence elegantly without building complex precedence tables. Used specifically for expressions with binary operators.
+- Error recovery: The parser makes a special effort to continue parsing even when it encounters syntax errors. Instead of stopping at the first error, it attempts to recover and continue building the tree, marking problematic sections with `ERROR` nodes.
+
+### Parser Recap
+
+The parser's design achieves strict modularity through well-defined interfaces:
+- `TokenSource` trait:
+  - Define how the parser reads input tokens.
+  - The parser doesn't know or care whether tokens come from source text (with trivia), macro expansions (without trivia), or any other source.
+- `TreeSink` trait:
+  - Define how the parser writes output events (`start_node`, `finish_node`, `token`, `error`).
+  - The parser has no knowledge of how these events are converted into the final tree structure.
+
+## Interaction Between The `syntax` and The `parser` Crate
+
+The `parser` and `syntax` crates have **zero dependencies** on each other.
+
+```mermaid
+%%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
+flowchart LR
+    A["<i>string</i><br/><b>Source Text</b>"]
+
+    subgraph top["<code>syntax</code> crate"]
+        direction LR
+        B["<i>fn</i><br/><b>Lexer</b>"]
+        C["<i>Vec&lt;Token&gt;</i><br/><b>Token Stream</b>"]
+        D["<i>trait</i><br/><b>TokenSource</b>"]
+        B --> C --> D
+    end
+
+    subgraph P["<code>parser</code> crate"]
+        E["<i>fn</i><br/><b>Parser</b>"]
+    end
+
+    subgraph bottom["<code>syntax</code> crate"]
+        direction RL
+        I["<i>trait</i><br/><b>AST</b>"]
+        H["<i>type</i><br/><b>SyntaxNode</b>"]
+        G["<i>type</i><br/><b>GreenNode</b>"]
+        F["<i>trait</i><br/><b>TreeSink</b>"]
+        F --> G --> H --> I
+    end
+
+    A --> B
+    D -.->|reads tokens| E
+    E -.->|emits events| F
+
+    click B "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/lexer.rs#L1-L50" "View Lexer source"
+    click D "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L50-L70" "View TokenSource trait"
+    click E "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L81-L100" "View parse function"
+    click F "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L100-L120" "View TreeSink trait"
+    click G "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/syntax_node.rs#L20-L35" "View GreenNode type"
+    click H "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/syntax_node.rs#L29-L29" "View SyntaxNode type alias"
+    click I "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/ast.rs#L39-L50" "View AstNode trait"
+
+    classDef syntaxNode fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
+    classDef parserNode fill:#fed7aa,stroke:#f97316,stroke-width:2px,color:#9a3412
+    classDef inputNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
+
+    class B,C,D,F,G,H,I syntaxNode
+    class E parserNode
+    class A inputNode
+
+    style top fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
+    style bottom fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
+    style P fill:#fff7ed,stroke:#f97316,stroke-width:2px,rx:5
+```
