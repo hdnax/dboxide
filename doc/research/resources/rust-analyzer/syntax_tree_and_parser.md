@@ -411,4 +411,70 @@ struct SyntaxData {
 
 - Green trees make modifications cheap—you can "patch" by swapping a single node pointer with a freshly parsed subtree. No external state needed.
 - Block heuristic: Edits get isolated to the smallest `{}` block that contains them. This works because the parser keeps braces balanced even in broken code, giving you stable anchor points.
+
+<details>
+<summary><strong>Q&A: How does the parser maintain balanced braces in broken code?</strong></summary>
+
+**Q: How can braces be "balanced" when users type unmatched `{` or `}`?**
+
+A: The **tree structure** maintains balanced braces, not the source text. The parser uses error recovery to ensure every `start_node(BLOCK)` has a matching `finish_node()`.
+
+**Q: What happens when a closing brace is missing?**
+
+A: The parser inserts an **implicit/phantom closing brace**. For example:
+
+```rust
+fn foo() {
+    let x = 1;
+// EOF - missing }
+```
+
+The tree structure acts as if the `}` exists at EOF, even though it's not in the source text. This is implemented in the parser's [block parsing logic](https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/grammar/expressions/atom.rs#L501-L508), which automatically closes unclosed blocks at EOF or when encountering incompatible tokens.
+
+**Q: What if there's an unexpected token inside a block?**
+
+A: The parser uses **early block termination**. For example:
+
+```rust
+fn foo() {
+    let x = 1;
+fn bar() {  // unexpected fn - shouldn't be here
+```
+
+The parser:
+
+- Realizes `fn` shouldn't be inside `foo`'s block
+- Inserts an implicit `}` to close `foo`
+- Continues parsing `bar` at the outer level
+- Wraps the malformed content in an `ERROR` node
+
+This is part of the "panic mode" error recovery strategy implemented in the [event-based parser](https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/event.rs#L20-L132).
+
+**Q: What about extra closing braces?**
+
+A: Unmatched `}` tokens are:
+
+```rust
+fn foo() {
+}
+}  // extra closing brace
+```
+
+- Treated as error tokens
+- Wrapped in an `ERROR` node
+- Not matched with anything
+- The structural tree still has balanced blocks
+
+**Q: How does this enable the block heuristic?**
+
+A: Because braces are always structurally balanced, the parser can reliably:
+
+- Find the smallest enclosing `{}` block around any edit
+- Use these blocks as stable anchor points
+- Reparse just that subtree instead of the entire file
+
+This is implemented in the [incremental reparsing logic](https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/reparsing.rs#L19-L146) in the `syntax` crate, particularly the `incremental_reparse` function and `is_balanced` check.
+
+</details>
+
 - In practice though, incremental reparsing often isn't worth it. Modern parsers are fast enough to just reparse the whole file from scratch.
