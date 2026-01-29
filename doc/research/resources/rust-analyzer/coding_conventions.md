@@ -721,7 +721,7 @@ Ok(_) => {}  // <--- Block style breaks the visual rhythm
 - Prefer explicit type ascription (`let x: Vec<i32> = ...`) over the "turbofish" syntax (`...collect::<Vec<i32>>()`).
 - Rationale: We want to able to read everything from left-to-right without maintaining to much context:
   - Good: `let names: Vec<String> = users.iter().map(...).collect();`
-    - Why: When you read the line left-to-right, you immediately know what is being built (Vec<String>). This context helps you understand the complex iterator chain that follows.
+    - Why: When you read the line left-to-right, you immediately know what is being built (`Vec<String>`). This context helps you understand the complex iterator chain that follows.
   - Bad: `let names = users.iter().map(...).collect::<Vec<String>>();`
     - Why: You have to read the entire chain until the very end to figure out what type is actually being produced.
   - No placeholders (`_`): Avoid `let x: Vec<_> = ...`.

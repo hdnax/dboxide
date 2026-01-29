@@ -4,9 +4,32 @@ authors = ["Huy-DNA"]
 language = "en"
 src = "doc"
 
+[preprocessor.mermaid]
+command = "cargo"
+args = ["bin", "mdbook-mermaid"]
+renderer = ["html"]
+
+[preprocessor.toc]
+command = "cargo"
+args = ["bin", "mdbook-toc"]
+renderer = ["html"]
+
+[preprocessor.alerts]
+command = "cargo"
+args = ["bin", "mdbook-alerts"]
+renderer = ["html"]
+
+[preprocessor.cmdrun]
+command = "cargo"
+args = ["bin", "mdbook-cmdrun"]
+renderer = ["html"]
+
 [output.html]
 smart-punctuation = true
 mathjax-support = true
 git-repository-url = "https://github.com/hdnax/dboxide/tree/main/doc"
 edit-url-template = "https://github.com/hdnax/dboxide/tree/main/doc"
 hash-files = true
+site-url = "/dboxide/"
+default-theme = "light"
+preferred-dark-theme = "navy"
