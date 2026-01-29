@@ -48,9 +48,9 @@ The main reasons I was assigned to the DBML parser rewrite were (I believe):
 
 Since the first version of `@dbml/parse`, there has been some impact, but a lot are left to be desired.
 
-### The Impact
+### The Outcome
 
-- Performance: Although `@dbml/parse` waas just a naive rewrite, it was already 7 times faster than the Peg.js parser.
+- Performance: Although `@dbml/parse` was just a naive rewrite, it was already 7 times faster than the Peg.js parser.
 - Language services: `@dbml/parse` provides language services like suggestion, go to definition and go to references.
 - Resilient parsing: Multiple error messages are allowed. Suggestion works even if the source file is partially broken.
 
