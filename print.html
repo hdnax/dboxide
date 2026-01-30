@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-1fa14f44.js";
+            window.path_to_searchindex_js = "searchindex-75a14370.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-86b9510b.js"></script>
@@ -2231,28 +2231,28 @@ fn bar() {  // unexpected fn - shouldn't be here
 <p>The <code>parser</code> and <code>syntax</code> crates have <strong>zero dependencies</strong> on each other.</p>
 <pre class="mermaid">%%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
 flowchart LR
-    A["&lt;i&gt;string&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Source Text&lt;/b&gt;"]
+    A(["&lt;i&gt;string&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Source Text&lt;/b&gt;"])
 
     subgraph top["&lt;code&gt;syntax&lt;/code&gt; crate"]
         direction LR
         B["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;tokenize&lt;/b&gt;"]
-        C["&lt;i&gt;Vec&amp;lt;Token&amp;gt;&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Token Stream&lt;/b&gt;"]
+        C(["&lt;i&gt;Vec&amp;lt;Token&amp;gt;&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Token Stream&lt;/b&gt;"])
         B --&gt; C
     end
 
     subgraph P["&lt;code&gt;parser&lt;/code&gt; crate"]
         direction LR
-        D["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TokenSource&lt;/b&gt;"]
+        D{{"&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TokenSource&lt;/b&gt;"}}
         E["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;parse&lt;/b&gt;"]
-        F["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TreeSink&lt;/b&gt;"]
+        F{{"&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TreeSink&lt;/b&gt;"}}
         D --&gt; E --&gt; F
     end
 
     subgraph bottom["&lt;code&gt;syntax&lt;/code&gt; crate"]
         direction RL
-        I["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;AstNode&lt;/b&gt;"]
-        H["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;SyntaxNode&lt;/b&gt;"]
-        G["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;GreenNode&lt;/b&gt;"]
+        I{{"&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;AstNode&lt;/b&gt;"}}
+        H(["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;SyntaxNode&lt;/b&gt;"])
+        G(["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;GreenNode&lt;/b&gt;"])
         G --&gt; H --&gt; I
     end
 
@@ -2271,11 +2271,12 @@ flowchart LR
 
     classDef syntaxNode fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
     classDef parserNode fill:#fed7aa,stroke:#f97316,stroke-width:2px,color:#9a3412
-    classDef inputNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
+    classDef dataNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
+    classDef traitNode fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
 
-    class B,C,G,H,I syntaxNode
-    class D,E,F parserNode
-    class A inputNode
+    class B,E syntaxNode
+    class A,C,G,H dataNode
+    class D,F,I traitNode
 
     style top fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
     style bottom fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
