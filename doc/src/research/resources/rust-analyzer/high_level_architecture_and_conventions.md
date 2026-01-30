@@ -45,7 +45,7 @@ Official site: [Link](https://rust-analyzer.github.io/book/contributing/architec
 
 ## Syntax Tree Structure & Parser - `syntax` Crate
 
-Based on [`libsyntax-2.0`](../../libsyntax/SUMMARY.md).
+Based on [`libsyntax-2.0`](../libsyntax/SUMMARY.md).
 
 - [`rowan`](https://github.com/rust-analyzer/rowan): The underlying library used to construct the raw, untyped syntax trees (Green/Red trees).
 - `ast` internal crate: Provide a **type-safe API** layer on top of the raw `rowan` tree.
