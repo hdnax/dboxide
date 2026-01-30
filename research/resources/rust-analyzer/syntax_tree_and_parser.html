@@ -37,7 +37,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-894c401d.js";
+            window.path_to_searchindex_js = "../../../searchindex-1fa14f44.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-86b9510b.js"></script>
@@ -190,8 +190,8 @@
 <li>The system has three isolated components:
 <ul>
 <li><a href="https://github.com/rust-analyzer/rowan/tree/v0.15.10"><code>rowan</code></a>: A generic, language-agnostic library for immutable syntax trees using the Red-Green tree model.</li>
-<li><a href="https://github.com/rust-lang/rust-analyzer/tree/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax"><code>syntax</code> (crate)</a>: Wrap <code>rowan</code> with a <code>rust-analyzer</code>-specific API. It’s the only crate that knows about <code>rowan</code>.</li>
-<li><a href="https://github.com/rust-lang/rust-analyzer/tree/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser"><code>parser</code> (crate)</a>: Output events from parsing without knowing anything about the tree structure.</li>
+<li><a href="https://github.com/rust-lang/rust-analyzer/tree/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax"><code>syntax</code> (crate)</a>: Wrap <code>rowan</code> with a <code>rust-analyzer</code>-specific API. It’s the only crate that knows about <code>rowan</code>.</li>
+<li><a href="https://github.com/rust-lang/rust-analyzer/tree/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_parser"><code>parser</code> (crate)</a>: Output events from parsing without knowing anything about the tree structure.</li>
 </ul>
 </li>
 </ul>
@@ -691,7 +691,7 @@ pub fn parse(
     let x = 1;
 // EOF - missing }
 <span class="boring">}</span></code></pre>
-<p>The tree structure acts as if the <code>}</code> exists at EOF, even though it’s not in the source text. This is implemented in the parser’s <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/grammar/expressions/atom.rs#L501-L508">block parsing logic</a>, which automatically closes unclosed blocks at EOF or when encountering incompatible tokens.</p>
+<p>The tree structure acts as if the <code>}</code> exists at EOF, even though it’s not in the source text. This is implemented in the parser’s <a href="https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_parser/src/grammar/expressions/atom.rs#L476-L481">block parsing logic</a>, which automatically closes unclosed blocks at EOF or when encountering incompatible tokens.</p>
 <p><strong>Q: What if there’s an unexpected token inside a block?</strong></p>
 <p>A: The parser uses <strong>early block termination</strong>. For example:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -707,7 +707,7 @@ fn bar() {  // unexpected fn - shouldn't be here
 <li>Continues parsing <code>bar</code> at the outer level</li>
 <li>Wraps the malformed content in an <code>ERROR</code> node</li>
 </ul>
-<p>This is part of the “panic mode” error recovery strategy implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/event.rs#L20-L132">event-based parser</a>.</p>
+<p>This is part of the “panic mode” error recovery strategy implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_parser/src/event.rs#L21-L129">event-based parser</a>.</p>
 <p><strong>Q: What about extra closing braces?</strong></p>
 <p>A: Unmatched <code>}</code> tokens are:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -729,7 +729,7 @@ fn bar() {  // unexpected fn - shouldn't be here
 <li>Use these blocks as stable anchor points</li>
 <li>Reparse just that subtree instead of the entire file</li>
 </ul>
-<p>This is implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/reparsing.rs#L19-L146">incremental reparsing logic</a> in the <code>syntax</code> crate, particularly the <code>incremental_reparse</code> function and <code>is_balanced</code> check.</p>
+<p>This is implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax/src/parsing/reparsing.rs#L24-L148">incremental reparsing logic</a> in the <code>syntax</code> crate, particularly the <code>incremental_reparse</code> function and <code>is_balanced</code> check.</p>
 </details>
 <ul>
 <li>In practice though, incremental reparsing often isn’t worth it. Modern parsers are fast enough to just reparse the whole file from scratch.</li>
@@ -764,43 +764,46 @@ flowchart LR
 
     subgraph top["&lt;code&gt;syntax&lt;/code&gt; crate"]
         direction LR
-        B["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Lexer&lt;/b&gt;"]
+        B["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;tokenize&lt;/b&gt;"]
         C["&lt;i&gt;Vec&amp;lt;Token&amp;gt;&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Token Stream&lt;/b&gt;"]
-        D["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TokenSource&lt;/b&gt;"]
-        B --&gt; C --&gt; D
+        B --&gt; C
     end
 
     subgraph P["&lt;code&gt;parser&lt;/code&gt; crate"]
-        E["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Parser&lt;/b&gt;"]
+        direction LR
+        D["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TokenSource&lt;/b&gt;"]
+        E["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;parse&lt;/b&gt;"]
+        F["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TreeSink&lt;/b&gt;"]
+        D --&gt; E --&gt; F
     end
 
     subgraph bottom["&lt;code&gt;syntax&lt;/code&gt; crate"]
         direction RL
-        I["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;AST&lt;/b&gt;"]
+        I["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;AstNode&lt;/b&gt;"]
         H["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;SyntaxNode&lt;/b&gt;"]
         G["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;GreenNode&lt;/b&gt;"]
-        F["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TreeSink&lt;/b&gt;"]
-        F --&gt; G --&gt; H --&gt; I
+        G --&gt; H --&gt; I
     end
 
     A --&gt; B
-    D -.-&gt;|reads tokens| E
-    E -.-&gt;|emits events| F
+    C -.-&gt;|implements| D
+    F -.-&gt;|implemented by| G
 
-    click B "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/lexer.rs#L1-L50" "View Lexer source"
-    click D "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L50-L70" "View TokenSource trait"
-    click E "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L81-L100" "View parse function"
-    click F "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L100-L120" "View TreeSink trait"
-    click G "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/syntax_node.rs#L20-L35" "View GreenNode type"
-    click H "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/syntax_node.rs#L29-L29" "View SyntaxNode type alias"
-    click I "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/ast.rs#L39-L50" "View AstNode trait"
+    click B "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax/src/parsing/lexer.rs#L30-L92" "View tokenize function"
+    click C "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax/src/parsing/lexer.rs#L9-L15" "View Token struct"
+    click D "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_parser/src/lib.rs#L30-L44" "View TokenSource trait"
+    click E "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_parser/src/lib.rs#L81-L84" "View parse function"
+    click F "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_parser/src/lib.rs#L56-L69" "View TreeSink trait"
+    click G "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax/src/syntax_node.rs#L10-L10" "View GreenNode type"
+    click H "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax/src/syntax_node.rs#L33-L34" "View SyntaxNode type alias"
+    click I "https://github.com/rust-lang/rust-analyzer/blob/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6/crates/ra_syntax/src/ast.rs#L31-L42" "View AstNode trait"
 
     classDef syntaxNode fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
     classDef parserNode fill:#fed7aa,stroke:#f97316,stroke-width:2px,color:#9a3412
     classDef inputNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
 
-    class B,C,D,F,G,H,I syntaxNode
-    class E parserNode
+    class B,C,G,H,I syntaxNode
+    class D,E,F parserNode
     class A inputNode
 
     style top fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
