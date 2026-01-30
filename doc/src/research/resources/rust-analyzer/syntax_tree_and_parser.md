@@ -502,28 +502,28 @@ The `parser` and `syntax` crates have **zero dependencies** on each other.
 ```mermaid
 %%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
 flowchart LR
-    A["<i>string</i><br/><b>Source Text</b>"]
+    A(["<i>string</i><br/><b>Source Text</b>"])
 
     subgraph top["<code>syntax</code> crate"]
         direction LR
         B["<i>fn</i><br/><b>tokenize</b>"]
-        C["<i>Vec&lt;Token&gt;</i><br/><b>Token Stream</b>"]
+        C(["<i>Vec&lt;Token&gt;</i><br/><b>Token Stream</b>"])
         B --> C
     end
 
     subgraph P["<code>parser</code> crate"]
         direction LR
-        D["<i>trait</i><br/><b>TokenSource</b>"]
+        D{{"<i>trait</i><br/><b>TokenSource</b>"}}
         E["<i>fn</i><br/><b>parse</b>"]
-        F["<i>trait</i><br/><b>TreeSink</b>"]
+        F{{"<i>trait</i><br/><b>TreeSink</b>"}}
         D --> E --> F
     end
 
     subgraph bottom["<code>syntax</code> crate"]
         direction RL
-        I["<i>trait</i><br/><b>AstNode</b>"]
-        H["<i>type</i><br/><b>SyntaxNode</b>"]
-        G["<i>type</i><br/><b>GreenNode</b>"]
+        I{{"<i>trait</i><br/><b>AstNode</b>"}}
+        H(["<i>type</i><br/><b>SyntaxNode</b>"])
+        G(["<i>type</i><br/><b>GreenNode</b>"])
         G --> H --> I
     end
 
@@ -542,11 +542,12 @@ flowchart LR
 
     classDef syntaxNode fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
     classDef parserNode fill:#fed7aa,stroke:#f97316,stroke-width:2px,color:#9a3412
-    classDef inputNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
+    classDef dataNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
+    classDef traitNode fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
 
-    class B,C,G,H,I syntaxNode
-    class D,E,F parserNode
-    class A inputNode
+    class B,E syntaxNode
+    class A,C,G,H dataNode
+    class D,F,I traitNode
 
     style top fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
     style bottom fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
