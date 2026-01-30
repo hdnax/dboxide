@@ -41,6 +41,7 @@ Based on the Rust toolchains (like `salsa` and `rust-analyzer`):
 The DBML parser was rewritten once around 2023 when I was an intern at Holistics. The original parser was a PEG.js parser.
 
 The main reasons I was assigned to the DBML parser rewrite were (I believe):
+
 - I was an intern at another team that worked solely on the AML language. It was a more complex language so probably, the others thought that a simpler language like DBML was a good task.
 - The Peg.js parser had some problems:
   - Slow: I don't think that this is the inherent property of parser combinators. One argument I can come up with to support this idea is that parser combinators tend to have excessive function calls. However, in a compiled language like C++, would this overhead be reduced by inlining or some more sophisticated optimization?
@@ -59,11 +60,13 @@ Since the first version of `@dbml/parse`, there has been some impact, but a lot 
 During the first launch, `@dbml/parse` broke a lot of user's code, mainly because the Peg.js parser was too lax that it allowed undocumented/legacy syntax I was not aware of.
 
 Since then, I encountered a lot of pain arising from my poor design choices and the way I wrote tests:
+
 - Fragile snapshot testing: I though snapshots were a shortcut for generating unit tests. This eventually led to me capturing entire CSTs, which created brittle, 2,000+ line test files where trivial internal changes triggered massive diffs. Genuine regression detection was nearly impossible.
 - Poor abstraction/Misuse of design patterns: I made the noobie mistake of "the more reuse, the better". I decided to force name resolution and validation phases of the parser into a Template Method pattern. This design choice created tight coupling via a shared component. The base class became a bloated, incomprehensible mess of "hooks" and "configs" to handle slight variations in logic across unrelated components.
 - Lack of type-driven validation (Parse, not validate): The parser was too lax, yielding a generic CST rather than a refined IR. Because the CST validation phase didn't transform the data into a "known-good" structure, subsequent phases were forced to re-validate or rely on unsafe type assertions.
 - The syntax tokens and nodes positions are precomputed, making CST patches almost always invalidate the positions & incremental parsing partly impossible.
 
 Some are minor issues:
+
 - Error messages & error codes in `@dbml/parse` are a mess.
 - No linter setup.
