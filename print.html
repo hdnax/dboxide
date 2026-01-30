@@ -1,0 +1,2428 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>dboxide</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-894c401d.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-86b9510b.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">dboxide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/hdnax/dboxide/tree/main/doc" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p align="center">
+  <img src="assets/dbml.png" alt="dboxide logo" width="200" />
+</p>
+
+<p>This repository, <a href="https://github.com/hdnax/dboxide"><code>dboxide</code></a>, is a rewrite of a DBML parser. It is a learning project to explore concepts in language theory, inspired by the work in the <a href="https://github.com/hdnax/type-theory"><code>type-theory</code></a> repository. The project builds on lessons learned from a previous parser, <code>@dbml/parse</code>.</p>
+<p>The primary motivation for this rewrite is to address the shortcomings of previous versions and explore more advanced compiler design concepts. The original PEG.js parser was slow and lacked resilience, making it difficult to build a good developer experience (e.g., in a language server). The first rewrite, <code>@dbml/parse</code>, brought performance improvements and basic language services but suffered from design flaws that made it fragile and hard to maintain.</p>
+<p>This project is not just about parsing DBML. It’s a research ground for:</p>
+<ul>
+<li><strong>Compiler infrastructure:</strong> Investigating best practices for lexing, parsing, and representing code in a way that supports incremental updates and rich analysis.</li>
+<li><strong>Developer experience:</strong> Building a foundation for a high-quality language server with features like precise error reporting, autocompletion, and code navigation.</li>
+<li><strong>Modern techniques:</strong> Applying query-based (on-demand) compilation, inspired by Salsa, to create a scalable and efficient analysis engine.</li>
+</ul>
+<p>The goal is to create a parser that is not only fast and correct but also serves as a solid foundation for a new generation of DBML tooling.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="goals"><a class="header" href="#goals">Goals</a></h1>
+<p>This document outlines the primary goals for <code>dboxide</code>. These goals are divided into two main categories: <strong>Project Goals</strong>, which focus on the tangible outcomes of the project, and <strong>Learning Goals</strong>, which focus on the practical techniques and concepts to be explored during development.</p>
+<h2 id="project-goals"><a class="header" href="#project-goals">Project Goals</a></h2>
+<p>These goals are about building a high-quality, feature-rich, and performant DBML parser and associated tooling.</p>
+<ul>
+<li><strong>Resilient and high-quality parser:</strong> Create a parser that can gracefully handle syntax errors, provide meaningful error messages, and produce a lossless syntax tree. This is crucial for a good developer experience.</li>
+<li><strong>Language server implementation:</strong> Build a functional language server for DBML that provides features like:
+<ul>
+<li>Autocompletion</li>
+<li>Go to definition</li>
+<li>Find references</li>
+<li>Real-time diagnostics</li>
+</ul>
+</li>
+<li><strong>Performance:</strong> The parser should be significantly faster than previous implementations, leveraging the performance benefits of Rust.</li>
+<li><strong>SQL dialect awareness:</strong> The parser should be able to understand and handle different SQL dialects, making it more versatile.</li>
+<li><strong>Modularity and extensibility:</strong> Design the parser and its components in a way that is easy to maintain, extend, and reuse.</li>
+</ul>
+<h2 id="learning-goals"><a class="header" href="#learning-goals">Learning Goals</a></h2>
+<p>This project is also an opportunity to learn and apply modern compiler construction techniques. The focus is on understanding the “how” and “why” behind these techniques.</p>
+<ul>
+<li><strong>Lexing and parsing techniques:</strong>
+<ul>
+<li><strong>Token representation:</strong> Investigate the ideal way to represent syntax tokens, including their position, kind, and value.</li>
+<li><strong>Lossless syntax trees:</strong> Learn how to build and work with lossless syntax trees that preserve all source information, including whitespace and comments.</li>
+<li><strong>Resilient parsing:</strong> Master techniques for error recovery and resilience in parsers.</li>
+<li><strong>Incremental parsing and red-green trees:</strong> Understand and implement incremental parsing using red-green trees to efficiently re-parse only the changed parts of a file.</li>
+</ul>
+</li>
+<li><strong>Query-based compilation:</strong>
+<ul>
+<li><strong>Salsa framework:</strong> Learn how to use the <code>salsa</code> framework to build a query-based compiler architecture.</li>
+<li><strong>Incremental computation:</strong> Understand how query-based systems enable incremental computation, where only the necessary computations are re-run when the input changes.</li>
+<li><strong>Parallelism:</strong> Explore opportunities for parallelizing the compilation process to improve performance.</li>
+</ul>
+</li>
+<li><strong>Type-driven validation:</strong> Learn to apply the “Parse, don’t validate” principle to create a more robust and type-safe parser.</li>
+<li><strong>Effective testing strategies:</strong> Learn how to write effective and maintainable unit and integration tests for a compiler.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="research"><a class="header" href="#research">Research</a></h1>
+<p>This section documents the research done for the <code>dboxide</code> project. It is divided into two main parts:</p>
+<ul>
+<li><a href="#research-plan"><strong>Research Plan</strong></a>: This page outlines the research plan, including the list of topics to be investigated.</li>
+<li><a href="#resources"><strong>Resources</strong></a>: This page documents the knowledge learnt from various resources.</li>
+<li><a href="#glossary"><strong>Glossary</strong></a>: This page contains brief explanations of the concepts and techniques researched for the project.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="research-plan"><a class="header" href="#research-plan">Research Plan</a></h1>
+<p>This page outlines the research plan for <code>dboxide</code>. The goal is to investigate and understand the following concepts and techniques, which are crucial for building a modern and efficient parser and language server.</p>
+<h2 id="research-topics"><a class="header" href="#research-topics">Research Topics</a></h2>
+<ul>
+<li><strong>Lexing &amp; Token representation:</strong>
+<ul>
+<li>Ideal representation of a syntax token (source offset/pointer, kind, processed value).</li>
+<li>Handling of non-ASCII characters (UTF-8).</li>
+<li>Handling of trivial and error tokens in a lossless syntax tree.</li>
+<li>Handling of multi-word and unreserved keywords.</li>
+<li>Handling of ambiguous tokens (e.g., <code>&lt;</code> as a less than sign or a generic bracket).</li>
+<li>Efficient storage and computation of token positions for incremental parsing.</li>
+<li>On-demand lexing vs lexing all at once.</li>
+</ul>
+</li>
+<li><strong>String interning:</strong>
+<ul>
+<li>What is string interning and why is it useful in a compiler?</li>
+<li>Where and how is it typically applied in a compilation pipeline (e.g., during lexing, parsing, or semantic analysis)?</li>
+<li>How can it be implemented efficiently?</li>
+<li>What are the trade-offs of using string interning?</li>
+</ul>
+</li>
+<li><strong>Parsing &amp; Syntax tree:</strong>
+<ul>
+<li>Good representation for a lossless syntax tree.</li>
+<li>Storing error nodes and partial nodes in the lossless syntax tree.</li>
+<li>Resilience parsing and error recovery techniques.</li>
+<li>Designing good error messages.</li>
+</ul>
+</li>
+<li><strong>Incremental parsing &amp; Red-green trees:</strong>
+<ul>
+<li>What are red-green trees and how do they work?</li>
+<li>How can they be used to implement incremental parsing?</li>
+<li>What are the performance implications of using red-green trees?</li>
+</ul>
+</li>
+<li><strong>Program analysis &amp; Query-based compiler:</strong>
+<ul>
+<li>Utilizing a query-based architecture (like <code>salsa</code>) for program analysis, lexing, and parsing.</li>
+<li>Module system features, including module resolution.</li>
+<li>Name resolution and related problems.</li>
+<li><strong>Resources:</strong></li>
+</ul>
+</li>
+<li><strong>Other topics:</strong>
+<ul>
+<li><strong>Language server implementation</strong></li>
+<li><strong>Parallelism in compilation</strong></li>
+<li><strong>SQL dialect awareness</strong></li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="resources"><a class="header" href="#resources">Resources</a></h1>
+<p>This section documents the knowledge learnt from various sources during the implementation of <code>dboxide</code>:</p>
+<ul>
+<li><a href="#rust-analyzer"><strong><code>rust-analyzer</code></strong></a>: An implementation of LSP for the Rust programming language - a good reference model.</li>
+<li><a href="#libsyntax"><strong><code>libsyntax</code></strong></a>: Rust compiler’s crate that documents some design notes on tree structure and parser.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rust-analyzer"><a class="header" href="#rust-analyzer"><code>rust-analyzer</code></a></h1>
+<p>This section contains resources and notes about the <code>rust-analyzer</code> project.</p>
+<p><code>rust-analyzer</code> is an LSP implement for Rust for many code editors.</p>
+<p>Official site: <a href="https://rust-analyzer.github.io/">Link</a>.</p>
+<ul>
+<li><a href="#high-level-architecture--conventions">High-Level Architecture &amp; Conventions</a></li>
+<li><a href="#coding-conventions">Coding Conventions</a></li>
+<li><a href="#syntax-tree--parser">Syntax Tree &amp; Parser</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="high-level-architecture--conventions"><a class="header" href="#high-level-architecture--conventions">High-Level Architecture &amp; Conventions</a></h1>
+<p>This section describes the architecture of <code>rust-analyzer</code>.</p>
+<p>Official site: <a href="https://rust-analyzer.github.io/book/contributing/architecture.html">Link</a>.</p>
+<ul>
+<li>
+<p><code>rust-analyzer</code> input/output:</p>
+<ul>
+<li>Input (Ground state): Source code data from the client. Everything is kept in memory.
+<ul>
+<li>Mapping from file paths to their contents.</li>
+<li>Project structure metadata represented as a crate graph (crate roots, <code>cfg</code> flags, crate dependencies)</li>
+</ul>
+</li>
+<li>Output (Derived state): “Structure semantic model” of the code.
+<ul>
+<li>A representation of the project that is fully resolved - type-wise and reference-wise.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Optimizations:</p>
+<ul>
+<li>Incremental:
+<ul>
+<li>Input can be a delta of changes.</li>
+<li>Output can be a fresh code model.</li>
+</ul>
+</li>
+<li>Lazy: The output is computed on-demand.</li>
+</ul>
+</li>
+</ul>
+<h2 id="parser---parser-crate"><a class="header" href="#parser---parser-crate">Parser - <code>parser</code> Crate</a></h2>
+<ul>
+<li>A hand-written recursive descent tree-agnostic parser.</li>
+<li>Output: A sequence of events like “start node” and “finish node”, based on <a href="https://github.com/JetBrains/kotlin/blob/4d951de616b20feca92f3e9cc9679b2de9e65195/compiler/frontend/src/org/jetbrains/kotlin/parsing/KotlinParsing.java">kotlin’s parser</a>, which can be used to learn about dealing with syntax errors and incomplete input.</li>
+<li>Some traits (<code>TreeSink</code> and <code>TokenSource</code>) are used to bridge the tree-agnostic parser with <code>rowan</code> trees.</li>
+</ul>
+<h3 id="architecture-invariant---tree-agnostic-parser"><a class="header" href="#architecture-invariant---tree-agnostic-parser">Architecture Invariant - Tree-Agnostic Parser</a></h3>
+<ul>
+<li>The parser functions as a pure transformer, converting one flat stream of events into another.</li>
+<li>Dual independence: The parser is not locked into:
+<ul>
+<li>A specific tree structure (output format).</li>
+<li>A specific token representation (input format).</li>
+</ul>
+</li>
+<li>Benefits:
+<ul>
+<li>Token independence allows using the same logic to parse:
+<ul>
+<li>Standard source code (text -&gt; tokens).</li>
+<li>Macro expansion (token trees -&gt; tokens).</li>
+<li>Synthetic code generated programmatically.</li>
+</ul>
+</li>
+<li>Tree independence allows easily varying the syntax tree implementation + light-parsing.
+<ul>
+<li>Avoid allocation of tree nodes.</li>
+<li>For tasks like “find all function names in this 10k line file,” the parser can simply emit “DefineName” events. A listener catches those names and ignores everything else, finishing the task in a fraction of the time.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="architecture-invariant---infallible-parser"><a class="header" href="#architecture-invariant---infallible-parser">Architecture Invariant - Infallible Parser</a></h3>
+<ul>
+<li>Parsing never fails.</li>
+<li>Parser returns <code>(T, Vec&lt;Error&gt;)</code>.</li>
+</ul>
+<h2 id="syntax-tree-structure--parser---syntax-crate"><a class="header" href="#syntax-tree-structure--parser---syntax-crate">Syntax Tree Structure &amp; Parser - <code>syntax</code> Crate</a></h2>
+<p>Based on <a href="#libsyntax"><code>libsyntax-2.0</code></a>.</p>
+<ul>
+<li><a href="https://github.com/rust-analyzer/rowan"><code>rowan</code></a>: The underlying library used to construct the raw, untyped syntax trees (Green/Red trees).</li>
+<li><code>ast</code> internal crate: Provide a <strong>type-safe API</strong> layer on top of the raw <code>rowan</code> tree.</li>
+<li><code>ungrammar</code> internal crate: A grammar description format used to automatically generate the <code>syntax_kinds</code> and <code>ast</code> modules.</li>
+</ul>
+<h3 id="architecture-invariant---syntax-crate-as-an-api-boundary"><a class="header" href="#architecture-invariant---syntax-crate-as-an-api-boundary">Architecture Invariant - <code>syntax</code> Crate as an API Boundary</a></h3>
+<ul>
+<li>The <code>syntax</code> crate knows nothing about <code>salsa</code> and LSP. It’s an API boundary.</li>
+<li>Benefits:
+<ul>
+<li>Allows it to be used for lightweight tooling without needing a full build or semantic analysis.</li>
+</ul>
+</li>
+</ul>
+<h3 id="architecture-invariant---syntax-tree-as-a-value-type"><a class="header" href="#architecture-invariant---syntax-tree-as-a-value-type">Architecture Invariant - Syntax Tree as a Value Type</a></h3>
+<ul>
+<li>The syntax tree is self-contained, defined solely by its contents without relying on global context (like interners).</li>
+<li>Pure syntax: Unlike traditional compiler trees, it strictly excludes semantic information (such as type inference data).</li>
+<li>Benefits:
+<ul>
+<li>IDE optimization: Critical for tools like <code>rust-analyzer</code>, where assists and refactors require frequent tree modifications.</li>
+<li>Simplified transformation: Keeping the tree “dumb” (purely structural) allows for easy code manipulation without the complexity of managing semantic state during edits.</li>
+</ul>
+</li>
+</ul>
+<h3 id="architecture-invariant---syntax-tree-per-file"><a class="header" href="#architecture-invariant---syntax-tree-per-file">Architecture Invariant - Syntax Tree per File</a></h3>
+<ul>
+<li>A syntax tree is built for a single file.</li>
+<li>Benefits: Enable parallel parsing of all files.</li>
+</ul>
+<h3 id="architectural-invariant---incomplete-syntax-tree"><a class="header" href="#architectural-invariant---incomplete-syntax-tree">Architectural Invariant - Incomplete Syntax Tree</a></h3>
+<ul>
+<li>Syntax trees are designed to tolerate incomplete or invalid code (common during live editing).</li>
+<li>AST accessor methods return <code>Option</code> types to safely handle missing data.</li>
+</ul>
+<h2 id="query-database---base-db-crate"><a class="header" href="#query-database---base-db-crate">Query database - <code>base-db</code> Crate</a></h2>
+<ul>
+<li><a href="https://github.com/salsa-rs/salsa"><code>salsa</code></a>: A crate used for incremental and on-demand computation.
+<ul>
+<li><code>salsa</code> resembles a key-value store.</li>
+<li><code>salsa</code> can compute derived values with specified functions.</li>
+</ul>
+</li>
+<li>Define most input queries.</li>
+</ul>
+<h3 id="architecture-invariant---file-system-agnostic"><a class="header" href="#architecture-invariant---file-system-agnostic">Architecture Invariant - File-System Agnostic</a></h3>
+<ul>
+<li>Nothing is known about the file system &amp; file paths.</li>
+<li><code>FileId</code>: An opaque type that represents a file.</li>
+</ul>
+<h2 id="analyzer-macro-expansion-name-resolution-type-inference---hir-xxx-crates"><a class="header" href="#analyzer-macro-expansion-name-resolution-type-inference---hir-xxx-crates">Analyzer (Macro expansion, Name resolution, Type inference) - <code>hir-xxx</code> Crates</a></h2>
+<ul>
+<li>
+<p><code>hir-expand</code>: Macro expansion.</p>
+</li>
+<li>
+<p><code>hir-def</code>: Name resolution.</p>
+</li>
+<li>
+<p><code>hir_ty</code>: Type inference (Why does this one uses underscore?).</p>
+</li>
+<li>
+<p>Define various IRs of the core.</p>
+</li>
+<li>
+<p><code>hir-xxx</code> is ECS-based (Entity-Component-System):</p>
+<ul>
+<li>ECS architecture: Instead of rich objects, compiler entities (like functions or structs) are represented as raw integer IDs (handles), similar to game entities.</li>
+<li>Database-driven: You cannot access data directly from an ID. You must query the central Salsa database (e.g., <code>db.function_data(id)</code>), which stores the actual content in “component” arrays.</li>
+</ul>
+</li>
+<li>
+<p>Zero abstraction: The code is intentionally explicit about database access. It avoids helper methods to keep dependency tracking transparent and overhead low.</p>
+</li>
+<li>
+<p>These crates “lower” (translate) Rust syntax into logic predicates, allowing the <code>chalk</code> engine to solve complex trait bounds and type inference.</p>
+</li>
+</ul>
+<h3 id="architecture-invariant---incremental"><a class="header" href="#architecture-invariant---incremental">Architecture Invariant - Incremental</a></h3>
+<ul>
+<li>The separation of “Identity” (ID) from “Data” in ECS allows <code>rust-analyzer</code> to update only changed data without breaking references to the ID elsewhere, enabling millisecond-level updates.</li>
+</ul>
+<h2 id="high-level-ir---hir-crate"><a class="header" href="#high-level-ir---hir-crate">High-Level IR - <code>hir</code> Crate</a></h2>
+<ul>
+<li>
+<p>An API boundary for consuming <code>rust-analyzer</code> as a library.</p>
+</li>
+<li>
+<p><code>hir</code> acts as the high-level API boundary, wrapping internal raw IDs (ECS-style) into semantic structs (e.g., <code>Function</code>) to provide a familiar object-oriented interface for library consumers.</p>
+</li>
+<li>
+<p>“Thin handle” Pattern: These structs hold no data (only the ID) and require the <code>db</code> to be passed into every method call (e.g., <code>func.name(db)</code>), effectively bridging the stateless handles with the stateful Salsa database.</p>
+</li>
+<li>
+<p>Analogy: Internally, the ECS-style code is like SQL &amp; <code>hir</code> is like ORM.</p>
+<ul>
+<li>Syntax inversion (object-oriented vs functional):
+<ul>
+<li>In pure ECS, logic lives in external systems (e.g. <code>db.function_visibility(id)</code>).</li>
+<li>The <code>hir</code> crate inverts this to an object-oriented style (<code>func.visibility(db)</code>), making the API discoverable via IDE autocomplete.</li>
+</ul>
+</li>
+<li>Encapsulated “joins”:
+<ul>
+<li>Pure ECS requires you to manually query multiple tables to piece together information (e.g., get parent module ID → look up module data → find visibility).</li>
+<li>The <code>hir</code> crate abstracts these complex multi-step database lookups into single, coherent methods.</li>
+</ul>
+</li>
+<li>Semantic types:
+<ul>
+<li>ECS deals with efficient storage (raw <code>u32</code> IDs).</li>
+<li><code>hir</code> deals with high-level meaning, exposing semantic types (like struct <code>Type</code>) rather than implementation details (like struct <code>TypeId</code>).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="architecture-invariant---inert-data-structure"><a class="header" href="#architecture-invariant---inert-data-structure">Architecture Invariant - Inert Data Structure</a></h3>
+<ul>
+<li><code>hir</code> presents a fully resolved, inert view of the code, abstracting away the dynamic computations occurring in internal crates.
+<ul>
+<li>“Inert” here is relative to the <code>db</code> object.</li>
+</ul>
+</li>
+<li>Syntax-to-HIR bridge: It manages the complex one-to-many mapping between raw syntax and semantic definitions (via the <code>Semantics</code> type).</li>
+<li>The “Uber-IDE” pattern: To resolve a specific syntax node to an HIR entity (essential for “Go to Definition”), it employs a recursive strategy used by Roslyn and Kotlin: it resolves the syntax parent to a HIR owner, then queries that owner’s children to re-identify the target node.</li>
+</ul>
+<h2 id="ide---ide-xxx-crates"><a class="header" href="#ide---ide-xxx-crates">IDE - <code>ide-xxx</code> Crates</a></h2>
+<ul>
+<li>
+<p>Top-level API boundary: The ultimate entry point for external clients (LSP servers, text editors) to interact with rust-analyzer.</p>
+</li>
+<li>
+<p><code>ide</code> consumes the semantic model provided by the <code>hir</code> crate to implement concrete user features like code completion, goto definition, and refactoring.</p>
+</li>
+<li>
+<p><code>ide</code> is protocol-agnostic, designed to be used via LSP, custom protocols (like FlatBuffers), or directly as a library within an editor.</p>
+</li>
+<li>
+<p>This crate introduces the concept of change over time:</p>
+<ul>
+<li><code>AnalysisHost</code>: The mutable state container where you <code>apply_change</code>.</li>
+<li><code>Analysis</code>: An immutable, transactional snapshot of the state used for querying.</li>
+</ul>
+</li>
+<li>
+<p>Modular Architecture:</p>
+<ul>
+<li><code>ide</code>: The public facade and home for smaller features.</li>
+<li><code>ide-db</code>: Shared infrastructure (e.g. reference search).</li>
+<li><code>ide-xxx</code>: Isolated crates for major features (completion, diagnostics, assists, SSR).</li>
+</ul>
+</li>
+</ul>
+<h3 id="architecture-invariant---view-layer"><a class="header" href="#architecture-invariant---view-layer">Architecture Invariant - View Layer</a></h3>
+<ul>
+<li>View/ViewModel layer:
+<ul>
+<li><code>ide</code> acts as the “View” (MVC) or “ViewModel” (MVVM), translating complex compiler data into simple, editor-friendly terms (offsets, text labels) rather than internal definitions or syntax trees.</li>
+<li>The API is built with POD types. All inputs and outputs are conceptually serializable (no complex object graphs or HIR types exposed).</li>
+</ul>
+</li>
+<li>The boundary is explicitly drawn at the “UI” level, following the philosophy popularized by the Language Server Protocol. - It talks in the language of the text editor &amp; not the language of the compiler.</li>
+</ul>
+<h2 id="rust-analyzer-crate"><a class="header" href="#rust-analyzer-crate"><code>rust-analyzer</code> Crate</a></h2>
+<ul>
+<li>Define the binary for the language server -&gt; The entry point.</li>
+<li>It acts like the network/protocol adapter tha connects the pure logic of the <code>ide</code> crate to the outside world. -&gt; Functional core, imperative shell.</li>
+</ul>
+<h3 id="architecture-invariant---lsp--json-awareness"><a class="header" href="#architecture-invariant---lsp--json-awareness">Architecture Invariant - LSP &amp; JSON Awareness</a></h3>
+<ul>
+<li><code>rust-analyzer</code> is the only place where LSP types and JSON serialization exist.</li>
+<li>Lower crates (<code>ide</code>, <code>hir</code>) remain pure and protocol-agnostic. They are forbidden from deriving <code>Serialize</code> or <code>Deserialize</code> for LSP purposes.</li>
+<li><code>rust-analyzer</code> maintains its own set of serializable types. It manually converts the <code>ide</code> crate’s Rust-native data structures (like <code>TextRange</code>) into LSP’s wire-format structures (like <code>Range</code> with line/character) before sending them over the wire.</li>
+</ul>
+<h3 id="architecture-invariant---protocol-wise-statelessness"><a class="header" href="#architecture-invariant---protocol-wise-statelessness">Architecture Invariant - Protocol-Wise Statelessness</a></h3>
+<ul>
+<li>The server is stateless, in the sense that it doesn’t know about the previous requests.</li>
+</ul>
+<h2 id="utilities---stdx-crate"><a class="header" href="#utilities---stdx-crate">Utilities - <code>stdx</code> Crate</a></h2>
+<ul>
+<li><code>rust-analyzer</code> avoids small helper crates.</li>
+<li><code>stdx</code> is the crate to store all small reusable utilities.</li>
+</ul>
+<h2 id="macro-crates"><a class="header" href="#macro-crates">Macro Crates</a></h2>
+<ul>
+<li>Core abstraction (<code>tt</code>): Macros are defined purely as <code>TokenTree</code> → <code>TokenTree</code> transforms, isolated from other compiler parts. The <code>tt</code> crate defines this structure (single tokens or delimited sequences).</li>
+<li>Declarative macros (<code>mbe</code>): The <code>mbe</code> crate implements “Macros By Example” (<code>macro_rules!</code>). It handles parsing, expansion, and the translation between the IDE’s syntax trees and the raw token trees.</li>
+<li>Procedural Macros: Proc-macros run in a separate process to isolate the IDE from user code crashes.
+<ul>
+<li>Server (<code>proc-macro-srv</code>): Load the dynamic libraries (built by Cargo) and executes the macros.</li>
+<li>Client (<code>proc-macro-api</code>): Communicate with the server, sending/receiving Token Trees.</li>
+</ul>
+</li>
+</ul>
+<h3 id="architecture-invariant---isolation"><a class="header" href="#architecture-invariant---isolation">Architecture Invariant - Isolation</a></h3>
+<ul>
+<li>Because arbitrary macro code can panic or segfault (crashing the editor), <code>rust-analyzer</code> executes them in a separate process. This allows the main IDE to survive fatal errors and recover gracefully.</li>
+<li><code>salsa</code>’s incremental system assumes all functions are pure (deterministic). Since proc-macros can be non-deterministic (e.g., reading external files or random numbers), they violate this core assumption and require special handling to prevent database corruption or infinite invalidation loops.</li>
+</ul>
+<h2 id="virtual-file-system---vfs-xxx-and-paths-crates"><a class="header" href="#virtual-file-system---vfs-xxx-and-paths-crates">Virtual File System - <code>vfs-xxx</code> and <code>paths</code> Crates <a id="vfs"></a></a></h2>
+<ul>
+<li>Virtual file system (VFS): These crates provide an abstraction layer that generates consistent snapshots of the file system, insulating the compiler from raw, messy OS paths.</li>
+<li>The architecture does not assume a single unified file system. A single <code>rust-analyzer</code> process can serve multiple remote machines simultaneously, meaning the same path string could exist on two different machines and refer to different content.</li>
+<li>“Witness” API: To resolve this ambiguity, path APIs generally require a “file system witness” (an existing anchor path) to identify which specific file system context the operation targets.</li>
+</ul>
+<h2 id="interning---intern-crate"><a class="header" href="#interning---intern-crate">Interning - <code>intern</code> Crate</a></h2>
+<ul>
+<li>Use <code>Arc</code> (Atomic Reference Counting) to ensure identical data (like strings or paths) is stored only once in memory.</li>
+<li>Optimized for “value types” that are defined by their content (e.g., <code>std::vec::Vec</code>), rather than “entities” defined by an ID (e.g., <code>Function #42</code>).</li>
+<li><code>db</code>-independent: Unlike <code>salsa</code>’s integer IDs, <code>Interned&lt;T&gt;</code> owns its data, allowing access and inspection without needing a reference to the compiler database (<code>db</code>).</li>
+</ul>
+<ul>
+<li>Interning enables instant equality checks by comparing memory pointers instead of scanning content, which is critical for frequently compared items like file paths.</li>
+<li>Interning serves as a lower-level optimization layer for static, immutable data that doesn’t require the full overhead of incremental dependency tracking.</li>
+</ul>
+<h2 id="architectural-policies"><a class="header" href="#architectural-policies">Architectural Policies</a></h2>
+<h3 id="stability-guarantees"><a class="header" href="#stability-guarantees">Stability Guarantees</a></h3>
+<ul>
+<li><code>rust-analyzer</code> avoids new stability guarantees to move fast.</li>
+<li>The internal <code>ide</code> API is explicitly unstable.</li>
+<li>Stability is only guaranteed at the <strong>LSP</strong> level (managed by the protocol) and <strong>input</strong> level (Rust language/Cargo).</li>
+<li>De-facto stability: <code>rust-project.json</code> became stable implicitly by virtue of having users — a lesson to explicitly mark APIs as unstable/opt-in before release.</li>
+</ul>
+<h3 id="code-generation"><a class="header" href="#code-generation">Code Generation</a></h3>
+<ul>
+<li>The API for syntax trees (<code>syntax::ast</code>) and manual sections (features, assists, config) are generated automatically.</li>
+<li>To simplify builds, <code>rust-analyzer</code> does not use itself for codegen. It uses <code>syn</code> and manual string parsing instead.</li>
+</ul>
+<h3 id="3-cancellation-concurrency"><a class="header" href="#3-cancellation-concurrency">3. Cancellation (Concurrency)</a></h3>
+<ul>
+<li>The problem: If the user types while the IDE is computing (e.g., highlighting), the result is immediately stale.</li>
+<li>The solution: The <strong>salsa</strong> database maintains a global revision counter.
+<ul>
+<li>When input changes, the counter is bumped.</li>
+<li>Old threads checking the counter notice the mismatch and <strong>panic</strong> with a special <code>Canceled</code> token.</li>
+</ul>
+</li>
+<li>The <code>ide</code> boundary catches this panic and converts it into a <code>Result&lt;T, Canceled&gt;</code>.</li>
+</ul>
+<h3 id="testing-strategy"><a class="header" href="#testing-strategy">Testing Strategy</a></h3>
+<ul>
+<li>Tests are concentrated on three system boundaries:
+<ul>
+<li>Outer (<code>rust-analyzer</code> crate): “Heavy” integration tests via LSP/stdio. Validates the protocol but is slow (reads real files).</li>
+<li>Middle (<code>ide</code> crate): The most important layer. Tests <code>AnalysisHost</code> (simulating an editor) against expectations.</li>
+<li>Inner (<code>hir</code> crate): Tests semantic models using rich types and <strong>snapshot testing</strong> (via the <code>expect</code> crate).</li>
+</ul>
+</li>
+</ul>
+<h4 id="key-testing-invariants"><a class="header" href="#key-testing-invariants">Key Testing Invariants</a></h4>
+<ul>
+<li>Data-driven: Tests use string fixtures (representing multiple files) rather than calling API setup functions manually. This allows significant API refactorings.</li>
+<li>No <code>libstd</code>: Tests do not link to <code>libstd</code>/<code>libcore</code> to ensure speed; all necessary code is defined within the test fixture.</li>
+</ul>
+<h3 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h3>
+<ul>
+<li>No IO in core: Internal crates (<code>ide</code>, <code>hir</code>) are pure and never fail (no <code>Result</code>). They return partial data plus errors: <code>(T, Vec&lt;Error&gt;)</code>.</li>
+<li>Panic resilience: Since bugs are inevitable, every LSP request is wrapped in <code>catch_unwind</code> so a crash in one feature doesn’t kill the server.</li>
+<li>Macros: Uses <code>always!</code> and <code>never!</code> macros to handle impossible states gracefully.</li>
+</ul>
+<h3 id="observability"><a class="header" href="#observability">Observability</a></h3>
+<ul>
+<li>Profiling: Includes a custom low-overhead hierarchical profiler (<code>hprof</code>) enabled via env vars (<code>RA_PROFILE</code>).</li>
+</ul>
+<h3 id="serialization"><a class="header" href="#serialization">Serialization</a></h3>
+<ul>
+<li>The trap of ease: While <code>#[derive(Serialize)]</code> is easy to add, it creates rigid IPC boundaries (backward compatibility contracts) that are extremely difficult to change later.</li>
+<li>To strictly preserve internal flexibility, types in core crates like <code>ide</code> and <code>base_db</code> are not serializable by design.</li>
+<li>Serialization is forced to the “edge” (the client). External clients must define their own stable schemas (e.g., <code>rust-project.json</code>) and manually convert them into internal structures, isolating the core compiler from protocol versioning issues.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="coding-conventions"><a class="header" href="#coding-conventions">Coding Conventions</a></h1>
+<p>Official site: <a href="https://rust-analyzer.github.io/book/contributing/style.html">Link</a>.</p>
+<h2 id="general-philosophy"><a class="header" href="#general-philosophy">General Philosophy</a></h2>
+<ul>
+<li><code>rust-analyzer</code>’s approach to clean code:
+<ul>
+<li>Velocity over perfection: Do not block functional PRs on purely stylistic changes.</li>
+<li>“Show, don’t just tell”: For complex style issues, reviewers are encouraged to merge the PR and then send a follow-up cleanup PR themselves. This resolves the issue faster and teaches the author “by example” rather than through endless comment threads.</li>
+</ul>
+</li>
+<li>If a review comment applies generally, update the Style Guide instead of leaving a one-off comment. This way, temporary feedback is turned into permanent documentation.</li>
+<li>Small, atomic cleanup PRs (even just renaming a variable) are explicitly encouraged to keep the codebase healthy.</li>
+</ul>
+<h2 id="scale-of-changes"><a class="header" href="#scale-of-changes">Scale of Changes</a></h2>
+<ul>
+<li>
+<p>Generally, small &amp; focused PRs are preferred; but sometimes, that isn’t possible.</p>
+</li>
+<li>
+<p><code>rust-analyzer</code> categorizes PRs into 3 groups.</p>
+</li>
+</ul>
+<h3 id="internal-changes-low-risk"><a class="header" href="#internal-changes-low-risk">Internal Changes (Low Risk)</a></h3>
+<ul>
+<li>Definition: Changes confined to the internals of a single component. No <code>pub</code> items are changed or added (no changes to the interfaces and no new dependencies).</li>
+<li>Review standard: Easy Merge.
+<ul>
+<li>Does the happy path work?</li>
+<li>Are there tests?</li>
+<li>Does it avoid panicking on the unhappy path?</li>
+</ul>
+</li>
+</ul>
+<h3 id="api-expansion-medium-risk"><a class="header" href="#api-expansion-medium-risk">API Expansion (Medium Risk)</a></h3>
+<ul>
+<li>Definition: Adding new <code>pub</code> functions or types that expose internal capabilities to other crates.</li>
+<li>Review standard: High scrutiny.
+<ul>
+<li>The interface matters more than the implementation. It must be correct and future-proof.</li>
+</ul>
+</li>
+<li><code>rust-analyzer</code>’s guideline: If you start a “Type 1” change and realize you need to change the API, stop. Split the API change into its own separate, focused PR first.</li>
+</ul>
+<h3 id="dependency-changes-high-risk"><a class="header" href="#dependency-changes-high-risk">Dependency Changes (High Risk)</a></h3>
+<ul>
+<li>Definition: Introducing new connections between components via pub use re-exports or <code>Cargo.toml</code> dependencies.</li>
+<li>Review standard: Rare &amp; dangerous.
+<ul>
+<li>These break encapsulation.</li>
+<li>Even an innocent-looking <code>pub use</code> can accidentally degrade the architecture by leaking abstractions across boundaries.</li>
+</ul>
+</li>
+</ul>
+<h2 id="cratesio-dependencies"><a class="header" href="#cratesio-dependencies">Crates.io Dependencies</a></h2>
+<ul>
+<li>Restrict external dependencies: Be extremely conservative with <code>crates.io</code> usage to minimize compile times and breakage risks.</li>
+<li>Do not use small “helper” libraries (allowed exceptions: <code>itertools</code>, <code>either</code>).</li>
+<li>Internalize utilities: Place general, reusable logic into the internal <code>stdx</code> crate rather than adding a dependency.</li>
+<li>Audit dependency tree: Periodically review <code>Cargo.lock</code> to prune irrational transitive dependencies.</li>
+</ul>
+<h3 id="rationale"><a class="header" href="#rationale">Rationale</a></h3>
+<ul>
+<li>Compilation speed:
+<ul>
+<li>Rust compiles dependencies from source.</li>
+<li>Avoiding bloat is the best way to keep build times and feedback loops fast.</li>
+</ul>
+</li>
+<li>Transitive bloat:
+<ul>
+<li>Small “helper” crates often pull in deep chains of hidden dependencies (the “iceberg” effect).</li>
+</ul>
+</li>
+<li>Stability &amp; Security:
+<ul>
+<li>Reduce the risk of upstream abandonment, breaking changes, or supply chain attacks.</li>
+</ul>
+</li>
+<li>Self-reliance: If logic is simple enough for a micro-crate, it belongs in the internal <code>stdx</code> library, not as an external liability.</li>
+</ul>
+<h2 id="commit-style"><a class="header" href="#commit-style">Commit Style</a></h2>
+<ul>
+<li>Document for changelogs to avoid release burden on the maintainers.</li>
+<li>Changelogs &gt; Clean history.</li>
+</ul>
+<h3 id="git-history"><a class="header" href="#git-history">Git History</a></h3>
+<ul>
+<li>Clean git history is strongly encouraged but not mandated.</li>
+<li>Use a rebase workflow. It is explicitly acceptable to rewrite history (force push) during the PR review process.</li>
+<li>Before the final merge, use interactive rebase to squash small “fixup” commits into logical units.</li>
+</ul>
+<h3 id="commit-message--pr-description"><a class="header" href="#commit-message--pr-description">Commit Message &amp; PR Description</a></h3>
+<ul>
+<li>Do not <code>@mention</code> users in commit messages or PR descriptions.
+<ul>
+<li>Reason: Rebasing re-commits the message, spamming the mentioned user with duplicate notifications.</li>
+</ul>
+</li>
+<li>User-centric titles: Write PR titles/descriptions describing the user benefit, not the implementation details.
+<ul>
+<li>Good: “Make goto definition work inside macros”.</li>
+<li>Bad: “Use original span for <code>FileId</code>”.</li>
+</ul>
+</li>
+<li>Changelog automation: You must categorize PRs so release notes can be auto-generated. Use one of two methods:
+<ul>
+<li>Title prefix: <code>feat:</code>, <code>fix:</code>, <code>internal:</code>, or <code>minor:</code> (e.g., <code>feat: Add hover support</code>).</li>
+<li>Magic comment: <code>changelog [fix] Description here in the PR body</code>.</li>
+</ul>
+</li>
+<li>Visuals: For UI changes, include a GIF in the description to demonstrate the feature.</li>
+</ul>
+<h2 id="linting"><a class="header" href="#linting">Linting</a></h2>
+<ul>
+<li>Clippy is used.</li>
+</ul>
+<h2 id="code"><a class="header" href="#code">Code</a></h2>
+<h3 id="minimal-tests"><a class="header" href="#minimal-tests">Minimal Tests</a></h3>
+<ul>
+<li>Tests must use the absolute minimum code necessary to reproduce the case. Aggressively strip “noise” from copy-pasted real-world code.</li>
+<li>Format declarative code densely (e.g., <code>enum E { A, B }</code> on a single line) to keep the test concise, provided it remains readable.</li>
+<li>Unindented raw strings: Use <code>r#...#</code> literals for multiline fixtures. Ensure the content is unindented (starts at column <code>0</code>) so that character offsets in the test match the actual file positions exactly.</li>
+<li>Rationale:
+<ul>
+<li>Reduce visual noise and scrolling, making the actual test case immediately obvious.</li>
+<li>Lower execution time and keeps debug logs clean.</li>
+<li>Unindented formatting allows you to use your editor’s “selection character count” to verify byte offsets directly, without needing to manually subtract indentation whitespace.</li>
+</ul>
+</li>
+</ul>
+<h3 id="marked-tests"><a class="header" href="#marked-tests">Marked Tests</a></h3>
+<ul>
+<li>Marked test: A technique used to verify that a specific, often hard-to-reach line of code was actually executed during a test.</li>
+<li>Use <code>cov_mark::hit!</code> (in code) and <code>cov_mark::check!</code> (in tests) to create a strictly unique link between a specific edge case in the implementation and its corresponding test.</li>
+<li>Principle: Only maintain one mark per test and one mark per code branch.</li>
+<li>Never place multiple marks in a single test, and never reuse the same mark across different tests.</li>
+<li>Rationale: This ensures that searching for a mark immediately reveals the single canonical test responsible for verifying that specific code branch, eliminating ambiguity.</li>
+</ul>
+<h3 id="should_panic"><a class="header" href="#should_panic"><code>#[should_panic]</code></a></h3>
+<ul>
+<li><code>#[should_panic]</code> is prohibited - <code>None</code> and <code>Err</code> should be explicitly checked.</li>
+<li>Rationale:
+<ul>
+<li><code>#[should_panic]</code> is a tool for library authors to make sure that the API does not fail silently when misused.</li>
+<li><code>rust-analyzer</code> is a long-running server, not a library. It must handle all input gracefully, even invalid input (returning <code>Err</code> or <code>None</code>). It should never intentionally crash.</li>
+<li>Expected panics still dump stack traces into the test logs. This “noise” creates confusion, making it difficult to distinguish between a test verifying a panic and an actual bug causing a crash.</li>
+<li>Expected panics still dump stack traces into the test logs. This “noise” creates confusion, making it difficult to distinguish between a test verifying a panic and an actual bug causing a crash.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ignore"><a class="header" href="#ignore"><code>#[ignore]</code></a></h3>
+<ul>
+<li>Never ignore tests. Explicitly assert the wrong behavor and add a <code>FIXME</code> comment.</li>
+<li>Rationale:
+<ul>
+<li>Visibility: It ensures the test fails immediately if the bug is accidentally fixed (alerting you to update the test).</li>
+<li>Safety: It proves the bug causes incorrect output rather than a server crash (panic), which is a critical distinction for a long-running service.</li>
+</ul>
+</li>
+</ul>
+<h3 id="function-preconditions"><a class="header" href="#function-preconditions">Function Preconditions</a></h3>
+<h4 id="type-encoding"><a class="header" href="#type-encoding">Type Encoding</a></h4>
+<ul>
+<li>Function’s assumptions should be expressed in types.</li>
+<li>The caller must be enforced to provide them.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD
+fn is_zero(n: i32) -&gt; bool {
+  ...
+}
+
+// BAD
+fn is_zero(n: Option&lt;i32&gt;) -&gt; bool {
+   let n = match n {
+       Some(it) =&gt; ...,
+       None =&gt; ...,
+   };
+}
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Rationale:
+<ul>
+<li>The caller has more context as to why to the callee’s assumptions do not hold.</li>
+<li>The control flow is therefore more explicit at the call site.</li>
+</ul>
+</li>
+</ul>
+<h4 id="parse-dont-validate"><a class="header" href="#parse-dont-validate">Parse, Don’t Validate</a></h4>
+<ul>
+<li>
+<p>Bad practice:</p>
+<ul>
+<li>One function validates that the data is valid (validate the assumption).</li>
+<li>Another function uses that data based on the assumptions.</li>
+</ul>
+</li>
+<li>
+<p>Good practice: Validate and immediately use the data in the same place (like <code>match</code> instead of bare <code>if</code>).</p>
+</li>
+<li>
+<p>Reasons:</p>
+<ul>
+<li>The bad practice is prone to decay over time. The maintainer has to memorize the assumptions and make sure refactoring efforts of checks actually verify the assumptions.</li>
+<li>The good practice always ensure that the assumptions hold when manipulating the data.</li>
+</ul>
+</li>
+<li>
+<p>Example from <code>rust-analyzer</code></p>
+<pre class="playground"><code class="language-rust">// GOOD
+fn main() {
+    let s: &amp;str = ...;
+    if let Some(contents) = string_literal_contents(s) {
+
+    }
+}
+
+fn string_literal_contents(s: &amp;str) -&gt; Option&lt;&amp;str&gt; {
+    if s.starts_with('"') &amp;&amp; s.ends_with('"') {
+        Some(&amp;s[1..s.len() - 1])
+    } else {
+        None
+    }
+}
+
+// BAD
+fn main() {
+    let s: &amp;str = ...;
+    if is_string_literal(s) {
+        let contents = &amp;s[1..s.len() - 1];
+    }
+}
+
+fn is_string_literal(s: &amp;str) -&gt; bool {
+    s.starts_with('"') &amp;&amp; s.ends_with('"')
+}</code></pre>
+</li>
+<li>
+<p>Remarks:</p>
+<ul>
+<li>This pattern perfectly illustrates Robert Harper’s concept of “Boolean Blindness”. By reducing a complex check to a simple bool (true/false), we discard the proof of validity. The compiler sees a “true” flag, but it doesn’t see the “valid data,” forcing us to rely on faith later in the code.</li>
+<li>I learned this the hard way while building a DBML parser. I designed a system where the “validation phase” was separate from the “execution phase”. Because the validation step didn’t return a new, safe type (it just returned true), the execution phase had to blindly trust that the validation had run correctly.</li>
+<li>While systems like TypeScript uses Flow Typing to mitigate this (by inferring types inside <code>if</code> blocks), that safety is often local only. As soon as you pass that variable into a different function, the “flow context” is lost unless explicitly redefined.</li>
+</ul>
+</li>
+</ul>
+<h3 id="control-flow"><a class="header" href="#control-flow">Control Flow</a></h3>
+<ul>
+<li>Push “if“s up and “for“s down.</li>
+</ul>
+<h3 id="assertions"><a class="header" href="#assertions">Assertions</a></h3>
+<ul>
+<li>Use <code>stdx::never!</code> liberally instead of <code>assert!</code>.</li>
+<li><code>never!</code> checks a condition and logs a backtrace if it fails, but returns a <code>bool</code> instead of crashing. This allows you to write: <code>if stdx::never!(condition) { return; }</code>.</li>
+<li>Rationale: <code>rust-analyzer</code> is a long-running server. A bug in a minor feature (like a specific completion) should <strong>log an error</strong> and bail out of that specific request, not <strong>crash</strong> the entire IDE session.</li>
+</ul>
+<h3 id="getters--setters"><a class="header" href="#getters--setters">Getters &amp; Setters</a></h3>
+<ul>
+<li>
+<p>Two cases to consider:</p>
+<ul>
+<li>No invariants: If a field can hold any value safely, just make it <code>pub</code>. Don’t write boilerplate code.</li>
+<li>Invariants exist: If the data has rules (e.g., “cannot be empty”), make the field private, enforce the rule in the Constructor, and provide a Getter.</li>
+</ul>
+</li>
+<li>
+<p>Never provide setters. If data needs to change, it should likely be done via a specific behavior method or by creating a new instance, ensuring invariants are never bypassed.</p>
+</li>
+<li>
+<p>Getters should return borrowed data. <code>rust-analyzer</code>’s example:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Person {
+  // Invariant: never empty
+  first_name: String,
+  middle_name: Option&lt;String&gt;
+}
+
+// GOOD
+impl Person {
+    fn first_name(&amp;self) -&gt; &amp;str { self.first_name.as_str() }
+    fn middle_name(&amp;self) -&gt; Option&lt;&amp;str&gt; { self.middle_name.as_ref() }
+}
+
+// BAD
+impl Person {
+    fn first_name(&amp;self) -&gt; String { self.first_name.clone() }
+    fn middle_name(&amp;self) -&gt; &amp;Option&lt;String&gt; { &amp;self.middle_name }
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>The APIs are internal so (internal) breaking changes can be allowed to move fast:
+<ul>
+<li>Using a <code>pub</code> field (with no invariants) introduces less boilerplate but may be breaking if the <code>pub</code> field is suddenly imposed an invariant and has to be changed to private.</li>
+<li>Using an accessor can prevent breaking changes, but it means implicitly promising a contract and imposing some maintenance boilerplate.</li>
+</ul>
+</li>
+<li>Privacy helps make invariants local to prevent code rot.</li>
+<li>A type that is too specific (borrow owned types like <code>&amp;String</code>) leaks irrelevant details (neither right nor wrong), which creates noise and the client may accidentally rely on those irrelevent details.</li>
+</ul>
+</li>
+</ul>
+<h3 id="useless-types"><a class="header" href="#useless-types">Useless Types</a></h3>
+<ul>
+<li>Prefer general types.</li>
+<li>If generality is not important, consistency is important.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD      BAD
+&amp;[T]         &amp;Vec&lt;T&gt;
+&amp;str         &amp;String
+Option&lt;&amp;T&gt;   &amp;Option&lt;T&gt;
+&amp;Path        &amp;PathBuf
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Rationale:
+<ul>
+<li>General types are more flexible.</li>
+<li>General types leak fewer irrelevant details (which the client may accidentally rely on).</li>
+</ul>
+</li>
+</ul>
+<h3 id="constructors"><a class="header" href="#constructors">Constructors</a></h3>
+<ul>
+<li>If a <code>new</code> function accepts zero arguments, then use the <code>Default</code> trait (either derive or manually implemented).
+<ul>
+<li>Rationale:
+<ul>
+<li>Less boilerplate.</li>
+<li>Consistent: Less cognitive load for the caller - “Should I call <code>new()</code> or <code>default()</code>?”</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Use <code>Vec::new</code> instead of <code>vec![]</code>.
+<ul>
+<li>Rationale:
+<ul>
+<li>Strength reduction.</li>
+<li>Uniformity.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Do not provide <code>Default</code> if the type doesn’t have sensible default value (many possible defaults or defaults that has invalid states).
+<ul>
+<li>Preserve invariants.</li>
+<li>The user does not need to wonder if the provided default is their desired initial values.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD
+#[derive(Default)] // 1. Best case: Derive it automatically
+struct Options {
+    check_on_save: bool,
+}
+
+// GOOD (Manual Implementation)
+struct Buffer {
+    data: Vec&lt;u8&gt;,
+}
+
+impl Default for Buffer {
+    fn default() -&gt; Self {
+        Self {
+            // 2. Use Vec::new() instead of vec![] (Strength Reduction)
+            // It is semantically lighter (function vs macro) and more uniform.
+            data: Vec::new(),
+        }
+    }
+}
+
+// BAD
+struct OptionsBad {
+    check_on_save: bool,
+}
+
+impl OptionsBad {
+    // 3. Avoid zero-arg new().
+    // It forces users to remember "Do I call new() or default() for this type?"
+    fn new() -&gt; Self {
+        Self { check_on_save: false }
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="functions-over-objects"><a class="header" href="#functions-over-objects">Functions Over Objects</a></h3>
+<ul>
+<li>Public API: Prefer simple functions (<code>do_thing()</code>) over transient objects that exist only to execute one method (<code>ThingDoer::new().do()</code>).</li>
+<li>Internal logic: It is acceptable (and encouraged) to use “Context” structs <em>inside</em> the function to manage complex state or arguments during execution.</li>
+<li>Rationale:
+<ul>
+<li>The “Iceberg” pattern: The user sees a simple function interface; the developer uses a structured object implementation behind the scenes.</li>
+<li>Implementor API is not mixed with user API.</li>
+</ul>
+</li>
+<li>Middle ground: If a struct is preferred for namespacing, provide a static <code>do()</code> helper method that handles the instantiation and execution in one step.</li>
+<li>Rationale:
+<ul>
+<li>Reduce boilerplate for the caller.</li>
+<li>Prevent implementation details (like temporary state management) from leaking into the public API.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD (Caller has to build and run)
+ThingDoer::new(arg1, arg2).do();
+
+// GOOD (Caller just acts)
+do_thing(arg1, arg2);
+
+// ACCEPTABLE INTERNAL IMPLEMENTATION (Using a struct to organize code)
+pub fn do_thing(arg1: Arg1, arg2: Arg2) -&gt; Res {
+    // The struct is an implementation detail, hidden from the user
+    let mut ctx = Ctx { arg1, arg2 };
+    ctx.run()
+}
+<span class="boring">}</span></code></pre>
+<h3 id="functions-with-many-parameters"><a class="header" href="#functions-with-many-parameters">Functions With Many Parameters</a></h3>
+<ul>
+<li>
+<p>Use <code>Config</code> struct:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD (Call site is confusing)
+fn annotations(db, file_id, true, false, true);
+
+// GOOD (Call site is explicit and flexible)
+fn annotations(db, file_id, AnnotationConfig {
+    binary_target: true,
+    annotate_runnables: false,
+    annotate_impls: true,
+});
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>Call site is clearer.</li>
+<li>Encapsulating volatile parameters in a struct shields intermediate functions from breaking changes, allowing you to add new options without updating the signature of every function in the call chain.</li>
+</ul>
+</li>
+<li>
+<p>No <code>Default</code> for <code>Config</code>: Do not implement <code>Default</code>. Force the caller to provide explicit context.</p>
+<ul>
+<li>Rationale: They know better than the struct what the initial state should be.</li>
+</ul>
+</li>
+<li>
+<p>Pass configuration as an argument to the function, do not store it in the object’s state.</p>
+<ul>
+<li>Rationale: This allows the same object to handle multiple requests with different configurations dynamically.</li>
+</ul>
+</li>
+<li>
+<p><code>Command</code> pattern: If a set of parameters can yield different return types (e.g., <code>Vec&lt;T&gt;</code> vs <code>Option&lt;T&gt;</code>), wrap parameters in a “Command” struct.</p>
+<ul>
+<li>Rationale: This avoids creating multiple top-level functions (<code>query_all</code>, <code>query_first</code>) with identical argument lists.</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD (Command Pattern)
+// Captures arguments once, offers multiple execution paths
+pub struct Query {
+    pub name: String,
+    pub case_sensitive: bool,
+}
+
+impl Query {
+    // Return type A
+    pub fn all(self) -&gt; Vec&lt;Item&gt; { ... }
+    // Return type B
+    pub fn first(self) -&gt; Option&lt;Item&gt; { ... }
+}
+
+// BAD (Parameter Duplication)
+// Requires repeating arguments for every variation of the result
+fn query_all(name: String, case_sensitive: bool) -&gt; Vec&lt;Item&gt; { ... }
+fn query_first(name: String, case_sensitive: bool) -&gt; Option&lt;Item&gt; { ... }
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Remarks: Does the <code>Command</code> rule conflict with the rule “Do not store <code>Config</code> in state”?
+<ul>
+<li>The <code>Config</code> rule applies to long-lived services (e.g., <code>Database</code>). These should remain stateless so they can handle diverse requests without needing to be reset.</li>
+<li>The <code>Command</code> rule applies to short-lived tasks (e.g., <code>Query</code>). These objects exist solely to bundle parameters for a single operation and are discarded immediately after use.</li>
+<li>Relationship: The “Command” is effectively a temporary container that you pass to (or use with) the “Service”.</li>
+</ul>
+</li>
+</ul>
+<h3 id="prefer-separate-functions-over-parameters"><a class="header" href="#prefer-separate-functions-over-parameters">Prefer Separate Functions Over Parameters</a></h3>
+<ul>
+<li>
+<p>Split “flag” arguments: If a function is solely invoked with hardcoded literals (<code>true</code>/<code>None</code>), refactor it into distinct named functions (e.g., <code>process_fast()</code> vs <code>process_full()</code>) to eliminate internal branching and “false sharing” of unrelated logic.</p>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>Functions with flag arguments often display false sharing. There’s often <code>if</code> branching to distinguish between different cases.
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Caller
+process_data(true);
+process_data(false);
+
+// Callee
+fn process_data(is_fast: bool) {
+    if is_fast {
+        // Fast algorithm
+    } else {
+        // Accurate algorithm
+    }
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>These functions seem to share logic and are related and it seems that it makes sense to merge them into 1 function. However, over time, they diverge. Therefore, splitting the control flows into separate functions simplify the logic &amp; eliminate irrelevant details (such as the maintainer would fail to see the cross-dependencies between the <code>if</code> branches).</li>
+<li>Split the common code of the <code>if</code> branches into a common helper instead.</li>
+</ul>
+</li>
+<li>
+<p>Remark: This <a href="https://github.com/holistics/dbml/pull/530">binder-refactoring PR</a> is a hard lesson for me illustrating this point, both the problem and the solution (splitting into separate classes &amp; extract common helpers). Although there is still lots of room for improvement, this is already significantly better.</p>
+</li>
+</ul>
+<h3 id="appropriate-string-types"><a class="header" href="#appropriate-string-types">Appropriate String Types</a></h3>
+<ul>
+<li>
+<p>When calling OS APIs (file systems, env vars, arguments), use <code>OsString</code> and <code>&amp;OsStr</code>, never <code>String</code> or <code>&amp;str</code>.</p>
+</li>
+<li>
+<p>Rust <code>String</code> guarantees valid UTF-8. Operating Systems do not.</p>
+<ul>
+<li>Linux/Unix: Paths are arbitrary byte sequences (except <code>null</code>).</li>
+<li>Windows: Paths are potentially ill-formed UTF-16 sequences.</li>
+</ul>
+</li>
+<li>
+<p>Rationale: This creates a strict type-level boundary.</p>
+<ul>
+<li>If you hold a <code>String</code>, you know it is safe, clean text.</li>
+<li>If you hold an <code>OsString</code>, you know it is “dirty” data from the outside world.</li>
+<li>Using <code>OsString</code> prevents accidental panics or data corruption when encountering a file named with invalid encoding.</li>
+</ul>
+</li>
+<li>
+<p>Avoid the standard <code>std::Path</code>, use the custom <code>AbsPathBuf</code> and <code>AbsPath</code> wrapper that guarantees the path inside is absolute.</p>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>CWD is global mutable state.</li>
+<li>If you use a relative path like <code>Path::new("src/main.rs")</code>, the OS resolves it relative to where the <em>server binary</em> started, not where the <em>project</em> is.</li>
+</ul>
+</li>
+</ul>
+<h2 id="premature-pessimization"><a class="header" href="#premature-pessimization">Premature Pessimization</a></h2>
+<h3 id="avoid-allocations"><a class="header" href="#avoid-allocations">Avoid Allocations</a></h3>
+<ul>
+<li>Zero-allocation default: Prefer stack-based structures (iterators) over heap-based collections (<code>Vec</code>, <code>String</code>) unless you specifically need ownership or long-term storage.</li>
+<li>Lazy vs eager: <code>collect::&lt;Vec&gt;()</code> eagerly processes the entire sequence and allocates memory immediately. Iterators are lazy and compute items only on demand.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use itertools::Itertools;
+
+// BAD (Heavy)
+// 1. Allocates heap memory. 2. Processes entire string. 3. Frees memory.
+let parts: Vec&lt;&amp;str&gt; = text.split(',').collect();
+if parts.len() == 3 {
+    process(parts[0], parts[1], parts[2]);
+}
+
+// GOOD (Light)
+// 1. No allocation. 2. Stops after 3 items. 3. Stores ptrs on Stack.
+if let Some((a, b, c)) = text.split(',').collect_tuple() {
+    process(a, b, c);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="push-allocations-to-the-call-site"><a class="header" href="#push-allocations-to-the-call-site">Push Allocations to the Call Site</a></h3>
+<ul>
+<li>Rationale: The cost of calling a function becomes more explicit.</li>
+</ul>
+<h3 id="collection-types"><a class="header" href="#collection-types">Collection Types</a></h3>
+<ul>
+<li>
+<p><code>rustc_hash</code>’s map and set are preferred over those in <code>std::collections</code>.</p>
+</li>
+<li>
+<p>Rationale:</p>
+<ul>
+<li>Faster hasher.</li>
+<li>Slightly reduce code size if applied consistently.</li>
+</ul>
+</li>
+</ul>
+<h3 id="avoid-intermediate-collections"><a class="header" href="#avoid-intermediate-collections">Avoid Intermediate Collections</a></h3>
+<ul>
+<li>Use an accumulator parameter (list, set, map) as the first parameter to collect values.</li>
+</ul>
+<h3 id="avoid-monomorphization"><a class="header" href="#avoid-monomorphization">Avoid Monomorphization</a></h3>
+<ul>
+<li>Minimize generics: Avoid heavy generic logic at crate boundaries to prevent compile-time bloat caused by monomorphization (code duplication).</li>
+<li>“Inner dyn” pattern: Use thin generic wrappers that immediately delegate to private, non-generic functions using dynamic dispatch (<code>dyn Trait</code>).</li>
+<li>Concrete types: Avoid <code>AsRef</code> polymorphism; prefer concrete types like <code>&amp;Path</code> unless writing a widely-used library.</li>
+<li>Rationale: Optimize for compile speed by default; runtime performance only matters for the “hot” 20% of code, but compilation costs affect 100%.</li>
+</ul>
+<pre class="playground"><code class="language-rust">use std::fmt::Display;
+
+// --- 1. The Wrapper (Generic) ---
+// This function is "monomorphized" (duplicated) for every type T.
+// But since it's only 1 line, the duplication cost is negligible.
+pub fn log_message&lt;T: Display&gt;(msg: T) {
+    // Coerce the specific type T into a trait object (&amp;dyn Display)
+    log_message_impl(&amp;msg);
+}
+
+// --- 2. The Implementation (Dynamic) ---
+// This function is compiled ONLY ONCE. 
+// It handles the heavy lifting via dynamic dispatch (vtable).
+fn log_message_impl(msg: &amp;dyn Display) {
+    // Imagine 500 lines of complex logging logic here...
+    println!("Timestamp: [INFO] {}", msg);
+    // ... extensive I/O, formatting, or network calls ...
+}
+
+fn main() {
+    log_message("Hello");       // T is &amp;str -&gt; Wrapper created for &amp;str
+    log_message(42);            // T is i32  -&gt; Wrapper created for i32
+    log_message(3.14);          // T is f64  -&gt; Wrapper created for f64
+    
+    // Result: 3 tiny wrappers, but the heavy `log_message_impl` exists only once.
+}</code></pre>
+<h2 id="style"><a class="header" href="#style">Style</a></h2>
+<h3 id="order-of-imports"><a class="header" href="#order-of-imports">Order of Imports</a></h3>
+<ul>
+<li>Modules first: Declare modules (<code>mod x;</code>) at the top, before any imports, ordered by “suggested reading.”</li>
+<li>Import structure:
+<ul>
+<li>Grouping: Use one <code>use</code> statement per crate (group items inside <code>{ ... }</code>).</li>
+<li>Spacing: Separate different groups with blank lines.</li>
+<li>Import order:
+<ol>
+<li><code>std</code>: Standard library (<code>use std::...</code>).</li>
+<li>External: Third-party and workspace crates.</li>
+<li>Local: Current crate (use <code>crate::...</code>).</li>
+<li>Relative: Parent/child modules (use <code>super::...</code>), though <code>crate::</code> is preferred.</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>Re-exports: Place <code>pub use</code> after all imports, as they are treated as item definitions.</li>
+<li>Rationale: Ensures consistency, improves readability for new contributors, and highlights dependencies clearly.</li>
+</ul>
+<h3 id="import-style"><a class="header" href="#import-style">Import Style</a></h3>
+<ul>
+<li>Qualify layer types: Always qualify items from <code>hir</code> and <code>ast</code> to prevent ambiguity and clarify the architectural layer.
+<ul>
+<li>Good: <code>use syntax::ast; ... func: hir::Function</code></li>
+<li>Bad: <code>use hir::Function; ... func: Function</code></li>
+</ul>
+</li>
+<li>Trait implementations: Import the module (e.g., <code>std::fmt</code>), not the trait itself, when implementing standard traits.
+<ul>
+<li>Good: <code>impl fmt::Display for ...</code></li>
+</ul>
+</li>
+<li>Rationale: Reduces typing and clearly distinguishes implementation from usage.</li>
+<li>Avoid local globs: Do not use use <code>MyEnum::*;</code> inside functions.</li>
+<li>Absolute paths: Prefer <code>use crate::foo</code> over relative paths like <code>super::</code> or <code>self::</code> for consistency.</li>
+<li>No re-exports: Avoid re-exports in non-library code to prevent multiple access paths and maintain consistency.</li>
+</ul>
+<h3 id="order-of-items"><a class="header" href="#order-of-items">Order of Items</a></h3>
+<ul>
+<li>Public API first: Always place public items (<code>pub</code> or <code>pub(crate)</code>) at the very top, before any private helpers or implementation details.</li>
+<li>Types before logic: Define data structures (<code>struct</code>, <code>enum</code>) before functions and <code>impl</code> blocks.</li>
+<li>Top-down: Order type definitions by dependency, place the “parent” container before the “child” component it contains.</li>
+<li>Rationale:
+<ul>
+<li>Optimize for a new reader scanning top-to-bottom.</li>
+<li>When code is folded, the file structure should read like API documentation.</li>
+</ul>
+</li>
+</ul>
+<h3 id="context-parameters"><a class="header" href="#context-parameters">Context Parameters</a></h3>
+<ul>
+<li>Context-first: Always pass “context” parameters (invariant data threaded through many calls) as the <strong>first</strong> arguments.
+<ul>
+<li>Rationale:
+<ul>
+<li>This creates a visual hierarchy: “setting”  “actors”.</li>
+<li>It mimics the <code>self</code> convention in OOP (where the context/object always comes first).</li>
+<li>When scanning a function call, you immediately see <em>where</em> the operation is happening (the context) before seeing <em>what</em> is being processed (the variable data).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Context (db) is hidden at the end.
+// In a long list of arguments, you might miss which 'db' is being used.
+fn transform_data(data: String, id: usize, force: bool, db: &amp;Database) { ... }
+
+// Usage
+transform_data(raw_input, 42, true, &amp;primary_db);
+
+// GOOD: Context (db) is front and center.
+// It establishes the environment immediately.
+fn transform_data(db: &amp;Database, data: String, id: usize, force: bool) { ... }
+
+// Usage
+transform_data(&amp;primary_db, raw_input, 42, true);
+
+<span class="boring">}</span></code></pre>
+<ul>
+<li>If there are multiple context parameters, bundle them into a struct and pass it as <code>&amp;self</code>.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Parameter explosion.
+// Every helper function needs to accept all three context items.
+fn parse(db: &amp;Db, cfg: &amp;Config, cache: &amp;Cache, text: &amp;str) {
+    validate(db, cfg, cache, text); // Tedious repetition
+}
+
+// GOOD: Packed Context.
+struct ParseCtx&lt;'a&gt; {
+    db: &amp;'a Db,
+    cfg: &amp;'a Config,
+    cache: &amp;'a Cache,
+}
+
+impl&lt;'a&gt; ParseCtx&lt;'a&gt; {
+    // The signature is clean. Context is implicit in `&amp;self`.
+    fn parse(&amp;self, text: &amp;str) {
+        self.validate(text);
+    }
+    
+    fn validate(&amp;self, text: &amp;str) { ... }
+}
+
+<span class="boring">}</span></code></pre>
+<ul>
+<li>The “dangling argument” problem:
+<ul>
+<li>Context-first works better when non-context parameters are lambdas (closures).</li>
+<li>Rationale:
+<ul>
+<li>Rust closures often span multiple lines.</li>
+<li>If the context parameter is placed <em>after</em> the closure, it ends up “dangling” after the closing brace <code>}</code>. This is visually confusing and looks like a syntax error or a forgotten fragment.</li>
+<li>Placing context <em>first</em> ensures the closure body is the last thing the eye sees, resulting in a clean termination of the statement.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Context Last
+// The `&amp;context` argument is easy to miss or looks like it belongs
+// to a different statement because it follows a large code block.
+apply_changes(|item| {
+    // ... complex multi-line logic ...
+    // ... complex multi-line logic ...
+    item.finalize()
+}, &amp;context); // &lt;--- The "Dangler"
+
+
+// GOOD: Context First
+// The statement starts with the context, and the closure flows naturally
+// until the end of the function call.
+apply_changes(&amp;context, |item| {
+    // ... complex multi-line logic ...
+    // ... complex multi-line logic ...
+    item.finalize()
+}); // &lt;--- Clean, standard closure syntax
+<span class="boring">}</span></code></pre>
+<h3 id="variable-naming"><a class="header" href="#variable-naming">Variable Naming</a></h3>
+<ul>
+<li>
+<p>Prioritize verbose &amp; boring but clear names: prefer long names that mirror the type (e.g., g<code>lobal_state: GlobalState</code>). Rely on code completion, not brevity.</p>
+</li>
+<li>
+<p>Standard variables:</p>
+<ul>
+<li><code>res</code>: Function result.</li>
+<li><code>it</code>: Generic item (when identity is irrelevant).</li>
+<li><code>n_foos</code>: Count (preferred over <code>foo_count</code>).</li>
+<li><code>foo_idx</code>: Index.</li>
+</ul>
+</li>
+<li>
+<p>Keyword collisions: Avoid <code>r#ident</code> syntax. Use these consistent replacements:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Keyword</th><th style="text-align: left">Replacement</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>crate</code></td><td style="text-align: left"><code>krate</code></td></tr>
+<tr><td style="text-align: left"><code>enum</code></td><td style="text-align: left"><code>enum_</code></td></tr>
+<tr><td style="text-align: left"><code>fn</code></td><td style="text-align: left"><code>func</code></td></tr>
+<tr><td style="text-align: left"><code>impl</code></td><td style="text-align: left"><code>imp</code></td></tr>
+<tr><td style="text-align: left"><code>macro</code></td><td style="text-align: left"><code>mac</code></td></tr>
+<tr><td style="text-align: left"><code>mod</code></td><td style="text-align: left"><code>module</code></td></tr>
+<tr><td style="text-align: left"><code>struct</code></td><td style="text-align: left"><code>strukt</code></td></tr>
+<tr><td style="text-align: left"><code>trait</code></td><td style="text-align: left"><code>trait_</code></td></tr>
+<tr><td style="text-align: left"><code>type</code></td><td style="text-align: left"><code>ty</code></td></tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<p>Spelling &amp; acronyms:</p>
+<ul>
+<li>Use American spelling (<code>color</code>).</li>
+<li>Avoid ad-hoc acronyms; stick to common ones (<code>db</code>, <code>ctx</code>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="error-handling-trivia"><a class="header" href="#error-handling-trivia">Error Handling Trivia</a></h3>
+<ul>
+<li>Use <code>anyhow::Result</code> instead of the bare <code>Result</code>.
+<ul>
+<li>Rationale: Makes the return type immediately clear without checking imports.</li>
+</ul>
+</li>
+<li>Macro choice: Prefer <code>anyhow::format_err!</code> over <code>anyhow::anyhow</code>.
+<ul>
+<li>Rationale: More “boring” (standard), consistent, and avoids the stuttering of <code>anyhow::anyhow</code>.</li>
+</ul>
+</li>
+<li>Message formatting:
+<ul>
+<li>There are no strict rules on message structure. Rust standard library uses lowecase, while <code>anyhow</code> uses uppercase.</li>
+<li>Do not end error or context messages with a period (<code>.</code>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="early-returns"><a class="header" href="#early-returns">Early Returns</a></h3>
+<ul>
+<li>Handle negative cases immediately with an early return rather than wrapping the “happy path” inside a large if/else block.</li>
+<li>Rationale: Flattens code nesting and reduces “cognitive stack usage” (mental load).</li>
+<li>Explicit error returns: Use <code>return Err(e)</code> to exit with an error. Avoid using <code>Err(e)?</code> to simulate a throw.</li>
+<li>Rationale: <code>return</code> evaluates to the “never type” (<code>!</code>), which allows the compiler to strictly identify dead code, whereas <code>?</code> resolves to a generic type that can mask unreachable code.</li>
+</ul>
+<h3 id="comparisons"><a class="header" href="#comparisons">Comparisons</a></h3>
+<ul>
+<li>Prefer less-than:
+<ul>
+<li>Always use <code>&lt;</code> or <code>&lt;=</code> comparisons.</li>
+<li>Avoid <code>&gt;</code> or <code>&gt;=</code>.</li>
+</ul>
+</li>
+<li>Rationale:
+<ul>
+<li>Spatial intuition: Corresponds to the real number line where values increase from left to right (<code>0→∞</code>).</li>
+<li>Visual ordering: <code>lo &lt;= x &amp;&amp; x &lt;= hi</code> visually places <code>x</code> in the middle, whereas <code>x &gt;= lo</code> forces a mental “flip.”</li>
+</ul>
+</li>
+</ul>
+<h3 id="if-let"><a class="header" href="#if-let">If-let</a></h3>
+<ul>
+<li>Prefer <code>match</code> over <code>if let ... else</code>: When you need to handle both the “success” and “failure” cases, use a full match statement.</li>
+<li>Rationale:
+<ul>
+<li>Compactness: <code>match</code> is usually cleaner and requires less syntax for simple alternatives.</li>
+<li><code>Precision</code>: The else block in <code>if let</code> is implicit (it covers everything else). <code>match</code> forces you, or allows you, to be explicit about what the negative case is (e.g., <code>None</code> vs <code>Err(_)</code>), making the code more robust to type changes.</li>
+</ul>
+</li>
+</ul>
+<h3 id="match-ergonomics"><a class="header" href="#match-ergonomics">Match Ergonomics</a></h3>
+<ul>
+<li>Avoid <code>ref</code>: Do not use the <code>ref</code> keyword in patterns.</li>
+</ul>
+<p>Rationale:</p>
+<ul>
+<li>Obsolescence: <code>ref</code> is largely redundant due to “match ergonomics” (introduced in recent Rust editions).</li>
+<li>Simplicity: Relying on <code>match</code> ergonomics is cleaner and avoids mixing legacy syntax with modern style.</li>
+</ul>
+<h3 id="empty-match-arms"><a class="header" href="#empty-match-arms">Empty Match Arms</a></h3>
+<ul>
+<li>Use the unit value <code>()</code>, for empty match arms, rather than an empty block <code>{}</code>.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>
+// GOOD
+Err(err) =&gt; error!("{}", err),
+Ok(_) =&gt; (), // &lt;--- Clean, single-line comma style
+
+// BAD
+Err(err) =&gt; error!("{}", err),
+Ok(_) =&gt; {}  // &lt;--- Block style breaks the visual rhythm
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Rationale:
+<ul>
+<li>In Rust, <code>()</code> is the value “nothing,” while <code>{}</code> is a block of code that evaluates to nothing.</li>
+<li>While they are functionally identical here, using <code>=&gt; ()</code>, keeps the match arm visibly distinct as a “value” rather than a “scope,” maintaining a consistent visual rhythm in long match statements.</li>
+</ul>
+</li>
+</ul>
+<h3 id="functional-combinators"><a class="header" href="#functional-combinators">Functional Combinators</a></h3>
+<ul>
+<li>Use functional combinators (<code>map</code>, <code>and_then</code>) only when they fit naturally.</li>
+<li>Prefer imperative control flow (<code>if</code>, <code>for</code>, <code>match</code>) over “forced” combinators like <code>bool::then</code> or <code>Option::filter</code>.</li>
+<li>The philosophy: Code should be dense in computation (doing work) but sparse in structure (fewer indirections per line).</li>
+<li>Rationale:
+<ul>
+<li>Rust has strong support for imperative flow (loops, early returns).</li>
+<li>Rust functions are “less first-class” because of effects like <code>?</code> (try-operator) and <code>.await</code>. These do not compose well inside long chains of closures (e.g., trying to <code>?</code> inside a <code>filter</code> closure is painful).</li>
+</ul>
+</li>
+</ul>
+<h3 id="turbofish"><a class="header" href="#turbofish">Turbofish</a></h3>
+<ul>
+<li>Prefer explicit type ascription (<code>let x: Vec&lt;i32&gt; = ...</code>) over the “turbofish” syntax (<code>...collect::&lt;Vec&lt;i32&gt;&gt;()</code>).</li>
+<li>Rationale: We want to able to read everything from left-to-right without maintaining to much context:
+<ul>
+<li>Good: <code>let names: Vec&lt;String&gt; = users.iter().map(...).collect();</code>
+<ul>
+<li>Why: When you read the line left-to-right, you immediately know what is being built (<code>Vec&lt;String&gt;</code>). This context helps you understand the complex iterator chain that follows.</li>
+</ul>
+</li>
+<li>Bad: <code>let names = users.iter().map(...).collect::&lt;Vec&lt;String&gt;&gt;();</code>
+<ul>
+<li>Why: You have to read the entire chain until the very end to figure out what type is actually being produced.</li>
+</ul>
+</li>
+<li>No placeholders (<code>_</code>): Avoid <code>let x: Vec&lt;_&gt; = ...</code>.</li>
+</ul>
+</li>
+<li>Rationale: If the compiler struggles to infer the type (forcing you to add a hint), a human reader will likely struggle too. Be kind to the reader and write the full type <code>Vec&lt;i32&gt;</code>.</li>
+</ul>
+<h3 id="helper-functions"><a class="header" href="#helper-functions">Helper Functions</a></h3>
+<ul>
+<li>
+<p>Avoid single-Use helpers: Do not create a separate function if it is only called once.</p>
+</li>
+<li>
+<p>Alternative: Use a block <code>{ ... }</code>.</p>
+</li>
+<li>
+<p>Rationale: This isolates the scope but keeps access to the context variables.</p>
+</li>
+<li>
+<p>Exception: Create a function if you need early returns (<code>return</code>) or error propagation (<code>?</code>).</p>
+</li>
+<li>
+<p>Local helpers: Place nested helper functions at the end of the enclosing function.</p>
+<ul>
+<li>Structure: Main logic → <code>return result;</code> → <code>fn helper() { ... }</code>.</li>
+<li>Limit: Do not nest more than 1 level deep.</li>
+</ul>
+</li>
+</ul>
+<h3 id="helper-variables"><a class="header" href="#helper-variables">Helper Variables</a></h3>
+<ul>
+<li>Create boolean helper variables for complex conditions (e.g., inside match guards).</li>
+<li>Rationale:
+<ul>
+<li>Act as a “cognitively cheap” abstraction (names the logic without hiding the context).</li>
+<li>Make debugging easier (you can inspect/print the variable).</li>
+</ul>
+</li>
+</ul>
+<h3 id="syntax-macros"><a class="header" href="#syntax-macros">Syntax Macros</a></h3>
+<ul>
+<li>Tokens: Use the <code>T![token]</code> macro instead of <code>SyntaxKind::TOKEN_KW</code>.</li>
+<li>Example: <code>T![true]</code> instead of <code>SyntaxKind::TRUE_KW</code>.</li>
+<li>Rationale: Familiar syntax, avoids ambiguity (e.g., <code>{</code> vs <code>[</code>).</li>
+</ul>
+<h3 id="documentation"><a class="header" href="#documentation">Documentation</a></h3>
+<ul>
+<li>Comments: Write proper sentences. Start with a capital, end with a dot <code>.</code>.</li>
+<li>Markdown: Use sentence-per-line. Do not wrap lines hard; press Enter after every sentence.</li>
+<li>Rationale:
+<ul>
+<li>Makes diffs cleaner and editing easier.</li>
+<li>Formatting a comment as a sentence (capital + period) forces the brain to switch from “scribbling notes” to “explaining thoughts.”</li>
+<li>Context dump: It tricks you into emptying your “mental RAM” (assumptions, constraints) into the code, rather than leaving vague fragments like <code>// fix this</code>.</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="syntax-tree--parser"><a class="header" href="#syntax-tree--parser">Syntax Tree &amp; Parser</a></h1>
+<p>Official site: <a href="https://rust-analyzer.github.io/book/contributing/syntax.html">Link</a>.</p>
+<p>Commit link: <a href="https://github.com/rust-lang/rust-analyzer/tree/cf5bdf464cad7ceb9a67e07985a3f4d3799ec0b6">2020-01-09</a></p>
+<h2 id="architectural-overview"><a class="header" href="#architectural-overview">Architectural Overview</a></h2>
+<ul>
+<li>The system has three isolated components:
+<ul>
+<li><a href="https://github.com/rust-analyzer/rowan/tree/v0.15.10"><code>rowan</code></a>: A generic, language-agnostic library for immutable syntax trees using the Red-Green tree model.</li>
+<li><a href="https://github.com/rust-lang/rust-analyzer/tree/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax"><code>syntax</code> (crate)</a>: Wrap <code>rowan</code> with a <code>rust-analyzer</code>-specific API. It’s the only crate that knows about <code>rowan</code>.</li>
+<li><a href="https://github.com/rust-lang/rust-analyzer/tree/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser"><code>parser</code> (crate)</a>: Output events from parsing without knowing anything about the tree structure.</li>
+</ul>
+</li>
+</ul>
+<h2 id="design-goals"><a class="header" href="#design-goals">Design Goals</a></h2>
+<ul>
+<li>Lossless: Everything is preserved—whitespace, comments, even invalid tokens.</li>
+<li>Semantic-less: Pure structure with no type checking or name resolution.</li>
+<li>Context-free: Trees are simple values that don’t depend on external context.</li>
+<li>Resilient: Always produce a tree, even from broken code (nodes may be partial).</li>
+<li>Performance: Optimized for memory and CPU using <code>unsafe</code> where needed.</li>
+<li>Decoupled: Parser and tree evolve independently.</li>
+<li>Intuitive traversal: Easy navigation between parent, children, and siblings.</li>
+</ul>
+<h2 id="the-three-layer-syntax-tree"><a class="header" href="#the-three-layer-syntax-tree">The Three-Layer Syntax Tree</a></h2>
+<p>The core idea is a “Red-Green Tree” (borrowed from Roslyn), where three layers balance memory usage against API convenience.</p>
+<ul>
+<li><em>Semi-transient</em>: Trees don’t live in memory permanently—they get lowered to a compact form but can be rebuilt when needed.</li>
+</ul>
+<h3 id="layer-1-greennode-the-storage"><a class="header" href="#layer-1-greennode-the-storage">Layer 1: GreenNode (The Storage)</a></h3>
+<ul>
+<li>
+<p>GreenNode is where the actual data lives—it’s purely functional, immutable, and persistent with arbitrary arity.</p>
+</li>
+<li>
+<p>Conceptual (unoptimized) example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Runtime tag for a Node/Token
+// Nodes and tokens both use the same tag kind?
+#[derive(PartialEq, Eq, Clone, Copy)]
+struct SyntaxKind(u16);
+
+#[derive(PartialEq, Eq, Clone)]
+struct Node {
+    kind: SyntaxKind,
+    // Only the byte-length is stored, offset is not stored
+    text_len: usize,
+    // A generic node with a sequence of children nodes and tokens
+    // `Arc` is used, so it allows for multithreading
+    children: Vec&lt;Arc&lt;Either&lt;Node, Token&gt;&gt;&gt;,
+}
+
+#[derive(PartialEq, Eq, Clone)]
+struct Token {
+    kind: SyntaxKind,
+    text: String,
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>A <code>Token</code> is a leaf node, while <code>Node</code> represents interior nodes.</p>
+</li>
+<li>
+<p>Some things to note:</p>
+<ul>
+<li>There’s just one generic node structure—nodes are untyped with a runtime tag.</li>
+<li>The original text comes from combining all the children’s text.</li>
+<li>Finding a specific child means scanning through siblings linearly.</li>
+<li>Modifying the tree gets more expensive with height (due to path copying).</li>
+<li>Invalid input gets wrapped in an <code>ERROR</code> node.</li>
+<li>Errors live separately, not embedded in the tree itself.</li>
+</ul>
+</li>
+</ul>
+<p>The following optimizations are mostly attributed to <a href="https://github.com/cad97">CAD97</a>.</p>
+<h4 id="optimizations"><a class="header" href="#optimizations">Optimizations</a></h4>
+<pre><code class="language-text">[ RefCount | Kind | TextLen | N_Children | Child_1 | Child_2 | ... | Child_N ]
+&lt;------------------------- Single Heap Allocation -------------------------&gt;
+</code></pre>
+<ul>
+<li>Dynamically sized type (DST): Everything in one heap allocation instead of splitting the node and its children into separate allocations.</li>
+<li>Tagged pointers: A single pointer where the last bit indicates whether it’s a <code>Node</code> or <code>Token</code> (cheaper than <code>Arc&lt;Either&lt;Node, Token&gt;&gt;</code>).</li>
+<li>Interning: Tokens get reused—<code>1 + 1</code> only stores one <code>1</code> token that’s shared. Returns <code>Arc&lt;Node&gt;</code> so trees are self-contained.</li>
+<li><code>TextSize</code>: Just a newtyped <code>u32</code> for tracking text length.</li>
+<li><code>SmolStr</code>: Small strings like <code>fn</code> or <code>if</code> live on the stack inline, no heap allocation needed.
+<ul>
+<li>Note: The text suggests moving this data directly into the interned token allocation in the future.</li>
+</ul>
+</li>
+</ul>
+<h4 id="alternative-designs"><a class="header" href="#alternative-designs">Alternative Designs</a></h4>
+<h5 id="dealing-with-trivia"><a class="header" href="#dealing-with-trivia">Dealing With Trivia</a></h5>
+<ul>
+<li>
+<p>Explicit nodes (Rowan/IntelliJ): Whitespace becomes regular sibling nodes. Lossless and easy to edit, but noisy when traversing.</p>
+</li>
+<li>
+<p>Attached trivia (Roslyn/Swift): Whitespace hides inside tokens as “leading/trailing” properties, so the tree only shows logical code.</p>
+</li>
+<li>
+<p>Linked list (Dart): A hybrid approach with a clean semantic tree plus a separate doubly-linked list for all tokens.</p>
+</li>
+<li>
+<p>There’s no standard approach to handling trivia. For reference, <code>@dbml/parse</code> uses the attached trivia approach.</p>
+</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Strategy</th><th style="text-align: left">Pros</th><th style="text-align: left">Cons</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Explicit Nodes</strong><br>(Rowan, IntelliJ, <code>rust-analyzer</code>)</td><td style="text-align: left"><strong>Uniformity:</strong> Everything is a node; simple data model.<br><strong>Fidelity:</strong> Lossless representation of text.<br><strong>Refactoring:</strong> Moving a branch naturally moves its formatting.</td><td style="text-align: left"><strong>Noise:</strong> Tree traversal requires manual filtering of whitespace.<br><strong>Memory:</strong> Higher node count (every space is an object).</td></tr>
+<tr><td style="text-align: left"><strong>Attached Trivia</strong><br>(Roslyn, Swift)</td><td style="text-align: left"><strong>Clarity:</strong> Tree contains <em>only</em> logical code.<br><strong>Iteration:</strong> Iterating children yields immediate semantic tokens.</td><td style="text-align: left"><strong>Complexity:</strong> “Re-stitching” text during refactoring is hard.<br><strong>Ownership:</strong> Ambiguous whether a comment belongs to the previous or next token.</td></tr>
+<tr><td style="text-align: left"><strong>Linked List</strong><br>(Dart)</td><td style="text-align: left"><strong>Dual View:</strong> Optimized for both semantic analysis (Tree) and formatting (List).<br><strong>Scanning:</strong> Linear access to tokens is very fast.</td><td style="text-align: left"><strong>Syncing:</strong> High maintenance cost to keep the Tree and List in perfect sync.<br><strong>Overhead:</strong> Requires managing parallel data structures.</td></tr>
+</tbody>
+</table>
+</div>
+<h5 id="accessing-children"><a class="header" href="#accessing-children">Accessing Children</a></h5>
+<ul>
+<li>Linear can (IntelliJ/Rowan):
+<ul>
+<li>Children live in a dynamic list with trivia mixed in.</li>
+<li>You have to scan through siblings (<strong>O(N)</strong>) to find what you want.</li>
+<li>Very memory efficient—missing nodes cost nothing.</li>
+</ul>
+</li>
+<li>Fixed slots (Roslyn/Swift):
+<ul>
+<li>Every possible child gets a fixed slot in the grammar.</li>
+<li>Direct <strong>O(1)</strong> access by index.</li>
+<li>Uses more memory since it allocates slots even for <code>None</code> values.</li>
+<li>Trivia has to be removed to keep indices stable.</li>
+</ul>
+</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Linear Scan (IntelliJ)</th><th style="text-align: left">Fixed Slots (Roslyn/Swift)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Access Speed</strong></td><td style="text-align: left"><strong>O(N)</strong> (Must iterate/skip)</td><td style="text-align: left"><strong>O(1)</strong> (Direct Index)</td></tr>
+<tr><td style="text-align: left"><strong>Memory Usage</strong></td><td style="text-align: left"><strong>Compact</strong> (Only stores present data)</td><td style="text-align: left"><strong>Sparse</strong> (Allocates slots for <code>None</code>)</td></tr>
+<tr><td style="text-align: left"><strong>Missing Nodes</strong></td><td style="text-align: left">Implicitly absent</td><td style="text-align: left">Explicitly stored as <code>Option::None</code></td></tr>
+<tr><td style="text-align: left"><strong>Trivia</strong></td><td style="text-align: left">Included as sibling nodes</td><td style="text-align: left">Removed or attached to tokens</td></tr>
+</tbody>
+</table>
+</div>
+<h5 id="mutable-trees"><a class="header" href="#mutable-trees">Mutable Trees</a></h5>
+<ul>
+<li>Mutable trees (IntelliJ): <strong>Imperative</strong> style.
+<ul>
+<li>You modify nodes directly in place (<code>node.delete()</code>).</li>
+<li>Simple API but thread-safety gets complicated (need read/write locks).</li>
+</ul>
+</li>
+<li>Immutable trees (<code>rust-analyzer</code>): <strong>Functional</strong> style.
+<ul>
+<li>You build up changes with a <code>Builder</code> then generate a fresh tree.</li>
+<li>More verbose API, but concurrency becomes trivial (snapshots are naturally safe).</li>
+</ul>
+</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// MUTABLE (IntelliJ Style)
+// Direct, in-place modification. Simple but requires locking.
+for bound in bounds {
+    // The tree changes immediately
+    bound.delete();
+}
+
+// IMMUTABLE (rust-analyzer Style)
+// Indirect. Must collect edits and rebuild the tree structure.
+let mut builder = tree.edit();
+for bound in bounds {
+    // Schedule deletion on the 'builder', not the node itself
+    builder.delete(bound);
+}
+// Apply generates a completely new root node
+let new_tree_root = builder.apply();
+
+<span class="boring">}</span></code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Mutable Trees (IntelliJ)</th><th style="text-align: left">Immutable Trees (<code>rust-analyzer</code>)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Editing API</strong></td><td style="text-align: left"><strong>Simple</strong> (Direct <code>node.delete()</code>)</td><td style="text-align: left"><strong>Verbose</strong> (Requires <code>Builder</code> / rewriting spine)</td></tr>
+<tr><td style="text-align: left"><strong>Concurrency</strong></td><td style="text-align: left"><strong>Hard</strong> (Needs complex R/W locks)</td><td style="text-align: left"><strong>Easy</strong> (Snapshots are thread-safe)</td></tr>
+<tr><td style="text-align: left"><strong>Mental Model</strong></td><td style="text-align: left">“DOM Manipulation”</td><td style="text-align: left">“Version Control” / Persistent Data Structures</td></tr>
+<tr><td style="text-align: left"><strong>Performance</strong></td><td style="text-align: left">Fast small edits</td><td style="text-align: left">Slower (allocates new nodes for the path to root)</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="layer-2-syntaxnode-the-cursor--rednode"><a class="header" href="#layer-2-syntaxnode-the-cursor--rednode">Layer 2: SyntaxNode (The Cursor / RedNode)</a></h3>
+<ul>
+<li>
+<p>GreenNode has some limitations: no parent pointers (can’t go up the tree), and if the same GreenNode appears in multiple places, they’re treated as identical.</p>
+</li>
+<li>
+<p>SyntaxNode/RedNode (also called cursors or <a href="https://en.wikipedia.org/wiki/Zipper_(data_structure)">zippers</a>) solve this by adding parent pointers and position information.</p>
+</li>
+<li>
+<p>Conceptual (unoptimized) example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>type SyntaxNode = Arc&lt;SyntaxData&gt;;
+
+struct SyntaxData {
+    offset: usize,
+    parent: Option&lt;SyntaxNode&gt;,
+    green: Arc&lt;GreenNode&gt;,
+}
+
+impl SyntaxNode {
+    fn new_root(root: Arc&lt;GreenNode&gt;) -&gt; SyntaxNode {
+        Arc::new(SyntaxData {
+            offset: 0,
+            parent: None,
+            green: root,
+        })
+    }
+    fn parent(&amp;self) -&gt; Option&lt;SyntaxNode&gt; {
+        self.parent.clone()
+    }
+    fn children(&amp;self) -&gt; impl Iterator&lt;Item = SyntaxNode&gt; {
+        let mut offset = self.offset;
+        self.green.children().map(|green_child| {
+            let child_offset = offset;
+            offset += green_child.text_len;
+            Arc::new(SyntaxData {
+                offset: child_offset,
+                parent: Some(Arc::clone(self)),
+                green: Arc::clone(green_child),
+            })
+        })
+    }
+}
+
+impl PartialEq for SyntaxNode {
+    fn eq(&amp;self, other: &amp;SyntaxNode) -&gt; bool {
+        self.offset == other.offset
+            &amp;&amp; Arc::ptr_eq(&amp;self.green, &amp;other.green)
+    }
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h4 id="optimizations-1"><a class="header" href="#optimizations-1">Optimizations</a></h4>
+<ul>
+<li>Atomic avoidance: Use <code>Rc</code> (non-atomic) instead of <code>Arc</code> for parent pointers since traversals are single-threaded anyway, avoiding atomic overhead.</li>
+<li>Thread movement: Can’t send <code>SyntaxNode</code> across threads directly, so you send lightweight coordinates like <code>(GreenNode, TextRange)</code> instead. The receiving thread rebuilds the node from those coordinates.</li>
+<li>Transient trees: Instead of keeping full trees in memory, <code>rust-analyzer</code> just stores <code>(FileId, TextRange)</code> and reparses when needed—trading CPU time for memory.</li>
+<li>Root-only <code>Arc</code>: Only the root holds an <code>Arc&lt;GreenNode&gt;</code> as the tree’s memory anchor. Descendants use raw pointers (fast) plus an <code>Rc</code> to their parent (safe). Since each child’s <code>Rc</code> keeps its parent alive all the way up to the root, the raw pointers never dangle. This means you only pay for atomic operations once at the root—the rest is just cheap <code>Rc</code> bumps.</li>
+<li>Object pooling: Keep a thread-local “free list” of node objects for reuse instead of calling <code>malloc</code> constantly. The pool only needs to match traversal depth (not tree size), so a few dozen slots can handle huge trees. This lets you return “owned” nodes cheaply (just a pointer move) which are nicer to work with than references.</li>
+</ul>
+<h4 id="alternative-designs-1"><a class="header" href="#alternative-designs-1">Alternative Designs</a></h4>
+<h5 id="memoized-rednodes"><a class="header" href="#memoized-rednodes">Memoized RedNodes</a></h5>
+<ul>
+<li>Memoized nodes (C#/Swift): Heavy <code>Arc</code> objects that permanently cache everything—offset, parent, children. You get true pointer equality (super fast comparison) but it doubles memory since the whole tree is duplicated in the “Red” layer. C# tries to claw back memory with weak references.</li>
+<li>Cursor approach (<code>rust-analyzer</code>): Lightweight views that calculate positions on demand. Memory scales with traversal depth, not tree size.</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Memoized Design (C# / Swift)
+// Persistent, heavy wrapper around the data.
+struct SyntaxData {
+    offset: usize,
+    parent: Option&lt;SyntaxNode&gt;, // Back-link
+    // Caches children forever. High memory cost.
+    children: Vec&lt;OnceCell&lt;SyntaxNode&gt;&gt;,
+}
+
+<span class="boring">}</span></code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Memoized Nodes (C#/Swift)</th><th style="text-align: left">Cursors (<code>rust-analyzer</code>)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Node Identity</strong></td><td style="text-align: left"><strong>Pointer Equality</strong> (Fast)</td><td style="text-align: left"><strong>Range Check</strong> (Slower)</td></tr>
+<tr><td style="text-align: left"><strong>Memory Cost</strong></td><td style="text-align: left"><strong>High</strong> (Doubles tree size)</td><td style="text-align: left"><strong>Low</strong> (Proportional to depth)</td></tr>
+<tr><td style="text-align: left"><strong>Child Access</strong></td><td style="text-align: left">Cached (Immediate)</td><td style="text-align: left">Computed (On-demand)</td></tr>
+<tr><td style="text-align: left"><strong>Persistence</strong></td><td style="text-align: left">Long-lived Objects</td><td style="text-align: left">Transient / Re-created</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="layer-3-ast-the-api"><a class="header" href="#layer-3-ast-the-api">Layer 3: AST (The API)</a></h3>
+<ul>
+<li>
+<p>A strongly typed API is way more convenient than working with untyped GreenNodes directly (though untyped works fine for error or trivial nodes).</p>
+</li>
+<li>
+<p>For example, having a typed <code>FnDef</code> with well-known methods beats a generic node you have to manually inspect.</p>
+</li>
+<li>
+<p>Example <code>AstNode</code> trait (from <code>rust-analyzer</code>):</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait AstNode {
+  fn cast(syntax: SyntaxNode) -&gt; Option&lt;Self&gt;
+  where
+      Self: Sized;
+
+  fn syntax(&amp;self) -&gt; &amp;SyntaxNode;
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>The classes are auto-generated. One example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FnDef {
+    syntax: SyntaxNode,
+}
+
+impl AstNode for FnDef {
+    fn cast(syntax: SyntaxNode) -&gt; Option&lt;Self&gt; {
+        match syntax.kind {
+            SyntaxKind::FN =&gt; Some(FnDef { syntax }),
+            _ =&gt; None,
+        }
+    }
+    fn syntax(&amp;self) -&gt; &amp;SyntaxNode {
+        &amp;self.syntax
+    }
+}
+
+impl FnDef {
+    pub fn param_list(&amp;self) -&gt; Option&lt;ParamList&gt; {
+        self.syntax.children().find_map(ParamList::cast)
+    }
+    pub fn ret_type(&amp;self) -&gt; Option&lt;RetType&gt; {
+        self.syntax.children().find_map(RetType::cast)
+    }
+    pub fn body(&amp;self) -&gt; Option&lt;BlockExpr&gt; {
+        self.syntax.children().find_map(BlockExpr::cast)
+    }
+    // ...
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Variants such as expressions are represented as <code>enum</code>s. One example from <code>rust-analyzer</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AssocItem {
+    FnDef(FnDef),
+    TypeAliasDef(TypeAliasDef),
+    ConstDef(ConstDef),
+}
+
+impl AstNode for AssocItem {
+    ...
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Shared syntactic elements (like names, loop bodies, or doc comments) are modeled via traits:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>trait HasName: AstNode {
+    fn name(&amp;self) -&gt; Option&lt;Name&gt;;
+}
+
+impl HasName for FnDef {
+    fn name(&amp;self) -&gt; Option&lt;Name&gt; {
+        self.syntax.children().find_map(Name::cast)
+    }
+}
+impl HasName for StructDef {
+    fn name(&amp;self) -&gt; Option&lt;Name&gt; {
+        self.syntax.children().find_map(Name::cast)
+    }
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h4 id="alternative-designs-2"><a class="header" href="#alternative-designs-2">Alternative Designs</a></h4>
+<h5 id="semantic-full-ast"><a class="header" href="#semantic-full-ast">Semantic Full AST</a></h5>
+<ul>
+<li>IntelliJ’s PSI is a “rich” AST that abstracts away where code came from—a <code>PsiMethod</code> looks the same whether it’s from source (<code>.java</code>) or compiled (<code>.jar</code>), hiding all that complexity.</li>
+<li>Attached semantics: Nodes have methods like <code>resolve()</code> or <code>getSuperClass()</code> built in, so you can query semantics directly on the tree.</li>
+<li>Memory optimization: Start as a lightweight “stub” (just serialized metadata) and only inflates to a full AST when you actually open the file.</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Feature</th><th style="text-align: left">Pure AST (<code>rust-analyzer</code>)</th><th style="text-align: left">Semantic PSI (IntelliJ)</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Scope</strong></td><td style="text-align: left">Source code structure only</td><td style="text-align: left">Source + Compiled Libraries</td></tr>
+<tr><td style="text-align: left"><strong>Backing</strong></td><td style="text-align: left">Always AST</td><td style="text-align: left"><strong>Dynamic</strong> (index stub -&gt; full tree)</td></tr>
+<tr><td style="text-align: left"><strong>Logic</strong></td><td style="text-align: left">External (analysis passes)</td><td style="text-align: left"><strong>Internal</strong> (methods on nodes)</td></tr>
+<tr><td style="text-align: left"><strong>Memory</strong></td><td style="text-align: left">Low (transient cursors)</td><td style="text-align: left">High (rich objects), mitigated by stubs</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="parsing---the-token-sequence-transformer"><a class="header" href="#parsing---the-token-sequence-transformer">Parsing - The Token Sequence Transformer</a></h2>
+<ul>
+<li>
+<p>You can think of parsing as doing a DFS traversal of the tree you want to build.</p>
+</li>
+<li>
+<p>When the parser finishes a node, it calls <code>GreenNodeBuilder</code> to construct it:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct GreenNodeBuilder { ... }
+
+impl GreenNodeBuilder {
+    pub fn new() -&gt; GreenNodeBuilder { ... }
+
+    pub fn token(&amp;mut self, kind: SyntaxKind, text: &amp;str) { ... }
+
+    pub fn start_node(&amp;mut self, kind: SyntaxKind) { ... }
+    pub fn finish_node(&amp;mut self) { ... }
+
+    pub fn finish(self) -&gt; GreenNode { ... }
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>There are two kinds of input: source text (full of trivia like whitespace and comments) and macro token trees (just structural tokens, no trivia).</p>
+</li>
+<li>
+<p>Input and output tokens don’t match 1-to-1. The parser uses abstract callbacks—<code>TokenSource</code> for reading input and <code>TreeSink</code> for writing output. An intermediary layer handles the mismatches, like stripping whitespace or merging <code>&gt;</code> + <code>&gt;</code> into <code>&gt;&gt;</code>.</p>
+</li>
+<li>
+<p>The parser interface (from <code>rust-analyzer</code>):</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Different structure than GreenNode's Token
+pub struct Token {
+  pub kind: SyntaxKind,
+  pub is_joined_to_next: bool,
+}
+
+pub trait TokenSource {
+    fn current(&amp;self) -&gt; Token;
+    fn lookahead_nth(&amp;self, n: usize) -&gt; Token;
+    fn is_keyword(&amp;self, kw: &amp;str) -&gt; bool;
+
+    fn bump(&amp;mut self);
+}
+
+pub trait TreeSink {
+    fn token(&amp;mut self, kind: SyntaxKind, n_tokens: u8);
+
+    fn start_node(&amp;mut self, kind: SyntaxKind);
+    fn finish_node(&amp;mut self);
+
+    fn error(&amp;mut self, error: ParseError);
+}
+
+pub fn parse(
+    token_source: &amp;mut dyn TokenSource,
+    tree_sink: &amp;mut dyn TreeSink,
+) { ... }
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>The <code>parser</code> and <code>syntax</code> crates are completely separate with zero dependencies on each other—strict modularity.</p>
+</li>
+<li>
+<p>The parser mostly works with <code>SyntaxKind</code> tags and ignores the actual text, except for one hack: checking contextual keywords like <code>union</code> or <code>default</code>.</p>
+</li>
+<li>
+<p><code>TreeSink</code> isn’t atomic—when the parser emits a logical token like <code>&gt;&gt;</code>, the sink can consume multiple raw tokens (<code>&gt;</code> and <code>&gt;</code>).</p>
+</li>
+</ul>
+<h3 id="reporting-syntax-errors"><a class="header" href="#reporting-syntax-errors">Reporting Syntax Errors</a></h3>
+<ul>
+<li>Errors aren’t stored in the tree—they’re collected separately in a <code>Vec&lt;SyntaxError&gt;</code>.</li>
+<li>This separation means you can build or modify trees manually without worrying about error state.</li>
+<li>The parser is intentionally permissive (like allowing <code>pub</code> on trait methods). These “soft” errors get caught later in a validation pass.</li>
+</ul>
+<h3 id="macros"><a class="header" href="#macros">Macros</a></h3>
+<ul>
+<li>Token hygiene: Macros need to remember where tokens came from so variables with the same name from different scopes don’t get confused. While building the tree, <code>TreeSink</code> also creates a map linking text ranges back to their original token IDs. So parsing gives you two things: the tree and a map tracing everything back to its source.</li>
+<li>Operator precedence: To avoid breaking precedence (like <code>$expr * 1</code> messing up order of operations), the parser adds invisible parentheses around macro expansions.</li>
+</ul>
+<h3 id="whitespace--comments"><a class="header" href="#whitespace--comments">Whitespace &amp; Comments</a></h3>
+<ul>
+<li>The core parser works with a “clean” token stream—no whitespace or comments to worry about.</li>
+<li>But trivia isn’t thrown away. The <code>TreeSink</code> layer re-inserts it into the final tree as nodes get built.</li>
+<li>Comments don’t just get dumped linearly—they’re attached heuristically to their semantic parents. Like a comment right before a function becomes a child of that <code>FnDef</code> node.</li>
+</ul>
+<h3 id="incremental-reparse"><a class="header" href="#incremental-reparse">Incremental Reparse</a></h3>
+<ul>
+<li>Green trees make modifications cheap—you can “patch” by swapping a single node pointer with a freshly parsed subtree. No external state needed.</li>
+<li>Block heuristic: Edits get isolated to the smallest <code>{}</code> block that contains them. This works because the parser keeps braces balanced even in broken code, giving you stable anchor points.</li>
+</ul>
+<details>
+<summary><strong>Q&amp;A: How does the parser maintain balanced braces in broken code?</strong></summary>
+<p><strong>Q: How can braces be “balanced” when users type unmatched <code>{</code> or <code>}</code>?</strong></p>
+<p>A: The <strong>tree structure</strong> maintains balanced braces, not the source text. The parser uses error recovery to ensure every <code>start_node(BLOCK)</code> has a matching <code>finish_node()</code>.</p>
+<p><strong>Q: What happens when a closing brace is missing?</strong></p>
+<p>A: The parser inserts an <strong>implicit/phantom closing brace</strong>. For example:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn foo() {
+    let x = 1;
+// EOF - missing }
+<span class="boring">}</span></code></pre>
+<p>The tree structure acts as if the <code>}</code> exists at EOF, even though it’s not in the source text. This is implemented in the parser’s <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/grammar/expressions/atom.rs#L501-L508">block parsing logic</a>, which automatically closes unclosed blocks at EOF or when encountering incompatible tokens.</p>
+<p><strong>Q: What if there’s an unexpected token inside a block?</strong></p>
+<p>A: The parser uses <strong>early block termination</strong>. For example:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn foo() {
+    let x = 1;
+fn bar() {  // unexpected fn - shouldn't be here
+<span class="boring">}</span></code></pre>
+<p>The parser:</p>
+<ul>
+<li>Realizes <code>fn</code> shouldn’t be inside <code>foo</code>’s block</li>
+<li>Inserts an implicit <code>}</code> to close <code>foo</code></li>
+<li>Continues parsing <code>bar</code> at the outer level</li>
+<li>Wraps the malformed content in an <code>ERROR</code> node</li>
+</ul>
+<p>This is part of the “panic mode” error recovery strategy implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/event.rs#L20-L132">event-based parser</a>.</p>
+<p><strong>Q: What about extra closing braces?</strong></p>
+<p>A: Unmatched <code>}</code> tokens are:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn foo() {
+}
+}  // extra closing brace
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Treated as error tokens</li>
+<li>Wrapped in an <code>ERROR</code> node</li>
+<li>Not matched with anything</li>
+<li>The structural tree still has balanced blocks</li>
+</ul>
+<p><strong>Q: How does this enable the block heuristic?</strong></p>
+<p>A: Because braces are always structurally balanced, the parser can reliably:</p>
+<ul>
+<li>Find the smallest enclosing <code>{}</code> block around any edit</li>
+<li>Use these blocks as stable anchor points</li>
+<li>Reparse just that subtree instead of the entire file</li>
+</ul>
+<p>This is implemented in the <a href="https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/reparsing.rs#L19-L146">incremental reparsing logic</a> in the <code>syntax</code> crate, particularly the <code>incremental_reparse</code> function and <code>is_balanced</code> check.</p>
+</details>
+<ul>
+<li>In practice though, incremental reparsing often isn’t worth it. Modern parsers are fast enough to just reparse the whole file from scratch.</li>
+</ul>
+<h2 id="parsing-algorithm"><a class="header" href="#parsing-algorithm">Parsing Algorithm</a></h2>
+<ul>
+<li>Recursive descent: Each grammar rule maps to a function that calls other functions recursively to parse sub-expressions. This makes the parser easy to understand and debug.</li>
+<li>Pratt parsing: Handle operator precedence elegantly without building complex precedence tables. Used specifically for expressions with binary operators.</li>
+<li>Error recovery: The parser makes a special effort to continue parsing even when it encounters syntax errors. Instead of stopping at the first error, it attempts to recover and continue building the tree, marking problematic sections with <code>ERROR</code> nodes.</li>
+</ul>
+<h3 id="parser-recap"><a class="header" href="#parser-recap">Parser Recap</a></h3>
+<p>The parser’s design achieves strict modularity through well-defined interfaces:</p>
+<ul>
+<li><code>TokenSource</code> trait:
+<ul>
+<li>Define how the parser reads input tokens.</li>
+<li>The parser doesn’t know or care whether tokens come from source text (with trivia), macro expansions (without trivia), or any other source.</li>
+</ul>
+</li>
+<li><code>TreeSink</code> trait:
+<ul>
+<li>Define how the parser writes output events (<code>start_node</code>, <code>finish_node</code>, <code>token</code>, <code>error</code>).</li>
+<li>The parser has no knowledge of how these events are converted into the final tree structure.</li>
+</ul>
+</li>
+</ul>
+<h2 id="interaction-between-the-syntax-and-the-parser-crate"><a class="header" href="#interaction-between-the-syntax-and-the-parser-crate">Interaction Between The <code>syntax</code> and The <code>parser</code> Crate</a></h2>
+<p>The <code>parser</code> and <code>syntax</code> crates have <strong>zero dependencies</strong> on each other.</p>
+<pre class="mermaid">%%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
+flowchart LR
+    A["&lt;i&gt;string&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Source Text&lt;/b&gt;"]
+
+    subgraph top["&lt;code&gt;syntax&lt;/code&gt; crate"]
+        direction LR
+        B["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Lexer&lt;/b&gt;"]
+        C["&lt;i&gt;Vec&amp;lt;Token&amp;gt;&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Token Stream&lt;/b&gt;"]
+        D["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TokenSource&lt;/b&gt;"]
+        B --&gt; C --&gt; D
+    end
+
+    subgraph P["&lt;code&gt;parser&lt;/code&gt; crate"]
+        E["&lt;i&gt;fn&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Parser&lt;/b&gt;"]
+    end
+
+    subgraph bottom["&lt;code&gt;syntax&lt;/code&gt; crate"]
+        direction RL
+        I["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;AST&lt;/b&gt;"]
+        H["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;SyntaxNode&lt;/b&gt;"]
+        G["&lt;i&gt;type&lt;/i&gt;&lt;br/&gt;&lt;b&gt;GreenNode&lt;/b&gt;"]
+        F["&lt;i&gt;trait&lt;/i&gt;&lt;br/&gt;&lt;b&gt;TreeSink&lt;/b&gt;"]
+        F --&gt; G --&gt; H --&gt; I
+    end
+
+    A --&gt; B
+    D -.-&gt;|reads tokens| E
+    E -.-&gt;|emits events| F
+
+    click B "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/parsing/lexer.rs#L1-L50" "View Lexer source"
+    click D "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L50-L70" "View TokenSource trait"
+    click E "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L81-L100" "View parse function"
+    click F "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/parser/src/lib.rs#L100-L120" "View TreeSink trait"
+    click G "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/syntax_node.rs#L20-L35" "View GreenNode type"
+    click H "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/syntax_node.rs#L29-L29" "View SyntaxNode type alias"
+    click I "https://github.com/rust-lang/rust-analyzer/blob/36a70b7435c48837018c71576d7bb4e8f763f501/crates/syntax/src/ast.rs#L39-L50" "View AstNode trait"
+
+    classDef syntaxNode fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
+    classDef parserNode fill:#fed7aa,stroke:#f97316,stroke-width:2px,color:#9a3412
+    classDef inputNode fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#374151
+
+    class B,C,D,F,G,H,I syntaxNode
+    class E parserNode
+    class A inputNode
+
+    style top fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
+    style bottom fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
+    style P fill:#fff7ed,stroke:#f97316,stroke-width:2px,rx:5
+</pre>
+
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
+<ul>
+<li>Related RFC for <code>libsyntax-2.0</code>: <a href="research/resources/libsyntax/github.com/rust-lang/rfcs/pull/2256">Link</a>.
+<ul>
+<li>Discuss design choices for syntax tree structure and parser.</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="research-summary"><a class="header" href="#research-summary">Research Summary</a></h1>
+<h2 id="operations"><a class="header" href="#operations">Operations</a></h2>
+<ol>
+<li><strong>Knowledge transfer</strong>: Study established projects to inherit mature operational workflows.</li>
+<li><strong>Institutional memory</strong>: Convert recurring code review feedback into a permanent “living style guide” to scale mentorship and prevent repetitive corrections<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Release automation</strong>: Structure commit metadata (titles, messages) to automate downstream documentation (changelogs), reducing manual release overhead<sup><a href="#1">1</a></sup>.</li>
+</ol>
+<h2 id="code-evolution"><a class="header" href="#code-evolution">Code Evolution</a></h2>
+<ol>
+<li><strong>Risk segmentation</strong>: Classify changes by impact scope (internal vs. API/dependency) to apply proportional review scrutiny<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Dependency minimalism</strong>: Internalize trivial utilities (“micro-dependencies”) to reduce supply chain attack surface and compilation bloat<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Type-driven correctness</strong>: Prefer parsing data into types that <em>guarantee</em> validity over simple validation checks. This eliminates “boolean blindness,” where the system loses the proof of validity after the check returns <code>true</code><sup><a href="#1">1</a></sup>.</li>
+<li><strong>Compilation optimization</strong>: Restrict heavy generics at system boundaries to prevent “monomorphization bloat,” trading minor runtime overhead for significant compile-time gains<sup><a href="#1">1</a></sup>.</li>
+</ol>
+<h2 id="compiler-architecture"><a class="header" href="#compiler-architecture">Compiler Architecture</a></h2>
+<ol>
+<li><code>rust-analyzer</code>’s high-level architecture, from low-level to higher-level<sup><a href="#1">1</a></sup>:
+<ol>
+<li><code>parser</code> crate: A recursive descent parser that is tree-agnostic and event-based.</li>
+<li><code>syntax</code> crate: Syntax tree structure &amp; parser that exposes a higher-level API for the code’s syntactic structure.</li>
+<li><code>base-db</code> crate: <code>salsa</code> integration, allowing for incremental and on-demand computation.</li>
+<li><code>hir-xxx</code> crates: Program analysis phases, explicitly integrating incremental computation.</li>
+<li><code>hir</code> crate: A high-level API that provides a static, inert and fully resolved view of the code.</li>
+<li><code>ide</code> crate: Provide high-level IDE features on top of <code>hir</code> semantic model, speaking IDE languages (such as texts and offsets instead of syntax nodes).</li>
+<li><code>rust-analyzer</code>: The language server, knowing about LSP and JSON.</li>
+</ol>
+</li>
+</ol>
+<h2 id="design-choices--general-architectures"><a class="header" href="#design-choices--general-architectures">Design Choices &amp; General Architectures</a></h2>
+<ol>
+<li><strong>Abstraction leakage prevention</strong>: Avoid blind serialization of internal types, which implicitly couples public clients to private implementation details<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Modular decoupling</strong>: Enforce opaque API boundaries (e.g., between analysis and IDE layers) to enable radical internal refactoring without breaking consumers<sup><a href="#1">1</a></sup>.</li>
+<li><strong>System invariants</strong>: Codify architectural laws (e.g., “core layers are I/O free”) to permanently guarantee non-functional requirements like speed and deterministic testing<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Visual hierarchy</strong>: Order function arguments by stability (context  data). This aligns code structure with mental models (“setting”  “actors”) and reduces cognitive load during scanning<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Type-level taint analysis</strong>: Use distinct types to segregate unverified external input (e.g., “dirty” OS strings) from validated internal data, preventing logic errors from crossing trust boundaries<sup><a href="#1">1</a></sup>.</li>
+<li><strong>State consistency</strong>: Enforce invariants via “construction &amp; retrieval” (private fields + public getters) rather than “mutation” (setters), ensuring objects never enter invalid states<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Compile-time contracts</strong>: Encode assumptions into the type system (e.g., non-nullable types) to force callers to handle edge cases explicitly, preserving context at the call site<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Parameter object / Command pattern</strong>: Encapsulate complex execution arguments into temporary structs to support multiple execution modes without duplicating function signatures<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Control flow divergence</strong>: Split functions with boolean flags (e.g., <code>do(true)</code>) into distinct named functions. This adheres to the Single Responsibility Principle and prevents unrelated logic paths from becoming coupled<sup><a href="#1">1</a></sup>.</li>
+</ol>
+<h3 id="implementation-patterns"><a class="header" href="#implementation-patterns">Implementation Patterns</a></h3>
+<ol>
+<li><strong>Computational density</strong>: Prioritize imperative clarity over functional brevity. Code should maximize “work per line” rather than minimizing line count via complex indirections<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Cognitive mapping</strong>: Use spatial operators (<code>&lt;</code> / <code>&lt;=</code>) that map intuitively to the mental number line (<code>0→∞</code>), avoiding the mental effort required to “flip” comparisons<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Linear scannability</strong>: Prefer syntax that supports left-to-right reading (e.g., explicit type ascription). This reduces the “context window” required to understand a statement by declaring intent up-front<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Scope minimization</strong>: Use blocks <code>{ ... }</code> to isolate temporary state, preventing variable pollution while retaining access to the parent context<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Cost explicitness</strong>: Push resource allocation (memory, I/O) up to the call site (e.g., passing a buffer in) to make performance costs visible and controllable by the caller<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Architectural enforcement</strong>: Use explicit namespaces/qualifiers to visually reinforce layer boundaries in code (e.g., <code>ast::Node</code> vs <code>hir::Node</code>)<sup><a href="#1">1</a></sup>.</li>
+</ol>
+<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
+<ol>
+<li><strong>Test decoupling</strong>: Use data-driven tests that rely on input/output data rather than internal API calls, creating resilience against refactoring<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Reproduction isolation</strong>: Minimize test cases to the smallest possible unit required to reproduce a behavior, reducing noise and debugging time<sup><a href="#1">1</a></sup>.</li>
+<li><strong>Strict regression policy</strong>: Never ignore failing tests; assert the incorrect behavior (with a FIXME) to ensure the failure remains visible and is not silently forgotten<sup><a href="#1">1</a></sup>.</li>
+</ol>
+<h2 id="documentation-1"><a class="header" href="#documentation-1">Documentation</a></h2>
+<ol>
+<li><strong>Intent capturing</strong>: Enforce full-sentence comments (capital + period) to psychologically shift the author from “note-taking” (what) to “explanation” (why/context)<sup><a href="#1">1</a></sup>.</li>
+</ol>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ol>
+<li><a href="https://www.google.com/search?q=../research/resources/rust-analyzer/high_level_architecture_and_conventions.md"><code>rust-analyzer</code> high-level architecture and conventions</a> <a id="1"></a></li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
+<p>This page will contain overview explanations of the concepts and techniques researched for the <code>dboxide</code> project.</p>
+<h2 id="api-boundary"><a class="header" href="#api-boundary">API Boundary</a></h2>
+<h2 id="architecture-invariant"><a class="header" href="#architecture-invariant">Architecture Invariant</a></h2>
+<h2 id="code-semantic-model"><a class="header" href="#code-semantic-model">Code Semantic Model</a></h2>
+<h2 id="recursive-descent-parser"><a class="header" href="#recursive-descent-parser">Recursive Descent Parser</a></h2>
+<h2 id="red-green-tree"><a class="header" href="#red-green-tree">Red-Green Tree</a></h2>
+<h2 id="tree-agnostic-parser"><a class="header" href="#tree-agnostic-parser">Tree-Agnostic Parser</a></h2>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="high-level-design"><a class="header" href="#high-level-design">High-Level Design</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="detailed-design"><a class="header" href="#detailed-design">Detailed Design</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="implementation-plan"><a class="header" href="#implementation-plan">Implementation Plan</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="learning-points"><a class="header" href="#learning-points">Learning Points</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="outcome"><a class="header" href="#outcome">Outcome</a></h1>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/mermaid-3a6b472a.min.js"></script>
+        <script src="theme/mermaid-init-025d9952.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
