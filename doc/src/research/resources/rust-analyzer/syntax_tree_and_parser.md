@@ -386,13 +386,13 @@ struct SyntaxData {
   ) { ... }
   ```
 
-- The `parser` and `syntax` crates are completely separate with zero dependencies on each other—strict modularity.
+- The `parser` and `syntax` crates are completely separate with zero dependencies on each other, achieving strict modularity.
 - The parser mostly works with `SyntaxKind` tags and ignores the actual text, except for one hack: checking contextual keywords like `union` or `default`.
-- `TreeSink` isn't atomic—when the parser emits a logical token like `>>`, the sink can consume multiple raw tokens (`>` and `>`).
+- `TreeSink` isn't atomic. When the parser emits a logical token like `>>`, the sink can consume multiple raw tokens (`>` and `>`).
 
 ### Reporting Syntax Errors
 
-- Errors aren't stored in the tree—they're collected separately in a `Vec<SyntaxError>`.
+- Errors aren't stored in the tree, they're collected separately in a `Vec<SyntaxError>`.
 - This separation means you can build or modify trees manually without worrying about error state.
 - The parser is intentionally permissive (like allowing `pub` on trait methods). These "soft" errors get caught later in a validation pass.
 

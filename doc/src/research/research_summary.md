@@ -28,7 +28,7 @@
 ## Token & Node
 
 1. Parser tokens have tags and their corresponding source text, while parser nodes have tags and source length with children nodes placed in a homogenous vector<sup>[2](#2)</sup>.
-2. Tokens and nodes share the same `SyntaxKind` enum and are not as clearly distinguished as in `@dbml/parse`—tokens function as leaf nodes while nodes function as interior nodes<sup>[2](#2)</sup>.
+2. Tokens and nodes share the same `SyntaxKind` enum and are not as clearly distinguished as in `@dbml/parse`. Tokens function as leaf nodes while nodes function as interior nodes<sup>[2](#2)</sup>.
 3. The [explicit nodes](./resources/rust-analyzer/syntax_tree_and_parser.md#dealing-with-trivia) approach treats whitespace and comments as sibling nodes, where `rust-analyzer` handles trivial and error nodes uniformly (everything is a node), while some parsers like `@dbml/parse` attach trivia to semantic parents and others use hybrid approaches<sup>[2](#2)</sup>.
 4. For context-sensitive keywords like `union` and `default`, the parser checks the actual text via `TokenSource::is_keyword()` rather than relying solely on token kind<sup>[2](#2)</sup>.
 5. An intermediary layer using `TokenSource` and `TreeSink` traits merges tokens based on context, such as combining `>` + `>` into `>>`<sup>[2](#2)</sup>.
@@ -43,7 +43,7 @@
 2. Everything is preserved including whitespace, comments, and invalid tokens, where invalid input gets wrapped in `ERROR` nodes and the original text can be reconstructed by concatenating token text<sup>[2](#2)</sup>.
 3. Errors live in a separate `Vec<SyntaxError>` rather than being embedded in the tree, which enables manual tree construction without error state management and produces parser output as `(green_node, errors)`<sup>[2](#2)</sup>.
 4. Resilient parsing combines multiple strategies<sup>[2](#2)</sup>:
-    - The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive (accepting invalid constructs that are validated later).
+    - The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive, accepting invalid constructs that are validated later.
     - The [event-based architecture](./resources/rust-analyzer/syntax_tree_and_parser.md#parsing---the-token-sequence-transformer) has the parser emit abstract events via `TokenSource` (input) and `TreeSink` (output) traits, keeping the parser agnostic to tree structure.
     - Error recovery employs panic mode (skipping to synchronization points like `}` or `;`), inserts implicit closing braces, performs early block termination, and wraps malformed content in ERROR nodes.
 5. [Incremental parsing](./resources/rust-analyzer/syntax_tree_and_parser.md#incremental-reparse) uses a sophisticated approach<sup>[2](#2)</sup>:
