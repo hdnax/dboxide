@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-4c01b41d.js";
+            window.path_to_searchindex_js = "searchindex-4190ea90.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-3f6a2b54.js"></script>
@@ -2813,13 +2813,56 @@ fn main() {
 </ol>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
-<p>This page will contain overview explanations of the concepts and techniques researched for the <code>dboxide</code> project.</p>
+<p>Technical terms and concepts used throughout the <code>dboxide</code> project documentation.</p>
 <h2 id="api-boundary"><a class="header" href="#api-boundary">API Boundary</a></h2>
-<h2 id="architecture-invariant"><a class="header" href="#architecture-invariant">Architecture Invariant</a></h2>
-<h2 id="code-semantic-model"><a class="header" href="#code-semantic-model">Code Semantic Model</a></h2>
-<h2 id="recursive-descent-parser"><a class="header" href="#recursive-descent-parser">Recursive Descent Parser</a></h2>
+<p>An explicit interface layer that separates different components of a system. By making boundaries opaque (hiding implementation details), you can refactor internal code without breaking external consumers. Example: the separation between the <code>hir</code> analysis layer and the <code>ide</code> layer in <code>rust-analyzer</code>.</p>
+<h2 id="ast"><a class="header" href="#ast">AST</a></h2>
+<p>Abstract Syntax Tree. A typed, high-level representation of source code structure that provides ergonomic access to syntactic constructs. In rust-analyzer, AST nodes like <code>FnDef</code> and <code>ParamList</code> are auto-generated wrappers around the lower-level <code>SyntaxNode</code>, offering convenient methods for traversing specific language constructs.</p>
+<h2 id="block-heuristic"><a class="header" href="#block-heuristic">Block Heuristic</a></h2>
+<p>An incremental parsing optimization that reparses only the smallest <code>{}</code> block containing an edit. This works because parsers can maintain structurally balanced braces even in broken code by inserting implicit closing braces and wrapping errors. Often not worth the complexity since full reparse is typically fast enough.</p>
+<h2 id="boolean-blindness"><a class="header" href="#boolean-blindness">Boolean Blindness</a></h2>
+<p>A situation where validation returns a simple boolean (<code>true</code>/<code>false</code>), causing the system to lose the proof of validity after the check. Instead of returning <code>bool</code>, prefer parsing into types that guarantee validity at the type level, preserving the validation evidence throughout the program.</p>
+<p>Actually, when writing this, I figured this is related to proof theory’s distinction between Admissibility and Derivability (I learned about these in PFPL - see my <a href="https://github.com/hdnax/type-theory">type-theory</a> repo). Returning <code>bool</code> is like admissibility (asserting “this is valid” without proof), while returning a validated type is like derivability (carrying constructive evidence). When you return <code>bool</code>, you lose the derivation - just like admissibility is a weaker assertion than derivability because it lacks the constructive proof tree.</p>
+<h2 id="dst"><a class="header" href="#dst">DST</a></h2>
+<p>Dynamically Sized Type. A Rust type whose size is not known at compile time. Used in rust-analyzer’s GreenNode implementation to store node data and all children in a single heap allocation: <code>[RefCount | Kind | TextLen | N_Children | Child_1 | ... | Child_N]</code>.</p>
+<h2 id="event-based-parser"><a class="header" href="#event-based-parser">Event-Based Parser</a></h2>
+<p>A parser architecture where the parser emits abstract events (like <code>start_node</code>, <code>token</code>, <code>finish_node</code>) through trait interfaces (<code>TokenSource</code> for input, <code>TreeSink</code> for output) rather than directly constructing tree structures. This decouples the parsing algorithm from tree representation, enabling the same parser to work with different input sources and output formats.</p>
+<h2 id="greennode"><a class="header" href="#greennode">GreenNode</a></h2>
+<p>The immutable storage layer in the Red-Green tree architecture. Stores the actual syntax tree data in a space-efficient, persistent structure that can be shared across threads via <code>Arc</code>. Contains only <code>kind: SyntaxKind</code>, <code>text_len: usize</code>, and children, with no position information or parent pointers. Optimizations include DST layout, tagged pointers, and token interning.</p>
+<h2 id="hir"><a class="header" href="#hir">HIR</a></h2>
+<p>High-level Intermediate Representation. A fully resolved, semantic view of the code that abstracts away syntactic details. In rust-analyzer, the <code>hir</code> crate provides a static API for querying resolved types, names, and semantic relationships, built on top of the syntax tree and incremental analysis passes.</p>
+<h2 id="incremental-parsing"><a class="header" href="#incremental-parsing">Incremental Parsing</a></h2>
+<p>A technique that reparses only the portions of a file affected by edits rather than reparsing the entire file. Enabled by immutable tree structures (GreenNode) that can be efficiently patched by swapping subtree pointers. Often not worth the implementation complexity as modern parsers are fast enough for full reparse.</p>
+<h2 id="interning"><a class="header" href="#interning">Interning</a></h2>
+<p>An optimization technique that stores only one copy of duplicate data. In rust-analyzer, identical tokens (like multiple occurrences of <code>1</code> in <code>1 + 1</code>) share the same allocated token, reducing memory usage.</p>
+<h2 id="lossless-syntax-tree"><a class="header" href="#lossless-syntax-tree">Lossless Syntax Tree</a></h2>
+<p>A tree representation that preserves everything from the source code including whitespace, comments, and invalid tokens. Enables perfect reconstruction of the original source text by concatenating token text. Invalid input gets wrapped in <code>ERROR</code> nodes rather than being discarded.</p>
+<h2 id="lsp"><a class="header" href="#lsp">LSP</a></h2>
+<p>Language Server Protocol. A standardized protocol for communication between editors and language servers, enabling features like auto-completion, go-to-definition, and diagnostics. Allows one language server implementation to work with multiple editors.</p>
+<h2 id="monomorphization"><a class="header" href="#monomorphization">Monomorphization</a></h2>
+<p>The process where Rust’s compiler generates separate copies of generic functions for each concrete type used. Can lead to “monomorphization bloat” where excessive use of generics at system boundaries causes long compile times. Mitigated by restricting generics or using dynamic dispatch at boundaries.</p>
+<h2 id="panic-mode"><a class="header" href="#panic-mode">Panic Mode</a></h2>
+<p>An error recovery technique where the parser skips tokens until it finds a synchronization point (like <code>}</code> or <code>;</code>) after encountering a syntax error. Allows the parser to continue and find additional errors rather than stopping at the first one.</p>
+<h2 id="pratt-parsing"><a class="header" href="#pratt-parsing">Pratt Parsing</a></h2>
+<p>An elegant technique for parsing expressions with operator precedence without building complex precedence tables. Handles infix, prefix, and postfix operators uniformly. Used by rust-analyzer for expression parsing alongside recursive descent for other constructs.</p>
 <h2 id="red-green-tree"><a class="header" href="#red-green-tree">Red-Green Tree</a></h2>
+<p>A tree architecture that separates immutable storage (Green layer) from navigation and position information (Red layer). <code>GreenNode</code>s store actual data and can be shared across threads. <code>SyntaxNode</code>s (Red layer) are lightweight cursors that add parent pointers and compute positions on-demand. This separation enables efficient tree edits and incremental parsing.</p>
+<h2 id="recursive-descent-parser"><a class="header" href="#recursive-descent-parser">Recursive Descent Parser</a></h2>
+<p>A top-down parsing technique where each grammar rule maps to a function that calls other parsing functions recursively. Makes the parser code easy to understand and debug since it directly mirrors the grammar structure. Used by rust-analyzer for most syntactic constructs.</p>
+<h2 id="resilient-parsing"><a class="header" href="#resilient-parsing">Resilient Parsing</a></h2>
+<p>A parsing approach that always produces a tree even from syntactically invalid code. Employs error recovery techniques (panic mode, implicit token insertion, early termination) to maintain tree structure. Invalid sections get wrapped in <code>ERROR</code> nodes. Enables IDE features like completion to work even in broken code.</p>
+<h2 id="salsa"><a class="header" href="#salsa">Salsa</a></h2>
+<p>An incremental computation framework that enables on-demand, cached evaluation of derived data. When inputs change, Salsa tracks dependencies and recomputes only what’s affected. Used in rust-analyzer’s <code>base-db</code> crate to make analysis incremental and efficient.</p>
+<h2 id="snapshot-testing"><a class="header" href="#snapshot-testing">Snapshot Testing</a></h2>
+<p>A testing approach where tests are defined as input/output pairs. The framework compares actual output against expected output stored in test files. When behavior changes intentionally, a flag (like <code>UPDATE_EXPECT=1</code>) auto-updates expectations, eliminating manual maintenance.</p>
+<h2 id="tokensource"><a class="header" href="#tokensource">TokenSource</a></h2>
+<p>A trait interface that defines how parsers read input tokens. Provides methods like <code>current()</code>, <code>lookahead_nth()</code>, and <code>bump()</code>. Abstracts over different token sources (source files, macro expansions, synthetic tokens) so the same parser can handle all inputs.</p>
 <h2 id="tree-agnostic-parser"><a class="header" href="#tree-agnostic-parser">Tree-Agnostic Parser</a></h2>
+<p>A parser that emits abstract parsing events without knowledge of the final tree structure. By working through trait interfaces (TokenSource/TreeSink), the parser remains decoupled from tree representation, enabling the same parsing logic to produce different output formats.</p>
+<h2 id="treesink"><a class="header" href="#treesink">TreeSink</a></h2>
+<p>A trait interface that defines how parsers write output. Receives events like <code>start_node()</code>, <code>token()</code>, <code>finish_node()</code>, and <code>error()</code>. The implementation decides how to build the actual tree structure. This abstraction enables different tree formats from the same parser.</p>
+<h2 id="trivia"><a class="header" href="#trivia">Trivia</a></h2>
+<p>Non-semantic tokens like whitespace, comments, and formatting characters. Different parsers handle trivia differently: explicit nodes (trivia as sibling nodes), attached trivia (stored in leading/trailing properties of tokens), or linked lists (separate doubly-linked list alongside the tree). rust-analyzer uses explicit nodes for uniformity and losslessness.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="high-level-design"><a class="header" href="#high-level-design">High-Level Design</a></h1>
 <ul>
