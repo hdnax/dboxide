@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-75a14370.js";
+            window.path_to_searchindex_js = "searchindex-ec7c10cc.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-86b9510b.js"></script>
@@ -2228,7 +2228,7 @@ fn bar() {  // unexpected fn - shouldn't be here
 </li>
 </ul>
 <h2 id="interaction-between-the-syntax-and-the-parser-crate"><a class="header" href="#interaction-between-the-syntax-and-the-parser-crate">Interaction Between The <code>syntax</code> and The <code>parser</code> Crate</a></h2>
-<p>The <code>parser</code> and <code>syntax</code> crates have <strong>zero dependencies</strong> on each other.</p>
+<p>The <code>parser</code> and <code>syntax</code> crates have <strong>zero dependencies</strong> on each other. Both crates depend on shared interfaces (traits), but neither depends on the other’s implementation.</p>
 <pre class="mermaid">%%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
 flowchart LR
     A(["&lt;i&gt;string&lt;/i&gt;&lt;br/&gt;&lt;b&gt;Source Text&lt;/b&gt;"])
@@ -2283,6 +2283,63 @@ flowchart LR
     style P fill:#fff7ed,stroke:#f97316,stroke-width:2px,rx:5
 </pre>
 
+<ul>
+<li>The <strong>solid arrows</strong> represent direct data flow within the same crate. The <strong>dashed arrows</strong> represent trait implementation/interface contracts.</li>
+<li>The <code>parser</code> crate (orange box) only touches <strong>traits</strong> - it never directly depends on concrete types from <code>syntax</code>.</li>
+<li>The <code>syntax</code> crate appears in two boxes because it provides both the input preparation (tokenization) and output consumption (tree building), but the parser sits independently in the middle.</li>
+<li>This architecture is like an “hourglass”: wide input capabilities (multiple token sources), narrow interface (two traits), wide output capabilities (multiple tree representations).</li>
+</ul>
+<h3 id="how-they-work-together"><a class="header" href="#how-they-work-together">How They Work Together</a></h3>
+<ol>
+<li>The <code>syntax</code> crate tokenizes the source text into a token stream.</li>
+<li>The <code>syntax</code> crate wraps its token stream in a struct that implements the <code>TokenSource</code> trait, providing the interface the parser expects.</li>
+<li>The <code>parser</code> crate’s <code>parse()</code> function reads from <code>TokenSource</code> and writes to <code>TreeSink</code> - it only knows about these trait interfaces, not the concrete implementations</li>
+<li>The <code>syntax</code> crate provides a struct implementing <code>TreeSink</code> that receives parser events and builds the actual <code>GreenNode</code> tree structure</li>
+<li>The <code>syntax</code> crate wraps the <code>GreenNode</code> in <code>SyntaxNode</code> and provides the typed AST layer</li>
+</ol>
+<p>Insight: The <code>parser</code> crate emits abstract <strong>events</strong> (<code>start_node</code>, <code>token</code>, <code>finish_node</code>, <code>error</code>) without knowing how they’ll be consumed. The <code>syntax</code> crate provides concrete implementations that convert these events into the tree structure.</p>
+<p><strong>What the parser knows vs doesn’t know:</strong></p>
+<ul>
+<li><strong>Knows</strong>: <code>SyntaxKind</code> tags (e.g., <code>FN_DEF</code>, <code>IDENT</code>, <code>LET_STMT</code>), the vocabulary of what syntactic constructs exist.</li>
+<li><strong>Knows</strong>: When to emit events like <code>start_node(FN_DEF)</code> or <code>token(IDENT)</code> based on parsing logic.</li>
+<li><strong>Doesn’t know</strong>: How these events are converted into actual tree nodes (<code>GreenNode</code>, <code>SyntaxNode</code>).</li>
+<li><strong>Doesn’t know</strong>: The memory layout, data structures, or APIs of the tree.</li>
+</ul>
+<p><code>SyntaxKind</code> is just a simple enum/tag shared between both crates. The parser uses it to label events, while the <code>syntax</code> crate uses it to tag tree nodes. This shared vocabulary is the only coupling between them.</p>
+<h4 id="illustrative-example"><a class="header" href="#illustrative-example">Illustrative example</a></h4>
+<p>The example glue code in <code>syntax</code> crate</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// `syntax` crate
+
+pub fn parse_source_file(text: &amp;str) -&gt; SourceFile {
+    // Step 1: Tokenize the source text (syntax crate's job)
+    let tokens = tokenize(text);
+
+    // Step 2: Create adapters that implement parser traits
+    let mut token_source = TokenSource::new(text, &amp;tokens);
+    let mut tree_sink = TreeSink::new(text, &amp;tokens);
+
+    // Step 3: Call the parser (parser crate's job)
+    // The parser only sees the trait interfaces, not the concrete types
+    parser::parse(&amp;mut token_source, &amp;mut tree_sink);
+
+    // Step 4: Extract the built tree (syntax crate's job)
+    let (green_node, errors) = tree_sink.finish();
+
+    // Step 5: Wrap in higher-level APIs
+    SourceFile::new(green_node, errors)
+}
+<span class="boring">}</span></code></pre>
+<h3 id="motivation"><a class="header" href="#motivation">Motivation</a></h3>
+<p>This separation provides several benefits:</p>
+<ul>
+<li>The parser logic can change without touching tree representation, and vice versa.</li>
+<li>Different token sources (source files, macro expansions, synthetic tokens) can all use the same parser.</li>
+<li>Different tree sinks could produce different tree formats, or even non-tree outputs (e.g., streaming validation).</li>
+<li>The parser can be tested with mock token sources and tree sinks.</li>
+<li>The parser is truly language-agnostic - it could theoretically be reused for other languages by providing different <code>SyntaxKind</code> definitions.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
