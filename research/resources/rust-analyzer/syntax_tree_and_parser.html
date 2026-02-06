@@ -37,7 +37,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-7b83d572.js";
+            window.path_to_searchindex_js = "../../../searchindex-0205426e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-490331af.js"></script>
@@ -648,18 +648,18 @@ pub fn parse(
 <span class="boring">}</span></code></pre>
 </li>
 <li>
-<p>The <code>parser</code> and <code>syntax</code> crates are completely separate with zero dependencies on each other—strict modularity.</p>
+<p>The <code>parser</code> and <code>syntax</code> crates are completely separate with zero dependencies on each other, achieving strict modularity.</p>
 </li>
 <li>
 <p>The parser mostly works with <code>SyntaxKind</code> tags and ignores the actual text, except for one hack: checking contextual keywords like <code>union</code> or <code>default</code>.</p>
 </li>
 <li>
-<p><code>TreeSink</code> isn’t atomic—when the parser emits a logical token like <code>&gt;&gt;</code>, the sink can consume multiple raw tokens (<code>&gt;</code> and <code>&gt;</code>).</p>
+<p><code>TreeSink</code> isn’t atomic. When the parser emits a logical token like <code>&gt;&gt;</code>, the sink can consume multiple raw tokens (<code>&gt;</code> and <code>&gt;</code>).</p>
 </li>
 </ul>
 <h3 id="reporting-syntax-errors"><a class="header" href="#reporting-syntax-errors">Reporting Syntax Errors</a></h3>
 <ul>
-<li>Errors aren’t stored in the tree—they’re collected separately in a <code>Vec&lt;SyntaxError&gt;</code>.</li>
+<li>Errors aren’t stored in the tree, they’re collected separately in a <code>Vec&lt;SyntaxError&gt;</code>.</li>
 <li>This separation means you can build or modify trees manually without worrying about error state.</li>
 <li>The parser is intentionally permissive (like allowing <code>pub</code> on trait methods). These “soft” errors get caught later in a validation pass.</li>
 </ul>

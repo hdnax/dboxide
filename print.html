@@ -38,7 +38,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-7b83d572.js";
+            window.path_to_searchindex_js = "searchindex-0205426e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-490331af.js"></script>
@@ -2120,18 +2120,18 @@ pub fn parse(
 <span class="boring">}</span></code></pre>
 </li>
 <li>
-<p>The <code>parser</code> and <code>syntax</code> crates are completely separate with zero dependencies on each other—strict modularity.</p>
+<p>The <code>parser</code> and <code>syntax</code> crates are completely separate with zero dependencies on each other, achieving strict modularity.</p>
 </li>
 <li>
 <p>The parser mostly works with <code>SyntaxKind</code> tags and ignores the actual text, except for one hack: checking contextual keywords like <code>union</code> or <code>default</code>.</p>
 </li>
 <li>
-<p><code>TreeSink</code> isn’t atomic—when the parser emits a logical token like <code>&gt;&gt;</code>, the sink can consume multiple raw tokens (<code>&gt;</code> and <code>&gt;</code>).</p>
+<p><code>TreeSink</code> isn’t atomic. When the parser emits a logical token like <code>&gt;&gt;</code>, the sink can consume multiple raw tokens (<code>&gt;</code> and <code>&gt;</code>).</p>
 </li>
 </ul>
 <h3 id="reporting-syntax-errors"><a class="header" href="#reporting-syntax-errors">Reporting Syntax Errors</a></h3>
 <ul>
-<li>Errors aren’t stored in the tree—they’re collected separately in a <code>Vec&lt;SyntaxError&gt;</code>.</li>
+<li>Errors aren’t stored in the tree, they’re collected separately in a <code>Vec&lt;SyntaxError&gt;</code>.</li>
 <li>This separation means you can build or modify trees manually without worrying about error state.</li>
 <li>The parser is intentionally permissive (like allowing <code>pub</code> on trait methods). These “soft” errors get caught later in a validation pass.</li>
 </ul>
@@ -2739,7 +2739,7 @@ fn main() {
 <h2 id="token--node"><a class="header" href="#token--node">Token &amp; Node</a></h2>
 <ol>
 <li>Parser tokens have tags and their corresponding source text, while parser nodes have tags and source length with children nodes placed in a homogenous vector<sup><a href="#2">2</a></sup>.</li>
-<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as clearly distinguished as in <code>@dbml/parse</code>—tokens function as leaf nodes while nodes function as interior nodes<sup><a href="#2">2</a></sup>.</li>
+<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as clearly distinguished as in <code>@dbml/parse</code>. Tokens function as leaf nodes while nodes function as interior nodes<sup><a href="#2">2</a></sup>.</li>
 <li>The <a href="#dealing-with-trivia">explicit nodes</a> approach treats whitespace and comments as sibling nodes, where <code>rust-analyzer</code> handles trivial and error nodes uniformly (everything is a node), while some parsers like <code>@dbml/parse</code> attach trivia to semantic parents and others use hybrid approaches<sup><a href="#2">2</a></sup>.</li>
 <li>For context-sensitive keywords like <code>union</code> and <code>default</code>, the parser checks the actual text via <code>TokenSource::is_keyword()</code> rather than relying solely on token kind<sup><a href="#2">2</a></sup>.</li>
 <li>An intermediary layer using <code>TokenSource</code> and <code>TreeSink</code> traits merges tokens based on context, such as combining <code>&gt;</code> + <code>&gt;</code> into <code>&gt;&gt;</code><sup><a href="#2">2</a></sup>.</li>
@@ -2758,7 +2758,7 @@ fn main() {
 <li>Errors live in a separate <code>Vec&lt;SyntaxError&gt;</code> rather than being embedded in the tree, which enables manual tree construction without error state management and produces parser output as <code>(green_node, errors)</code><sup><a href="#2">2</a></sup>.</li>
 <li>Resilient parsing combines multiple strategies<sup><a href="#2">2</a></sup>:
 <ul>
-<li>The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive (accepting invalid constructs that are validated later).</li>
+<li>The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive, accepting invalid constructs that are validated later.</li>
 <li>The <a href="#parsing---the-token-sequence-transformer">event-based architecture</a> has the parser emit abstract events via <code>TokenSource</code> (input) and <code>TreeSink</code> (output) traits, keeping the parser agnostic to tree structure.</li>
 <li>Error recovery employs panic mode (skipping to synchronization points like <code>}</code> or <code>;</code>), inserts implicit closing braces, performs early block termination, and wraps malformed content in ERROR nodes.</li>
 </ul>

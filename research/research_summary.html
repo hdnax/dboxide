@@ -37,7 +37,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-7b83d572.js";
+            window.path_to_searchindex_js = "../searchindex-0205426e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-490331af.js"></script>
@@ -210,7 +210,7 @@
 <h2 id="token--node"><a class="header" href="#token--node">Token &amp; Node</a></h2>
 <ol>
 <li>Parser tokens have tags and their corresponding source text, while parser nodes have tags and source length with children nodes placed in a homogenous vector<sup><a href="#2">2</a></sup>.</li>
-<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as clearly distinguished as in <code>@dbml/parse</code>—tokens function as leaf nodes while nodes function as interior nodes<sup><a href="#2">2</a></sup>.</li>
+<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as clearly distinguished as in <code>@dbml/parse</code>. Tokens function as leaf nodes while nodes function as interior nodes<sup><a href="#2">2</a></sup>.</li>
 <li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#dealing-with-trivia">explicit nodes</a> approach treats whitespace and comments as sibling nodes, where <code>rust-analyzer</code> handles trivial and error nodes uniformly (everything is a node), while some parsers like <code>@dbml/parse</code> attach trivia to semantic parents and others use hybrid approaches<sup><a href="#2">2</a></sup>.</li>
 <li>For context-sensitive keywords like <code>union</code> and <code>default</code>, the parser checks the actual text via <code>TokenSource::is_keyword()</code> rather than relying solely on token kind<sup><a href="#2">2</a></sup>.</li>
 <li>An intermediary layer using <code>TokenSource</code> and <code>TreeSink</code> traits merges tokens based on context, such as combining <code>&gt;</code> + <code>&gt;</code> into <code>&gt;&gt;</code><sup><a href="#2">2</a></sup>.</li>
@@ -229,7 +229,7 @@
 <li>Errors live in a separate <code>Vec&lt;SyntaxError&gt;</code> rather than being embedded in the tree, which enables manual tree construction without error state management and produces parser output as <code>(green_node, errors)</code><sup><a href="#2">2</a></sup>.</li>
 <li>Resilient parsing combines multiple strategies<sup><a href="#2">2</a></sup>:
 <ul>
-<li>The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive (accepting invalid constructs that are validated later).</li>
+<li>The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive, accepting invalid constructs that are validated later.</li>
 <li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#parsing---the-token-sequence-transformer">event-based architecture</a> has the parser emit abstract events via <code>TokenSource</code> (input) and <code>TreeSink</code> (output) traits, keeping the parser agnostic to tree structure.</li>
 <li>Error recovery employs panic mode (skipping to synchronization points like <code>}</code> or <code>;</code>), inserts implicit closing braces, performs early block termination, and wraps malformed content in ERROR nodes.</li>
 </ul>
