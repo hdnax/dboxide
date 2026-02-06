@@ -37,7 +37,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ea9905ee.js";
+            window.path_to_searchindex_js = "../searchindex-7b83d572.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-490331af.js"></script>
@@ -185,113 +185,102 @@
                         <h1 id="research-summary"><a class="header" href="#research-summary">Research Summary</a></h1>
 <h2 id="operations"><a class="header" href="#operations">Operations</a></h2>
 <ol>
-<li><strong>Knowledge transfer</strong>: Study established projects to inherit mature operational workflows.</li>
-<li><strong>Institutional memory</strong>: Convert recurring code review feedback into a permanent “living style guide” to scale mentorship and prevent repetitive corrections<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Release automation</strong>: Structure commit metadata (titles, messages) to automate downstream documentation (changelogs), reducing manual release overhead<sup><a href="#1">1</a></sup>.</li>
+<li>Study established projects to inherit their mature operational workflows<sup><a href="#1">1</a></sup>.</li>
+<li>Convert recurring code review feedback into a permanent “living style guide” that scales mentorship and prevents repetitive corrections<sup><a href="#1">1</a></sup>.</li>
+<li>Structure commit metadata (titles and messages) to automate downstream documentation like changelogs, which reduces manual release overhead<sup><a href="#1">1</a></sup>.</li>
 </ol>
 <h2 id="code-evolution"><a class="header" href="#code-evolution">Code Evolution</a></h2>
 <ol>
-<li><strong>Risk segmentation</strong>: Classify changes by impact scope (internal vs. API/dependency) to apply proportional review scrutiny<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Dependency minimalism</strong>: Internalize trivial utilities (“micro-dependencies”) to reduce supply chain attack surface and compilation bloat<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Type-driven correctness</strong>: Prefer parsing data into types that <em>guarantee</em> validity over simple validation checks. This eliminates “boolean blindness,” where the system loses the proof of validity after the check returns <code>true</code><sup><a href="#1">1</a></sup>.</li>
-<li><strong>Compilation optimization</strong>: Restrict heavy generics at system boundaries to prevent “monomorphization bloat,” trading minor runtime overhead for significant compile-time gains<sup><a href="#1">1</a></sup>.</li>
+<li>Classify changes by their impact scope (internal vs. API/dependency) to apply proportional review scrutiny<sup><a href="#1">1</a></sup>.</li>
+<li>Internalize trivial utilities (“micro-dependencies”) to reduce supply chain attack surface and compilation bloat<sup><a href="#1">1</a></sup>.</li>
+<li>Prefer parsing data into types that <em>guarantee</em> validity over simple validation checks, which eliminates “boolean blindness” where the system loses the proof of validity after the check returns <code>true</code><sup><a href="#1">1</a></sup>.</li>
+<li>Restrict heavy generics at system boundaries to prevent “monomorphization bloat,” trading minor runtime overhead for significant compile-time gains<sup><a href="#1">1</a></sup>.</li>
 </ol>
 <h2 id="compiler-architecture"><a class="header" href="#compiler-architecture">Compiler Architecture</a></h2>
-<ol>
-<li><code>rust-analyzer</code>’s high-level architecture, from low-level to higher-level<sup><a href="#1">1</a></sup>:
+<p><code>rust-analyzer</code>’s high-level architecture, from low-level to higher-level<sup><a href="#1">1</a></sup>:</p>
 <ol>
 <li><code>parser</code> crate: A recursive descent parser that is tree-agnostic and event-based.</li>
-<li><code>syntax</code> crate: Syntax tree structure &amp; parser that exposes a higher-level API for the code’s syntactic structure.</li>
-<li><code>base-db</code> crate: <code>salsa</code> integration, allowing for incremental and on-demand computation.</li>
-<li><code>hir-xxx</code> crates: Program analysis phases, explicitly integrating incremental computation.</li>
+<li><code>syntax</code> crate: Syntax tree structure and parser that exposes a higher-level API for the code’s syntactic structure.</li>
+<li><code>base-db</code> crate: Integration with <code>salsa</code>, allowing for incremental and on-demand computation.</li>
+<li><code>hir-xxx</code> crates: Program analysis phases that explicitly integrate incremental computation.</li>
 <li><code>hir</code> crate: A high-level API that provides a static, inert and fully resolved view of the code.</li>
-<li><code>ide</code> crate: Provide high-level IDE features on top of <code>hir</code> semantic model, speaking IDE languages (such as texts and offsets instead of syntax nodes).</li>
-<li><code>rust-analyzer</code>: The language server, knowing about LSP and JSON.</li>
-</ol>
-</li>
+<li><code>ide</code> crate: Provides high-level IDE features on top of the <code>hir</code> semantic model, speaking IDE languages such as texts and offsets instead of syntax nodes.</li>
+<li><code>rust-analyzer</code>: The language server that knows about LSP and JSON protocols.</li>
 </ol>
 <h2 id="token--node"><a class="header" href="#token--node">Token &amp; Node</a></h2>
 <ol>
-<li><strong>Token vs Node representation</strong><sup><a href="#2">2</a></sup>:
-<ul>
-<li><strong>Parser tokens</strong> have tags and their corresponding source text. <strong>Parser nodes</strong> have tags and source length.</li>
-<li>Children nodes are placed in a homogenous vector.</li>
-</ul>
-</li>
-<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as distinguished as <code>@dbml/parse</code>. In fact, tokens are like leaf nodes, and nodes are like interior nodes.<sup><a href="#2">2</a></sup></li>
-<li><strong>Trivia strategy</strong>: <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#dealing-with-trivia">Explicit nodes</a> (whitespace/comments as sibling nodes).
-<ul>
-<li><code>rust-analyzer</code> chooses to not treats trivial and error nodes specially. Everything is uniform.</li>
-<li>Some (like <code>@dbml/parse</code>) attach trivia to the nearest semantic parents.</li>
-<li>Some use a hybrid approach.</li>
-</ul>
-</li>
-<li><strong>Contextual keywords</strong>: Parser checks actual text via <code>TokenSource::is_keyword()</code> for context-sensitive keywords like <code>union</code>, <code>default</code><sup><a href="#2">2</a></sup>.</li>
-<li><strong>Token ambiguity</strong>: Intermediary layer (<code>TokenSource</code>/<code>TreeSink</code> traits) merges tokens (<code>&gt;</code> + <code>&gt;</code> → <code>&gt;&gt;</code>) based on context.<sup><a href="#2">2</a></sup>.</li>
-<li><strong>Position computation</strong>: Nodes store only <code>text_len</code> (not offset), tokens store text. SyntaxNode computes offset on-demand from parent. Enables incremental parsing without position invalidation<sup><a href="#2">2</a></sup>.</li>
+<li>Parser tokens have tags and their corresponding source text, while parser nodes have tags and source length with children nodes placed in a homogenous vector<sup><a href="#2">2</a></sup>.</li>
+<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as clearly distinguished as in <code>@dbml/parse</code>—tokens function as leaf nodes while nodes function as interior nodes<sup><a href="#2">2</a></sup>.</li>
+<li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#dealing-with-trivia">explicit nodes</a> approach treats whitespace and comments as sibling nodes, where <code>rust-analyzer</code> handles trivial and error nodes uniformly (everything is a node), while some parsers like <code>@dbml/parse</code> attach trivia to semantic parents and others use hybrid approaches<sup><a href="#2">2</a></sup>.</li>
+<li>For context-sensitive keywords like <code>union</code> and <code>default</code>, the parser checks the actual text via <code>TokenSource::is_keyword()</code> rather than relying solely on token kind<sup><a href="#2">2</a></sup>.</li>
+<li>An intermediary layer using <code>TokenSource</code> and <code>TreeSink</code> traits merges tokens based on context, such as combining <code>&gt;</code> + <code>&gt;</code> into <code>&gt;&gt;</code><sup><a href="#2">2</a></sup>.</li>
+<li>Nodes store only <code>text_len</code> (not absolute offset) while tokens store text, and SyntaxNode computes offset on-demand from its parent, which enables incremental parsing without position invalidation<sup><a href="#2">2</a></sup>.</li>
 </ol>
 <h2 id="parsing"><a class="header" href="#parsing">Parsing</a></h2>
 <ol>
-<li><strong>Three-layer tree architecture</strong><sup><a href="#2">2</a></sup>:
+<li>The three-layer tree architecture separates concerns effectively<sup><a href="#2">2</a></sup>:
 <ul>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-1-greennode-the-storage"><strong>GreenNode (storage)</strong></a>: Immutable, persistent. Optimizations: DST (single heap allocation), tagged pointers, token interning, <code>Arc</code>-sharing. Stores <code>text_len</code>, not offset.</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-2-syntaxnode-the-cursor--rednode"><strong>SyntaxNode (cursor/RedNode)</strong></a>: Adds parent pointers and on-demand position computation. Memory scales with depth, not tree size. Transient (rebuild from GreenNode when needed).</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-3-ast-the-api"><strong>AST (typed API)</strong></a>: Auto-generated typed wrappers (<code>FnDef</code>, <code>ParamList</code>) around <code>SyntaxNode</code> for ergonomic access.</li>
+<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-1-greennode-the-storage">GreenNode (storage)</a>: An immutable, persistent layer with optimizations including DST (single heap allocation), tagged pointers, token interning, and <code>Arc</code>-sharing that stores <code>text_len</code> rather than offset.</li>
+<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-2-syntaxnode-the-cursor--rednode">SyntaxNode (cursor/RedNode)</a>: Adds parent pointers and on-demand position computation where memory scales with traversal depth rather than tree size, and nodes are transient (rebuilt from GreenNode when needed).</li>
+<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-3-ast-the-api">AST (typed API)</a>: Auto-generated typed wrappers like <code>FnDef</code> and <code>ParamList</code> around <code>SyntaxNode</code> that provide ergonomic access to specific constructs.</li>
 </ul>
 </li>
-<li><strong>Lossless representation</strong>: Everything preserved (whitespace, comments, invalid tokens). Invalid input wrapped in <code>ERROR</code> nodes. Original text reconstructable by concatenating token text<sup><a href="#2">2</a></sup>.</li>
-<li><strong>Error storage</strong>: Errors live in separate <code>Vec&lt;SyntaxError&gt;</code>, not embedded in tree. Enables manual tree construction without error state management. Parser outputs <code>(green_node, errors)</code><sup><a href="#2">2</a></sup>.</li>
-<li><strong>Resilient parsing</strong><sup><a href="#2">2</a></sup>:
+<li>Everything is preserved including whitespace, comments, and invalid tokens, where invalid input gets wrapped in <code>ERROR</code> nodes and the original text can be reconstructed by concatenating token text<sup><a href="#2">2</a></sup>.</li>
+<li>Errors live in a separate <code>Vec&lt;SyntaxError&gt;</code> rather than being embedded in the tree, which enables manual tree construction without error state management and produces parser output as <code>(green_node, errors)</code><sup><a href="#2">2</a></sup>.</li>
+<li>Resilient parsing combines multiple strategies<sup><a href="#2">2</a></sup>:
 <ul>
-<li><strong>Algorithm</strong>: Recursive descent + Pratt parsing (expressions). Permissive (accepts invalid constructs, validated later).</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#parsing---the-token-sequence-transformer"><strong>Event-based architecture</strong></a>: Parser emits abstract events via <code>TokenSource</code> (input) and <code>TreeSink</code> (output) traits. Parser agnostic to tree structure.</li>
-<li><strong>Error recovery</strong>: Panic mode (skip to sync points like <code>}</code>, <code>;</code>), implicit closing braces, early block termination, ERROR node wrapping.</li>
+<li>The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive (accepting invalid constructs that are validated later).</li>
+<li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#parsing---the-token-sequence-transformer">event-based architecture</a> has the parser emit abstract events via <code>TokenSource</code> (input) and <code>TreeSink</code> (output) traits, keeping the parser agnostic to tree structure.</li>
+<li>Error recovery employs panic mode (skipping to synchronization points like <code>}</code> or <code>;</code>), inserts implicit closing braces, performs early block termination, and wraps malformed content in ERROR nodes.</li>
 </ul>
 </li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#incremental-reparse"><strong>Incremental parsing</strong></a><sup><a href="#2">2</a></sup>:
+<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#incremental-reparse">Incremental parsing</a> uses a sophisticated approach<sup><a href="#2">2</a></sup>:
 <ul>
-<li><strong>Red-Green model</strong>: Green = immutable storage, Red = cursors with positions. Separation enables cheap tree patches (swap GreenNode pointers).</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#incremental-reparse"><strong>Block heuristic</strong></a>: Reparse smallest <code>{}</code> block containing edit. Works because parser maintains structurally balanced braces (implicit <code>}</code> insertion, ERROR wrapping for extras).</li>
-<li><strong>Pragmatic note</strong>: Often not worth it—full reparse is fast and simpler. Valuable for tree edit cheapness and subtree sharing.</li>
+<li>The Red-Green model separates Green (immutable storage) from Red (cursors with positions), where this separation enables cheap tree patches by swapping GreenNode pointers.</li>
+<li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#incremental-reparse">block heuristic</a> reparses only the smallest <code>{}</code> block containing the edit, which works because the parser maintains structurally balanced braces through implicit <code>}</code> insertion and ERROR wrapping for extras.</li>
+<li>Pragmatically, incremental reparsing is often not worth the complexity since full reparse is fast and simpler, though the architecture remains valuable for tree edit cheapness and subtree sharing.</li>
 </ul>
 </li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#reporting-syntax-errors"><strong>Error messages</strong></a>: Permissive parser + separate validation pass for “soft” errors. Parser focuses on structure recovery; validation uses semantic context for detailed diagnostics<sup><a href="#2">2</a></sup>.</li>
+<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#reporting-syntax-errors">Error messages</a> use a layered approach where a permissive parser is followed by a separate validation pass for “soft” errors, allowing the parser to focus on structure recovery while validation uses semantic context for detailed diagnostics<sup><a href="#2">2</a></sup>.</li>
 </ol>
 <h2 id="design-choices--general-architectures"><a class="header" href="#design-choices--general-architectures">Design Choices &amp; General Architectures</a></h2>
 <ol>
-<li><strong>Abstraction leakage prevention</strong>: Avoid blind serialization of internal types, which implicitly couples public clients to private implementation details<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Modular decoupling</strong>: Enforce opaque API boundaries (e.g., between analysis and IDE layers) to enable radical internal refactoring without breaking consumers<sup><a href="#1">1</a></sup>.</li>
-<li><strong>System invariants</strong>: Codify architectural laws (e.g., “core layers are I/O free”) to permanently guarantee non-functional requirements like speed and deterministic testing<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Visual hierarchy</strong>: Order function arguments by stability (context  data). This aligns code structure with mental models (“setting”  “actors”) and reduces cognitive load during scanning<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Type-level taint analysis</strong>: Use distinct types to segregate unverified external input (e.g., “dirty” OS strings) from validated internal data, preventing logic errors from crossing trust boundaries<sup><a href="#1">1</a></sup>.</li>
-<li><strong>State consistency</strong>: Enforce invariants via “construction &amp; retrieval” (private fields + public getters) rather than “mutation” (setters), ensuring objects never enter invalid states<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Compile-time contracts</strong>: Encode assumptions into the type system (e.g., non-nullable types) to force callers to handle edge cases explicitly, preserving context at the call site<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Parameter object / Command pattern</strong>: Encapsulate complex execution arguments into temporary structs to support multiple execution modes without duplicating function signatures<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Control flow divergence</strong>: Split functions with boolean flags (e.g., <code>do(true)</code>) into distinct named functions. This adheres to the Single Responsibility Principle and prevents unrelated logic paths from becoming coupled<sup><a href="#1">1</a></sup>.</li>
+<li>Avoid blind serialization of internal types, which implicitly couples public clients to private implementation details<sup><a href="#1">1</a></sup>.</li>
+<li>Enforce opaque API boundaries (such as between analysis and IDE layers) to enable radical internal refactoring without breaking consumers<sup><a href="#1">1</a></sup>.</li>
+<li>Codify architectural laws (like “core layers are I/O free”) to permanently guarantee non-functional requirements such as speed and deterministic testing<sup><a href="#1">1</a></sup>.</li>
+<li>Order function arguments by stability (context → data) to align code structure with mental models (“setting” → “actors”) and reduce cognitive load during scanning<sup><a href="#1">1</a></sup>.</li>
+<li>Use distinct types to segregate unverified external input (like “dirty” OS strings) from validated internal data, preventing logic errors from crossing trust boundaries<sup><a href="#1">1</a></sup>.</li>
+<li>Enforce invariants via “construction &amp; retrieval” (private fields with public getters) rather than “mutation” (setters), ensuring objects never enter invalid states<sup><a href="#1">1</a></sup>.</li>
+<li>Encode assumptions into the type system (such as non-nullable types) to force callers to handle edge cases explicitly, preserving context at the call site<sup><a href="#1">1</a></sup>.</li>
+<li>Encapsulate complex execution arguments into temporary structs to support multiple execution modes without duplicating function signatures<sup><a href="#1">1</a></sup>.</li>
+<li>Split functions with boolean flags (like <code>do(true)</code>) into distinct named functions, which adheres to the Single Responsibility Principle and prevents unrelated logic paths from coupling<sup><a href="#1">1</a></sup>.</li>
 </ol>
 <h3 id="implementation-patterns"><a class="header" href="#implementation-patterns">Implementation Patterns</a></h3>
 <ol>
-<li><strong>Computational density</strong>: Prioritize imperative clarity over functional brevity. Code should maximize “work per line” rather than minimizing line count via complex indirections<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Cognitive mapping</strong>: Use spatial operators (<code>&lt;</code> / <code>&lt;=</code>) that map intuitively to the mental number line (<code>0→∞</code>), avoiding the mental effort required to “flip” comparisons<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Linear scannability</strong>: Prefer syntax that supports left-to-right reading (e.g., explicit type ascription). This reduces the “context window” required to understand a statement by declaring intent up-front<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Scope minimization</strong>: Use blocks <code>{ ... }</code> to isolate temporary state, preventing variable pollution while retaining access to the parent context<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Cost explicitness</strong>: Push resource allocation (memory, I/O) up to the call site (e.g., passing a buffer in) to make performance costs visible and controllable by the caller<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Architectural enforcement</strong>: Use explicit namespaces/qualifiers to visually reinforce layer boundaries in code (e.g., <code>ast::Node</code> vs <code>hir::Node</code>)<sup><a href="#1">1</a></sup>.</li>
+<li>Prioritize imperative clarity over functional brevity, where code should maximize “work per line” rather than minimizing line count via complex indirections<sup><a href="#1">1</a></sup>.</li>
+<li>Use spatial operators (like <code>&lt;</code> or <code>&lt;=</code>) that map intuitively to the mental number line (<code>0→∞</code>), avoiding the mental effort required to “flip” comparisons<sup><a href="#1">1</a></sup>.</li>
+<li>Prefer syntax that supports left-to-right reading (such as explicit type ascription), which reduces the “context window” required to understand a statement by declaring intent up-front<sup><a href="#1">1</a></sup>.</li>
+<li>Use blocks <code>{ ... }</code> to isolate temporary state, preventing variable pollution while retaining access to the parent context<sup><a href="#1">1</a></sup>.</li>
+<li>Push resource allocation (memory and I/O) up to the call site (like passing a buffer in) to make performance costs visible and controllable by the caller<sup><a href="#1">1</a></sup>.</li>
+<li>Use explicit namespaces or qualifiers to visually reinforce layer boundaries in code, such as distinguishing <code>ast::Node</code> from <code>hir::Node</code><sup><a href="#1">1</a></sup>.</li>
 </ol>
 <h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
 <ol>
-<li><strong>Test decoupling</strong>: Use data-driven tests that rely on input/output data rather than internal API calls, creating resilience against refactoring<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Reproduction isolation</strong>: Minimize test cases to the smallest possible unit required to reproduce a behavior, reducing noise and debugging time<sup><a href="#1">1</a></sup>.</li>
-<li><strong>Strict regression policy</strong>: Never ignore failing tests; assert the incorrect behavior (with a FIXME) to ensure the failure remains visible and is not silently forgotten<sup><a href="#1">1</a></sup>.</li>
+<li>Tests are defined as input/output pairs where the framework compares actual results against expected output, and expectations are updated when behavior changes intentionally<sup><a href="#3">3</a></sup>.</li>
+<li>Define tests via data (input and output) rather than API calls, which makes tests survive refactoring<sup><a href="#1">1</a></sup>.</li>
+<li>Each test simulates a complete environment (multi-file, multi-crate) in memory without shared state<sup><a href="#3">3</a></sup>.</li>
+<li>Failing tests can auto-update their expected output via a flag, which eliminates manual maintenance<sup><a href="#3">3</a></sup>.</li>
+<li>Minimize test cases to the smallest input that reproduces the behavior, resulting in less noise and faster debugging<sup><a href="#1">1</a></sup>.</li>
+<li>Place tests near their implementation to enable easy discovery during development<sup><a href="#3">3</a></sup>.</li>
+<li>Never ignore test failures. Instead, assert the incorrect behavior with a FIXME comment to keep the failure visible<sup><a href="#1">1</a></sup>.</li>
 </ol>
 <h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
-<ol>
-<li><strong>Intent capturing</strong>: Enforce full-sentence comments (capital + period) to psychologically shift the author from “note-taking” (what) to “explanation” (why/context)<sup><a href="#1">1</a></sup>.</li>
-</ol>
+<p>Enforce full-sentence comments (starting with a capital letter and ending with a period) to psychologically shift the author from “note-taking” (describing what) to “explanation” (describing why and providing context)<sup><a href="#1">1</a></sup>.</p>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <ol>
 <li><a href="https://www.google.com/search?q=../research/resources/rust-analyzer/high_level_architecture_and_conventions.md"><code>rust-analyzer</code> high-level architecture and conventions</a> <a id="1"></a></li>
 <li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html"><code>rust-analyzer</code> syntax tree and parser</a> <a id="2"></a></li>
+<li><a href="./resources/rust-analyzer/tests.html"><code>rust-analyzer</code> testing</a> <a id="3"></a></li>
 </ol>
 
                     </main>
