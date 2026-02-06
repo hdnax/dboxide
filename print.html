@@ -38,10 +38,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-ec7c10cc.js";
+            window.path_to_searchindex_js = "searchindex-16a64116.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-86b9510b.js"></script>
+        <script src="toc-490331af.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -313,6 +313,7 @@
 <li><a href="#high-level-architecture--conventions">High-Level Architecture &amp; Conventions</a></li>
 <li><a href="#coding-conventions">Coding Conventions</a></li>
 <li><a href="#syntax-tree--parser">Syntax Tree &amp; Parser</a></li>
+<li><a href="#writing-tests">Writing Tests</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="high-level-architecture--conventions"><a class="header" href="#high-level-architecture--conventions">High-Level Architecture &amp; Conventions</a></h1>
@@ -2341,6 +2342,8 @@ pub fn parse_source_file(text: &amp;str) -&gt; SourceFile {
 <li>The parser is truly language-agnostic - it could theoretically be reused for other languages by providing different <code>SyntaxKind</code> definitions.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="writing-tests"><a class="header" href="#writing-tests">Writing Tests</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="libsyntax"><a class="header" href="#libsyntax"><code>libsyntax</code></a></h1>
 <ul>
 <li>Related RFC for <code>libsyntax-2.0</code>: <a href="research/resources/libsyntax/github.com/rust-lang/rfcs/pull/2256">Link</a>.
@@ -2378,6 +2381,53 @@ pub fn parse_source_file(text: &amp;str) -&gt; SourceFile {
 </ol>
 </li>
 </ol>
+<h2 id="token--node"><a class="header" href="#token--node">Token &amp; Node</a></h2>
+<ol>
+<li><strong>Token vs Node representation</strong><sup><a href="#2">2</a></sup>:
+<ul>
+<li><strong>Parser tokens</strong> have tags and their corresponding source text. <strong>Parser nodes</strong> have tags and source length.</li>
+<li>Children nodes are placed in a homogenous vector.</li>
+</ul>
+</li>
+<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as distinguished as <code>@dbml/parse</code>. In fact, tokens are like leaf nodes, and nodes are like interior nodes.<sup><a href="#2">2</a></sup></li>
+<li><strong>Trivia strategy</strong>: <a href="#dealing-with-trivia">Explicit nodes</a> (whitespace/comments as sibling nodes).
+<ul>
+<li><code>rust-analyzer</code> chooses to not treats trivial and error nodes specially. Everything is uniform.</li>
+<li>Some (like <code>@dbml/parse</code>) attach trivia to the nearest semantic parents.</li>
+<li>Some use a hybrid approach.</li>
+</ul>
+</li>
+<li><strong>Contextual keywords</strong>: Parser checks actual text via <code>TokenSource::is_keyword()</code> for context-sensitive keywords like <code>union</code>, <code>default</code><sup><a href="#2">2</a></sup>.</li>
+<li><strong>Token ambiguity</strong>: Intermediary layer (<code>TokenSource</code>/<code>TreeSink</code> traits) merges tokens (<code>&gt;</code> + <code>&gt;</code> → <code>&gt;&gt;</code>) based on context.<sup><a href="#2">2</a></sup>.</li>
+<li><strong>Position computation</strong>: Nodes store only <code>text_len</code> (not offset), tokens store text. SyntaxNode computes offset on-demand from parent. Enables incremental parsing without position invalidation<sup><a href="#2">2</a></sup>.</li>
+</ol>
+<h2 id="parsing"><a class="header" href="#parsing">Parsing</a></h2>
+<ol>
+<li><strong>Three-layer tree architecture</strong><sup><a href="#2">2</a></sup>:
+<ul>
+<li><a href="#layer-1-greennode-the-storage"><strong>GreenNode (storage)</strong></a>: Immutable, persistent. Optimizations: DST (single heap allocation), tagged pointers, token interning, <code>Arc</code>-sharing. Stores <code>text_len</code>, not offset.</li>
+<li><a href="#layer-2-syntaxnode-the-cursor--rednode"><strong>SyntaxNode (cursor/RedNode)</strong></a>: Adds parent pointers and on-demand position computation. Memory scales with depth, not tree size. Transient (rebuild from GreenNode when needed).</li>
+<li><a href="#layer-3-ast-the-api"><strong>AST (typed API)</strong></a>: Auto-generated typed wrappers (<code>FnDef</code>, <code>ParamList</code>) around <code>SyntaxNode</code> for ergonomic access.</li>
+</ul>
+</li>
+<li><strong>Lossless representation</strong>: Everything preserved (whitespace, comments, invalid tokens). Invalid input wrapped in <code>ERROR</code> nodes. Original text reconstructable by concatenating token text<sup><a href="#2">2</a></sup>.</li>
+<li><strong>Error storage</strong>: Errors live in separate <code>Vec&lt;SyntaxError&gt;</code>, not embedded in tree. Enables manual tree construction without error state management. Parser outputs <code>(green_node, errors)</code><sup><a href="#2">2</a></sup>.</li>
+<li><strong>Resilient parsing</strong><sup><a href="#2">2</a></sup>:
+<ul>
+<li><strong>Algorithm</strong>: Recursive descent + Pratt parsing (expressions). Permissive (accepts invalid constructs, validated later).</li>
+<li><a href="#parsing---the-token-sequence-transformer"><strong>Event-based architecture</strong></a>: Parser emits abstract events via <code>TokenSource</code> (input) and <code>TreeSink</code> (output) traits. Parser agnostic to tree structure.</li>
+<li><strong>Error recovery</strong>: Panic mode (skip to sync points like <code>}</code>, <code>;</code>), implicit closing braces, early block termination, ERROR node wrapping.</li>
+</ul>
+</li>
+<li><a href="#incremental-reparse"><strong>Incremental parsing</strong></a><sup><a href="#2">2</a></sup>:
+<ul>
+<li><strong>Red-Green model</strong>: Green = immutable storage, Red = cursors with positions. Separation enables cheap tree patches (swap GreenNode pointers).</li>
+<li><a href="#incremental-reparse"><strong>Block heuristic</strong></a>: Reparse smallest <code>{}</code> block containing edit. Works because parser maintains structurally balanced braces (implicit <code>}</code> insertion, ERROR wrapping for extras).</li>
+<li><strong>Pragmatic note</strong>: Often not worth it—full reparse is fast and simpler. Valuable for tree edit cheapness and subtree sharing.</li>
+</ul>
+</li>
+<li><a href="#reporting-syntax-errors"><strong>Error messages</strong></a>: Permissive parser + separate validation pass for “soft” errors. Parser focuses on structure recovery; validation uses semantic context for detailed diagnostics<sup><a href="#2">2</a></sup>.</li>
+</ol>
 <h2 id="design-choices--general-architectures"><a class="header" href="#design-choices--general-architectures">Design Choices &amp; General Architectures</a></h2>
 <ol>
 <li><strong>Abstraction leakage prevention</strong>: Avoid blind serialization of internal types, which implicitly couples public clients to private implementation details<sup><a href="#1">1</a></sup>.</li>
@@ -2412,6 +2462,7 @@ pub fn parse_source_file(text: &amp;str) -&gt; SourceFile {
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <ol>
 <li><a href="https://www.google.com/search?q=../research/resources/rust-analyzer/high_level_architecture_and_conventions.md"><code>rust-analyzer</code> high-level architecture and conventions</a> <a id="1"></a></li>
+<li><a href="#syntax-tree--parser"><code>rust-analyzer</code> syntax tree and parser</a> <a id="2"></a></li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
