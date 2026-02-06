@@ -497,7 +497,7 @@ The parser's design achieves strict modularity through well-defined interfaces:
 
 ## Interaction Between The `syntax` and The `parser` Crate
 
-The `parser` and `syntax` crates have **zero dependencies** on each other.
+The `parser` and `syntax` crates have **zero dependencies** on each other. Both crates depend on shared interfaces (traits), but neither depends on the other's implementation.
 
 ```mermaid
 %%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
@@ -553,3 +553,63 @@ flowchart LR
     style bottom fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,rx:5
     style P fill:#fff7ed,stroke:#f97316,stroke-width:2px,rx:5
 ```
+
+- The **solid arrows** represent direct data flow within the same crate. The **dashed arrows** represent trait implementation/interface contracts.
+- The `parser` crate (orange box) only touches **traits** - it never directly depends on concrete types from `syntax`.
+- The `syntax` crate appears in two boxes because it provides both the input preparation (tokenization) and output consumption (tree building), but the parser sits independently in the middle.
+- This architecture is like an "hourglass": wide input capabilities (multiple token sources), narrow interface (two traits), wide output capabilities (multiple tree representations).
+
+### How They Work Together
+
+1. The `syntax` crate tokenizes the source text into a token stream.
+2. The `syntax` crate wraps its token stream in a struct that implements the `TokenSource` trait, providing the interface the parser expects.
+3. The `parser` crate's `parse()` function reads from `TokenSource` and writes to `TreeSink` - it only knows about these trait interfaces, not the concrete implementations
+4. The `syntax` crate provides a struct implementing `TreeSink` that receives parser events and builds the actual `GreenNode` tree structure
+5. The `syntax` crate wraps the `GreenNode` in `SyntaxNode` and provides the typed AST layer
+
+Insight: The `parser` crate emits abstract **events** (`start_node`, `token`, `finish_node`, `error`) without knowing how they'll be consumed. The `syntax` crate provides concrete implementations that convert these events into the tree structure.
+
+**What the parser knows vs doesn't know:**
+- **Knows**: `SyntaxKind` tags (e.g., `FN_DEF`, `IDENT`, `LET_STMT`), the vocabulary of what syntactic constructs exist.
+- **Knows**: When to emit events like `start_node(FN_DEF)` or `token(IDENT)` based on parsing logic.
+- **Doesn't know**: How these events are converted into actual tree nodes (`GreenNode`, `SyntaxNode`).
+- **Doesn't know**: The memory layout, data structures, or APIs of the tree.
+
+`SyntaxKind` is just a simple enum/tag shared between both crates. The parser uses it to label events, while the `syntax` crate uses it to tag tree nodes. This shared vocabulary is the only coupling between them.
+
+
+#### Illustrative example
+
+The example glue code in `syntax` crate
+
+```rust
+// `syntax` crate
+
+pub fn parse_source_file(text: &str) -> SourceFile {
+    // Step 1: Tokenize the source text (syntax crate's job)
+    let tokens = tokenize(text);
+
+    // Step 2: Create adapters that implement parser traits
+    let mut token_source = TokenSource::new(text, &tokens);
+    let mut tree_sink = TreeSink::new(text, &tokens);
+
+    // Step 3: Call the parser (parser crate's job)
+    // The parser only sees the trait interfaces, not the concrete types
+    parser::parse(&mut token_source, &mut tree_sink);
+
+    // Step 4: Extract the built tree (syntax crate's job)
+    let (green_node, errors) = tree_sink.finish();
+
+    // Step 5: Wrap in higher-level APIs
+    SourceFile::new(green_node, errors)
+}
+```
+
+### Motivation
+
+This separation provides several benefits:
+- The parser logic can change without touching tree representation, and vice versa.
+- Different token sources (source files, macro expansions, synthetic tokens) can all use the same parser.
+- Different tree sinks could produce different tree formats, or even non-tree outputs (e.g., streaming validation).
+- The parser can be tested with mock token sources and tree sinks.
+- The parser is truly language-agnostic - it could theoretically be reused for other languages by providing different `SyntaxKind` definitions.
