@@ -38,10 +38,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-4190ea90.js";
+            window.path_to_searchindex_js = "searchindex-96745181.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-3f6a2b54.js"></script>
+        <script src="toc-1770bef2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -303,6 +303,7 @@
 <ul>
 <li><a href="#rust-analyzer"><strong><code>rust-analyzer</code></strong></a>: An implementation of LSP for the Rust programming language - a good reference model.</li>
 <li><a href="#libsyntax"><strong><code>libsyntax</code></strong></a>: Rust compiler’s crate that documents some design notes on tree structure and parser.</li>
+<li><a href="#salsa"><strong><code>salsa</code></strong></a>: An incremental computation framework for building responsive compilers and language servers.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="rust-analyzer"><a class="header" href="#rust-analyzer"><code>rust-analyzer</code></a></h1>
@@ -2711,6 +2712,209 @@ fn main() {
 </li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="salsa"><a class="header" href="#salsa">Salsa</a></h1>
+<ul>
+<li><a href="#salsa-incremental-computation-framework">Overview</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="salsa-incremental-computation-framework"><a class="header" href="#salsa-incremental-computation-framework">Salsa: Incremental Computation Framework</a></h1>
+<p>Official site: <a href="https://salsa-rs.github.io/salsa/">Link</a>.</p>
+<h2 id="what-is-salsa"><a class="header" href="#what-is-salsa">What is Salsa?</a></h2>
+<p>A Rust framework for writing incremental, on-demand programs:</p>
+<ul>
+<li>Adapts to input changes while maintaining up-to-date outputs.</li>
+<li>Originally developed from incremental recompilation techniques in <code>rustc</code>.</li>
+<li>Tracks dependencies and memoizes results for efficient recomputation.</li>
+<li>Primary use case: Compilers and language tooling responding to source code modifications without full recompilation.</li>
+</ul>
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<h3 id="queries"><a class="header" href="#queries">Queries</a></h3>
+<p>The fundamental mechanism in Salsa:</p>
+<ul>
+<li>Functions whose results are cached (memoized) and tracked for dependencies.</li>
+</ul>
+<p>Two types of queries:</p>
+<ol>
+<li>Input queries: Values provided from outside the system. When these change, dependent computations are invalidated.</li>
+<li>Derived queries: Computed from other queries (inputs or derived). Results are cached and recomputed only when dependencies change.</li>
+</ol>
+<h3 id="database"><a class="header" href="#database">Database</a></h3>
+<p>The central runtime that manages query execution, dependency tracking, and memoization. All queries execute through the database, which coordinates:</p>
+<ul>
+<li>Active function tracking.</li>
+<li>Dependency recording.</li>
+<li>Cache invalidation.</li>
+<li>Result storage.</li>
+</ul>
+<h3 id="tracked-structures"><a class="header" href="#tracked-structures">Tracked Structures</a></h3>
+<p>Salsa manages tracked and interned structs:</p>
+<ul>
+<li>Maintain state throughout computations.</li>
+<li>Integrate with the dependency tracking system.</li>
+<li>Enable Salsa to know when they change and which computations depend on them.</li>
+</ul>
+<h2 id="how-it-works"><a class="header" href="#how-it-works">How It Works</a></h2>
+<h3 id="dependency-tracking"><a class="header" href="#dependency-tracking">Dependency Tracking</a></h3>
+<p>When a query executes:</p>
+<ul>
+<li>Salsa automatically records which other queries it reads.</li>
+<li>Creates a dependency graph.</li>
+</ul>
+<p>When an input changes:</p>
+<ol>
+<li>Salsa marks affected queries as “potentially stale”.</li>
+<li>On next access, performs a “maybe changed after” check.</li>
+<li>Only recomputes if dependencies actually changed.</li>
+<li>Reuses cached results when possible.</li>
+</ol>
+<h3 id="memoization"><a class="header" href="#memoization">Memoization</a></h3>
+<p>Query results are cached with their dependencies. Salsa stores:</p>
+<ul>
+<li>The computed result.</li>
+<li>Which queries were read during computation.</li>
+<li>The “revision” when the computation occurred.</li>
+</ul>
+<h3 id="incremental-updates"><a class="header" href="#incremental-updates">Incremental Updates</a></h3>
+<p>The framework uses a revision counter that increments when inputs change.</p>
+<p>For each cached result, Salsa can determine:</p>
+<ul>
+<li>Was this result computed before or after the last change?</li>
+<li>Have any of its dependencies changed since computation?</li>
+<li>Can we reuse the cached value?</li>
+</ul>
+<p>Result: Efficient incremental updates where only affected computations run.</p>
+<h3 id="cycle-handling"><a class="header" href="#cycle-handling">Cycle Handling</a></h3>
+<p>When circular dependencies occur (Query A depends on B, B depends on A):</p>
+<ul>
+<li>Salsa detects the cycle.</li>
+<li>Provides mechanisms to handle it.</li>
+<li>Prevents infinite loops.</li>
+</ul>
+<h2 id="example-workflow"><a class="header" href="#example-workflow">Example Workflow</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Input query - set from outside
+#[salsa::input]
+struct SourceText {
+    #[return_ref]
+    text: String,
+}
+
+// Derived query - computed from inputs
+#[salsa::tracked]
+fn parse(db: &amp;dyn Db, input: SourceText) -&gt; Ast {
+    // Parse the text
+    // Salsa automatically tracks that this depends on `input.text()`
+}
+
+#[salsa::tracked]
+fn check_types(db: &amp;dyn Db, input: SourceText) -&gt; TypeCheckResult {
+    let ast = parse(db, input);  // Depends on parse
+    // Type check the ast
+}
+
+// Later, when input changes:
+// 1. Set new input: input.set_text(db).to(new_text)
+// 2. Access check_types(db, input)
+// 3. Salsa sees parse() needs recompute (input changed)
+// 4. Salsa recomputes parse(), then check_types()
+// 5. If parse() result unchanged, check_types() reuses cache
+<span class="boring">}</span></code></pre>
+<h2 id="key-features"><a class="header" href="#key-features">Key Features</a></h2>
+<h3 id="on-demand-evaluation"><a class="header" href="#on-demand-evaluation">On-Demand Evaluation</a></h3>
+<ul>
+<li>Queries computed lazily.</li>
+<li>If no one asks for a result, it doesn’t get computed.</li>
+<li>Contrasts with systems that eagerly recompute everything after changes.</li>
+</ul>
+<h3 id="durability"><a class="header" href="#durability">Durability</a></h3>
+<ul>
+<li>Queries can be marked as “durable” if their inputs rarely change.</li>
+<li>Salsa uses durability levels to optimize invalidation checks.</li>
+</ul>
+<h3 id="lru-caching"><a class="header" href="#lru-caching">LRU Caching</a></h3>
+<ul>
+<li>Memoized results can be evicted using LRU (Least Recently Used) strategy.</li>
+<li>Manages memory by evicting old results.</li>
+<li>Results recomputed if accessed after eviction.</li>
+</ul>
+<h3 id="parallel-execution"><a class="header" href="#parallel-execution">Parallel Execution</a></h3>
+<ul>
+<li>Multiple queries execute concurrently.</li>
+<li>Salsa coordinates access and handles race conditions through its runtime.</li>
+</ul>
+<h3 id="cancellation"><a class="header" href="#cancellation">Cancellation</a></h3>
+<ul>
+<li>Long-running queries cancelled if inputs change during execution.</li>
+<li>Avoids wasted computation.</li>
+</ul>
+<h2 id="runtime-architecture"><a class="header" href="#runtime-architecture">Runtime Architecture</a></h2>
+<p>The Salsa runtime manages:</p>
+<ul>
+<li>Active function tracking: Which queries are currently executing.</li>
+<li>Revision management: Monotonic counter for tracking change epochs.</li>
+<li>Dependency graph: Records which queries depend on which.</li>
+<li>Memoization storage: Cached results indexed by query + inputs.</li>
+<li>Worker coordination: Handles concurrent query execution.</li>
+</ul>
+<h2 id="advantages"><a class="header" href="#advantages">Advantages</a></h2>
+<ol>
+<li>Automatic dependency tracking: No manual specification of what depends on what.</li>
+<li>Fine-grained invalidation: Only recompute what actually changed.</li>
+<li>Transparent caching: Memoization handled by framework, not user code.</li>
+<li>Parallel-friendly: Built-in support for concurrent execution.</li>
+<li>Memory efficient: LRU eviction prevents unbounded cache growth.</li>
+</ol>
+<h2 id="integration-with-rust-analyzer"><a class="header" href="#integration-with-rust-analyzer">Integration with <code>rust-analyzer</code></a></h2>
+<p><code>rust-analyzer</code> uses Salsa in its <code>base-db</code> crate for incremental compilation.</p>
+<p>Example uses:</p>
+<ul>
+<li>Input queries: File contents, crate graph configuration.</li>
+<li>Derived queries: Parse trees, name resolution, type inference.</li>
+</ul>
+<p>Benefits:</p>
+<ul>
+<li>When a file changes, only affected analysis passes rerun.</li>
+<li>Editing one function: type checking other functions reuses cached results.</li>
+<li>Responsive even on large codebases.</li>
+<li>Most edits trigger minimal recomputation.</li>
+</ul>
+<h2 id="comparison-reactive-vs-traditional"><a class="header" href="#comparison-reactive-vs-traditional">Comparison: Reactive vs Traditional</a></h2>
+<p>Traditional approach:</p>
+<pre><code>File change → Reparse entire project → Recheck all types → Update all diagnostics
+</code></pre>
+<p>Salsa approach:</p>
+<pre><code>File change → Mark queries as potentially stale
+User requests diagnostics → Salsa recomputes only affected queries → Return result
+</code></pre>
+<p>The Salsa approach is faster because:</p>
+<ul>
+<li>Only computes what’s actually needed (on-demand).</li>
+<li>Reuses unchanged intermediate results (memoization).</li>
+<li>Granular invalidation (file-level, not project-level).</li>
+</ul>
+<h2 id="learning-resources"><a class="header" href="#learning-resources">Learning Resources</a></h2>
+<ul>
+<li><a href="https://salsa-rs.github.io/salsa/tutorial.html">Tutorial: calc language</a>: End-to-end example building a compiler/interpreter</li>
+<li><a href="https://salsa-rs.github.io/salsa/plumbing.html">Plumbing documentation</a>: Internal mechanisms and algorithms</li>
+<li><a href="https://salsa.zulipchat.com">Community</a>: Zulip instance for discussions</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>Salsa provides incremental computation through:</p>
+<ol>
+<li>Query-based architecture: All computations are queries that depend on other queries.</li>
+<li>Automatic dependency tracking: Framework records dependencies during execution.</li>
+<li>Smart invalidation: Only recomputes when dependencies actually change.</li>
+<li>Transparent memoization: Caches results without explicit cache management.</li>
+<li>On-demand evaluation: Computes only what’s requested, when requested.</li>
+</ol>
+<p>Result:</p>
+<ul>
+<li>Responsive compilers and language servers.</li>
+<li>Efficient change handling.</li>
+<li>Real-time feedback practical even for large codebases.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="research-summary"><a class="header" href="#research-summary">Research Summary</a></h1>
 <h2 id="operations"><a class="header" href="#operations">Operations</a></h2>
 <ol>
@@ -2851,7 +3055,7 @@ fn main() {
 <p>A top-down parsing technique where each grammar rule maps to a function that calls other parsing functions recursively. Makes the parser code easy to understand and debug since it directly mirrors the grammar structure. Used by rust-analyzer for most syntactic constructs.</p>
 <h2 id="resilient-parsing"><a class="header" href="#resilient-parsing">Resilient Parsing</a></h2>
 <p>A parsing approach that always produces a tree even from syntactically invalid code. Employs error recovery techniques (panic mode, implicit token insertion, early termination) to maintain tree structure. Invalid sections get wrapped in <code>ERROR</code> nodes. Enables IDE features like completion to work even in broken code.</p>
-<h2 id="salsa"><a class="header" href="#salsa">Salsa</a></h2>
+<h2 id="salsa-1"><a class="header" href="#salsa-1">Salsa</a></h2>
 <p>An incremental computation framework that enables on-demand, cached evaluation of derived data. When inputs change, Salsa tracks dependencies and recomputes only what’s affected. Used in rust-analyzer’s <code>base-db</code> crate to make analysis incremental and efficient.</p>
 <h2 id="snapshot-testing"><a class="header" href="#snapshot-testing">Snapshot Testing</a></h2>
 <p>A testing approach where tests are defined as input/output pairs. The framework compares actual output against expected output stored in test files. When behavior changes intentionally, a flag (like <code>UPDATE_EXPECT=1</code>) auto-updates expectations, eliminating manual maintenance.</p>

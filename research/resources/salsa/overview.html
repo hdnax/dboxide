@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Research Summary - dboxide</title>
+        <title>Overview - dboxide</title>
 
 
         <!-- Custom HTML head -->
@@ -12,20 +12,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../favicon-de23e50b.svg">
-        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
-        <link rel="stylesheet" href="../css/variables-8adf115d.css">
-        <link rel="stylesheet" href="../css/general-2459343d.css">
-        <link rel="stylesheet" href="../css/chrome-ae938929.css">
-        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+        <link rel="icon" href="../../../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../../../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../../../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../../../css/general-2459343d.css">
+        <link rel="stylesheet" href="../../../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../../../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+        <link rel="stylesheet" href="../../../fonts/fonts-9644e21d.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
-        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
-        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../../../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../../../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../../../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
 
@@ -34,13 +34,13 @@
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../";
+            const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-96745181.js";
+            window.path_to_searchindex_js = "../../../searchindex-96745181.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-1770bef2.js"></script>
+        <script src="../../../toc-1770bef2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -107,7 +107,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../../../toc.html"></iframe>
             </noscript>
             <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -142,7 +142,7 @@
                     <h1 class="menu-title">dboxide</h1>
 
                     <div class="right-buttons">
-                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../../../print.html" title="Print this book" aria-label="Print this book">
                             <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
                         </a>
                         <a href="https://github.com/hdnax/dboxide/tree/main/doc" title="Git repository" aria-label="Git repository">
@@ -182,116 +182,213 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="research-summary"><a class="header" href="#research-summary">Research Summary</a></h1>
-<h2 id="operations"><a class="header" href="#operations">Operations</a></h2>
-<ol>
-<li>Study established projects to inherit their mature operational workflows<sup><a href="#1">1</a></sup>.</li>
-<li>Convert recurring code review feedback into a permanent “living style guide” that scales mentorship and prevents repetitive corrections<sup><a href="#1">1</a></sup>.</li>
-<li>Structure commit metadata (titles and messages) to automate downstream documentation like changelogs, which reduces manual release overhead<sup><a href="#1">1</a></sup>.</li>
-</ol>
-<h2 id="code-evolution"><a class="header" href="#code-evolution">Code Evolution</a></h2>
-<ol>
-<li>Classify changes by their impact scope (internal vs. API/dependency) to apply proportional review scrutiny<sup><a href="#1">1</a></sup>.</li>
-<li>Internalize trivial utilities (“micro-dependencies”) to reduce supply chain attack surface and compilation bloat<sup><a href="#1">1</a></sup>.</li>
-<li>Prefer parsing data into types that <em>guarantee</em> validity over simple validation checks, which eliminates “boolean blindness” where the system loses the proof of validity after the check returns <code>true</code><sup><a href="#1">1</a></sup>.</li>
-<li>Restrict heavy generics at system boundaries to prevent “monomorphization bloat,” trading minor runtime overhead for significant compile-time gains<sup><a href="#1">1</a></sup>.</li>
-</ol>
-<h2 id="compiler-architecture"><a class="header" href="#compiler-architecture">Compiler Architecture</a></h2>
-<p><code>rust-analyzer</code>’s high-level architecture, from low-level to higher-level<sup><a href="#1">1</a></sup>:</p>
-<ol>
-<li><code>parser</code> crate: A recursive descent parser that is tree-agnostic and event-based.</li>
-<li><code>syntax</code> crate: Syntax tree structure and parser that exposes a higher-level API for the code’s syntactic structure.</li>
-<li><code>base-db</code> crate: Integration with <code>salsa</code>, allowing for incremental and on-demand computation.</li>
-<li><code>hir-xxx</code> crates: Program analysis phases that explicitly integrate incremental computation.</li>
-<li><code>hir</code> crate: A high-level API that provides a static, inert and fully resolved view of the code.</li>
-<li><code>ide</code> crate: Provides high-level IDE features on top of the <code>hir</code> semantic model, speaking IDE languages such as texts and offsets instead of syntax nodes.</li>
-<li><code>rust-analyzer</code>: The language server that knows about LSP and JSON protocols.</li>
-</ol>
-<h2 id="token--node"><a class="header" href="#token--node">Token &amp; Node</a></h2>
-<ol>
-<li>Parser tokens have tags and their corresponding source text, while parser nodes have tags and source length with children nodes placed in a homogenous vector<sup><a href="#2">2</a></sup>.</li>
-<li>Tokens and nodes share the same <code>SyntaxKind</code> enum and are not as clearly distinguished as in <code>@dbml/parse</code>. Tokens function as leaf nodes while nodes function as interior nodes<sup><a href="#2">2</a></sup>.</li>
-<li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#dealing-with-trivia">explicit nodes</a> approach treats whitespace and comments as sibling nodes, where <code>rust-analyzer</code> handles trivial and error nodes uniformly (everything is a node), while some parsers like <code>@dbml/parse</code> attach trivia to semantic parents and others use hybrid approaches<sup><a href="#2">2</a></sup>.</li>
-<li>For context-sensitive keywords like <code>union</code> and <code>default</code>, the parser checks the actual text via <code>TokenSource::is_keyword()</code> rather than relying solely on token kind<sup><a href="#2">2</a></sup>.</li>
-<li>An intermediary layer using <code>TokenSource</code> and <code>TreeSink</code> traits merges tokens based on context, such as combining <code>&gt;</code> + <code>&gt;</code> into <code>&gt;&gt;</code><sup><a href="#2">2</a></sup>.</li>
-<li>Nodes store only <code>text_len</code> (not absolute offset) while tokens store text, and SyntaxNode computes offset on-demand from its parent, which enables incremental parsing without position invalidation<sup><a href="#2">2</a></sup>.</li>
-</ol>
-<h2 id="parsing"><a class="header" href="#parsing">Parsing</a></h2>
-<ol>
-<li>The three-layer tree architecture separates concerns effectively<sup><a href="#2">2</a></sup>:
+                        <h1 id="salsa-incremental-computation-framework"><a class="header" href="#salsa-incremental-computation-framework">Salsa: Incremental Computation Framework</a></h1>
+<p>Official site: <a href="https://salsa-rs.github.io/salsa/">Link</a>.</p>
+<h2 id="what-is-salsa"><a class="header" href="#what-is-salsa">What is Salsa?</a></h2>
+<p>A Rust framework for writing incremental, on-demand programs:</p>
 <ul>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-1-greennode-the-storage">GreenNode (storage)</a>: An immutable, persistent layer with optimizations including DST (single heap allocation), tagged pointers, token interning, and <code>Arc</code>-sharing that stores <code>text_len</code> rather than offset.</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-2-syntaxnode-the-cursor--rednode">SyntaxNode (cursor/RedNode)</a>: Adds parent pointers and on-demand position computation where memory scales with traversal depth rather than tree size, and nodes are transient (rebuilt from GreenNode when needed).</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#layer-3-ast-the-api">AST (typed API)</a>: Auto-generated typed wrappers like <code>FnDef</code> and <code>ParamList</code> around <code>SyntaxNode</code> that provide ergonomic access to specific constructs.</li>
+<li>Adapts to input changes while maintaining up-to-date outputs.</li>
+<li>Originally developed from incremental recompilation techniques in <code>rustc</code>.</li>
+<li>Tracks dependencies and memoizes results for efficient recomputation.</li>
+<li>Primary use case: Compilers and language tooling responding to source code modifications without full recompilation.</li>
 </ul>
-</li>
-<li>Everything is preserved including whitespace, comments, and invalid tokens, where invalid input gets wrapped in <code>ERROR</code> nodes and the original text can be reconstructed by concatenating token text<sup><a href="#2">2</a></sup>.</li>
-<li>Errors live in a separate <code>Vec&lt;SyntaxError&gt;</code> rather than being embedded in the tree, which enables manual tree construction without error state management and produces parser output as <code>(green_node, errors)</code><sup><a href="#2">2</a></sup>.</li>
-<li>Resilient parsing combines multiple strategies<sup><a href="#2">2</a></sup>:
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<h3 id="queries"><a class="header" href="#queries">Queries</a></h3>
+<p>The fundamental mechanism in Salsa:</p>
 <ul>
-<li>The algorithm uses recursive descent with Pratt parsing for expressions and is intentionally permissive, accepting invalid constructs that are validated later.</li>
-<li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#parsing---the-token-sequence-transformer">event-based architecture</a> has the parser emit abstract events via <code>TokenSource</code> (input) and <code>TreeSink</code> (output) traits, keeping the parser agnostic to tree structure.</li>
-<li>Error recovery employs panic mode (skipping to synchronization points like <code>}</code> or <code>;</code>), inserts implicit closing braces, performs early block termination, and wraps malformed content in ERROR nodes.</li>
+<li>Functions whose results are cached (memoized) and tracked for dependencies.</li>
 </ul>
-</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#incremental-reparse">Incremental parsing</a> uses a sophisticated approach<sup><a href="#2">2</a></sup>:
+<p>Two types of queries:</p>
+<ol>
+<li>Input queries: Values provided from outside the system. When these change, dependent computations are invalidated.</li>
+<li>Derived queries: Computed from other queries (inputs or derived). Results are cached and recomputed only when dependencies change.</li>
+</ol>
+<h3 id="database"><a class="header" href="#database">Database</a></h3>
+<p>The central runtime that manages query execution, dependency tracking, and memoization. All queries execute through the database, which coordinates:</p>
 <ul>
-<li>The Red-Green model separates Green (immutable storage) from Red (cursors with positions), where this separation enables cheap tree patches by swapping GreenNode pointers.</li>
-<li>The <a href="./resources/rust-analyzer/syntax_tree_and_parser.html#incremental-reparse">block heuristic</a> reparses only the smallest <code>{}</code> block containing the edit, which works because the parser maintains structurally balanced braces through implicit <code>}</code> insertion and ERROR wrapping for extras.</li>
-<li>Pragmatically, incremental reparsing is often not worth the complexity since full reparse is fast and simpler, though the architecture remains valuable for tree edit cheapness and subtree sharing.</li>
+<li>Active function tracking.</li>
+<li>Dependency recording.</li>
+<li>Cache invalidation.</li>
+<li>Result storage.</li>
 </ul>
-</li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html#reporting-syntax-errors">Error messages</a> use a layered approach where a permissive parser is followed by a separate validation pass for “soft” errors, allowing the parser to focus on structure recovery while validation uses semantic context for detailed diagnostics<sup><a href="#2">2</a></sup>.</li>
-</ol>
-<h2 id="design-choices--general-architectures"><a class="header" href="#design-choices--general-architectures">Design Choices &amp; General Architectures</a></h2>
+<h3 id="tracked-structures"><a class="header" href="#tracked-structures">Tracked Structures</a></h3>
+<p>Salsa manages tracked and interned structs:</p>
+<ul>
+<li>Maintain state throughout computations.</li>
+<li>Integrate with the dependency tracking system.</li>
+<li>Enable Salsa to know when they change and which computations depend on them.</li>
+</ul>
+<h2 id="how-it-works"><a class="header" href="#how-it-works">How It Works</a></h2>
+<h3 id="dependency-tracking"><a class="header" href="#dependency-tracking">Dependency Tracking</a></h3>
+<p>When a query executes:</p>
+<ul>
+<li>Salsa automatically records which other queries it reads.</li>
+<li>Creates a dependency graph.</li>
+</ul>
+<p>When an input changes:</p>
 <ol>
-<li>Avoid blind serialization of internal types, which implicitly couples public clients to private implementation details<sup><a href="#1">1</a></sup>.</li>
-<li>Enforce opaque API boundaries (such as between analysis and IDE layers) to enable radical internal refactoring without breaking consumers<sup><a href="#1">1</a></sup>.</li>
-<li>Codify architectural laws (like “core layers are I/O free”) to permanently guarantee non-functional requirements such as speed and deterministic testing<sup><a href="#1">1</a></sup>.</li>
-<li>Order function arguments by stability (context → data) to align code structure with mental models (“setting” → “actors”) and reduce cognitive load during scanning<sup><a href="#1">1</a></sup>.</li>
-<li>Use distinct types to segregate unverified external input (like “dirty” OS strings) from validated internal data, preventing logic errors from crossing trust boundaries<sup><a href="#1">1</a></sup>.</li>
-<li>Enforce invariants via “construction &amp; retrieval” (private fields with public getters) rather than “mutation” (setters), ensuring objects never enter invalid states<sup><a href="#1">1</a></sup>.</li>
-<li>Encode assumptions into the type system (such as non-nullable types) to force callers to handle edge cases explicitly, preserving context at the call site<sup><a href="#1">1</a></sup>.</li>
-<li>Encapsulate complex execution arguments into temporary structs to support multiple execution modes without duplicating function signatures<sup><a href="#1">1</a></sup>.</li>
-<li>Split functions with boolean flags (like <code>do(true)</code>) into distinct named functions, which adheres to the Single Responsibility Principle and prevents unrelated logic paths from coupling<sup><a href="#1">1</a></sup>.</li>
+<li>Salsa marks affected queries as “potentially stale”.</li>
+<li>On next access, performs a “maybe changed after” check.</li>
+<li>Only recomputes if dependencies actually changed.</li>
+<li>Reuses cached results when possible.</li>
 </ol>
-<h3 id="implementation-patterns"><a class="header" href="#implementation-patterns">Implementation Patterns</a></h3>
+<h3 id="memoization"><a class="header" href="#memoization">Memoization</a></h3>
+<p>Query results are cached with their dependencies. Salsa stores:</p>
+<ul>
+<li>The computed result.</li>
+<li>Which queries were read during computation.</li>
+<li>The “revision” when the computation occurred.</li>
+</ul>
+<h3 id="incremental-updates"><a class="header" href="#incremental-updates">Incremental Updates</a></h3>
+<p>The framework uses a revision counter that increments when inputs change.</p>
+<p>For each cached result, Salsa can determine:</p>
+<ul>
+<li>Was this result computed before or after the last change?</li>
+<li>Have any of its dependencies changed since computation?</li>
+<li>Can we reuse the cached value?</li>
+</ul>
+<p>Result: Efficient incremental updates where only affected computations run.</p>
+<h3 id="cycle-handling"><a class="header" href="#cycle-handling">Cycle Handling</a></h3>
+<p>When circular dependencies occur (Query A depends on B, B depends on A):</p>
+<ul>
+<li>Salsa detects the cycle.</li>
+<li>Provides mechanisms to handle it.</li>
+<li>Prevents infinite loops.</li>
+</ul>
+<h2 id="example-workflow"><a class="header" href="#example-workflow">Example Workflow</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Input query - set from outside
+#[salsa::input]
+struct SourceText {
+    #[return_ref]
+    text: String,
+}
+
+// Derived query - computed from inputs
+#[salsa::tracked]
+fn parse(db: &amp;dyn Db, input: SourceText) -&gt; Ast {
+    // Parse the text
+    // Salsa automatically tracks that this depends on `input.text()`
+}
+
+#[salsa::tracked]
+fn check_types(db: &amp;dyn Db, input: SourceText) -&gt; TypeCheckResult {
+    let ast = parse(db, input);  // Depends on parse
+    // Type check the ast
+}
+
+// Later, when input changes:
+// 1. Set new input: input.set_text(db).to(new_text)
+// 2. Access check_types(db, input)
+// 3. Salsa sees parse() needs recompute (input changed)
+// 4. Salsa recomputes parse(), then check_types()
+// 5. If parse() result unchanged, check_types() reuses cache
+<span class="boring">}</span></code></pre>
+<h2 id="key-features"><a class="header" href="#key-features">Key Features</a></h2>
+<h3 id="on-demand-evaluation"><a class="header" href="#on-demand-evaluation">On-Demand Evaluation</a></h3>
+<ul>
+<li>Queries computed lazily.</li>
+<li>If no one asks for a result, it doesn’t get computed.</li>
+<li>Contrasts with systems that eagerly recompute everything after changes.</li>
+</ul>
+<h3 id="durability"><a class="header" href="#durability">Durability</a></h3>
+<ul>
+<li>Queries can be marked as “durable” if their inputs rarely change.</li>
+<li>Salsa uses durability levels to optimize invalidation checks.</li>
+</ul>
+<h3 id="lru-caching"><a class="header" href="#lru-caching">LRU Caching</a></h3>
+<ul>
+<li>Memoized results can be evicted using LRU (Least Recently Used) strategy.</li>
+<li>Manages memory by evicting old results.</li>
+<li>Results recomputed if accessed after eviction.</li>
+</ul>
+<h3 id="parallel-execution"><a class="header" href="#parallel-execution">Parallel Execution</a></h3>
+<ul>
+<li>Multiple queries execute concurrently.</li>
+<li>Salsa coordinates access and handles race conditions through its runtime.</li>
+</ul>
+<h3 id="cancellation"><a class="header" href="#cancellation">Cancellation</a></h3>
+<ul>
+<li>Long-running queries cancelled if inputs change during execution.</li>
+<li>Avoids wasted computation.</li>
+</ul>
+<h2 id="runtime-architecture"><a class="header" href="#runtime-architecture">Runtime Architecture</a></h2>
+<p>The Salsa runtime manages:</p>
+<ul>
+<li>Active function tracking: Which queries are currently executing.</li>
+<li>Revision management: Monotonic counter for tracking change epochs.</li>
+<li>Dependency graph: Records which queries depend on which.</li>
+<li>Memoization storage: Cached results indexed by query + inputs.</li>
+<li>Worker coordination: Handles concurrent query execution.</li>
+</ul>
+<h2 id="advantages"><a class="header" href="#advantages">Advantages</a></h2>
 <ol>
-<li>Prioritize imperative clarity over functional brevity, where code should maximize “work per line” rather than minimizing line count via complex indirections<sup><a href="#1">1</a></sup>.</li>
-<li>Use spatial operators (like <code>&lt;</code> or <code>&lt;=</code>) that map intuitively to the mental number line (<code>0→∞</code>), avoiding the mental effort required to “flip” comparisons<sup><a href="#1">1</a></sup>.</li>
-<li>Prefer syntax that supports left-to-right reading (such as explicit type ascription), which reduces the “context window” required to understand a statement by declaring intent up-front<sup><a href="#1">1</a></sup>.</li>
-<li>Use blocks <code>{ ... }</code> to isolate temporary state, preventing variable pollution while retaining access to the parent context<sup><a href="#1">1</a></sup>.</li>
-<li>Push resource allocation (memory and I/O) up to the call site (like passing a buffer in) to make performance costs visible and controllable by the caller<sup><a href="#1">1</a></sup>.</li>
-<li>Use explicit namespaces or qualifiers to visually reinforce layer boundaries in code, such as distinguishing <code>ast::Node</code> from <code>hir::Node</code><sup><a href="#1">1</a></sup>.</li>
+<li>Automatic dependency tracking: No manual specification of what depends on what.</li>
+<li>Fine-grained invalidation: Only recompute what actually changed.</li>
+<li>Transparent caching: Memoization handled by framework, not user code.</li>
+<li>Parallel-friendly: Built-in support for concurrent execution.</li>
+<li>Memory efficient: LRU eviction prevents unbounded cache growth.</li>
 </ol>
-<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
+<h2 id="integration-with-rust-analyzer"><a class="header" href="#integration-with-rust-analyzer">Integration with <code>rust-analyzer</code></a></h2>
+<p><code>rust-analyzer</code> uses Salsa in its <code>base-db</code> crate for incremental compilation.</p>
+<p>Example uses:</p>
+<ul>
+<li>Input queries: File contents, crate graph configuration.</li>
+<li>Derived queries: Parse trees, name resolution, type inference.</li>
+</ul>
+<p>Benefits:</p>
+<ul>
+<li>When a file changes, only affected analysis passes rerun.</li>
+<li>Editing one function: type checking other functions reuses cached results.</li>
+<li>Responsive even on large codebases.</li>
+<li>Most edits trigger minimal recomputation.</li>
+</ul>
+<h2 id="comparison-reactive-vs-traditional"><a class="header" href="#comparison-reactive-vs-traditional">Comparison: Reactive vs Traditional</a></h2>
+<p>Traditional approach:</p>
+<pre><code>File change → Reparse entire project → Recheck all types → Update all diagnostics
+</code></pre>
+<p>Salsa approach:</p>
+<pre><code>File change → Mark queries as potentially stale
+User requests diagnostics → Salsa recomputes only affected queries → Return result
+</code></pre>
+<p>The Salsa approach is faster because:</p>
+<ul>
+<li>Only computes what’s actually needed (on-demand).</li>
+<li>Reuses unchanged intermediate results (memoization).</li>
+<li>Granular invalidation (file-level, not project-level).</li>
+</ul>
+<h2 id="learning-resources"><a class="header" href="#learning-resources">Learning Resources</a></h2>
+<ul>
+<li><a href="https://salsa-rs.github.io/salsa/tutorial.html">Tutorial: calc language</a>: End-to-end example building a compiler/interpreter</li>
+<li><a href="https://salsa-rs.github.io/salsa/plumbing.html">Plumbing documentation</a>: Internal mechanisms and algorithms</li>
+<li><a href="https://salsa.zulipchat.com">Community</a>: Zulip instance for discussions</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>Salsa provides incremental computation through:</p>
 <ol>
-<li>Tests are defined as input/output pairs where the framework compares actual results against expected output, and expectations are updated when behavior changes intentionally<sup><a href="#3">3</a></sup>.</li>
-<li>Define tests via data (input and output) rather than API calls, which makes tests survive refactoring<sup><a href="#1">1</a></sup>.</li>
-<li>Each test simulates a complete environment (multi-file, multi-crate) in memory without shared state<sup><a href="#3">3</a></sup>.</li>
-<li>Failing tests can auto-update their expected output via a flag, which eliminates manual maintenance<sup><a href="#3">3</a></sup>.</li>
-<li>Minimize test cases to the smallest input that reproduces the behavior, resulting in less noise and faster debugging<sup><a href="#1">1</a></sup>.</li>
-<li>Place tests near their implementation to enable easy discovery during development<sup><a href="#3">3</a></sup>.</li>
-<li>Never ignore test failures. Instead, assert the incorrect behavior with a FIXME comment to keep the failure visible<sup><a href="#1">1</a></sup>.</li>
+<li>Query-based architecture: All computations are queries that depend on other queries.</li>
+<li>Automatic dependency tracking: Framework records dependencies during execution.</li>
+<li>Smart invalidation: Only recomputes when dependencies actually change.</li>
+<li>Transparent memoization: Caches results without explicit cache management.</li>
+<li>On-demand evaluation: Computes only what’s requested, when requested.</li>
 </ol>
-<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
-<p>Enforce full-sentence comments (starting with a capital letter and ending with a period) to psychologically shift the author from “note-taking” (describing what) to “explanation” (describing why and providing context)<sup><a href="#1">1</a></sup>.</p>
-<h2 id="references"><a class="header" href="#references">References</a></h2>
-<ol>
-<li><a href="https://www.google.com/search?q=../research/resources/rust-analyzer/high_level_architecture_and_conventions.md"><code>rust-analyzer</code> high-level architecture and conventions</a> <a id="1"></a></li>
-<li><a href="./resources/rust-analyzer/syntax_tree_and_parser.html"><code>rust-analyzer</code> syntax tree and parser</a> <a id="2"></a></li>
-<li><a href="./resources/rust-analyzer/tests.html"><code>rust-analyzer</code> testing</a> <a id="3"></a></li>
-</ol>
+<p>Result:</p>
+<ul>
+<li>Responsive compilers and language servers.</li>
+<li>Efficient change handling.</li>
+<li>Real-time feedback practical even for large codebases.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../research/resources/salsa/overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../../research/resources/salsa/SUMMARY.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../research/glossary.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../../research/research_summary.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -301,11 +398,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../research/resources/salsa/overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../../research/resources/salsa/SUMMARY.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../research/glossary.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../../research/research_summary.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -325,17 +422,17 @@
         </script>
 
 
-        <script src="../elasticlunr-ef4e11c1.min.js"></script>
-        <script src="../mark-09e88c2c.min.js"></script>
-        <script src="../searcher-c2a407aa.js"></script>
+        <script src="../../../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../../../mark-09e88c2c.min.js"></script>
+        <script src="../../../searcher-c2a407aa.js"></script>
 
-        <script src="../clipboard-1626706a.min.js"></script>
-        <script src="../highlight-abc7f01d.js"></script>
-        <script src="../book-a0b12cfe.js"></script>
+        <script src="../../../clipboard-1626706a.min.js"></script>
+        <script src="../../../highlight-abc7f01d.js"></script>
+        <script src="../../../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/mermaid-3a6b472a.min.js"></script>
-        <script src="../theme/mermaid-init-025d9952.js"></script>
+        <script src="../../../theme/mermaid-3a6b472a.min.js"></script>
+        <script src="../../../theme/mermaid-init-025d9952.js"></script>
 
 
 
