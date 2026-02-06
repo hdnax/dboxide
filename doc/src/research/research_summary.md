@@ -24,6 +24,38 @@
     6. `ide` crate: Provide high-level IDE features on top of `hir` semantic model, speaking IDE languages (such as texts and offsets instead of syntax nodes).
     7. `rust-analyzer`: The language server, knowing about LSP and JSON.
 
+## Token & Node 
+
+1. **Token vs Node representation**<sup>[2](#2)</sup>:
+    - **Parser tokens** have tags and their corresponding source text. **Parser nodes** have tags and source length.
+    - Children nodes are placed in a homogenous vector.
+2. Tokens and nodes share the same `SyntaxKind` enum and are not as distinguished as `@dbml/parse`. In fact, tokens are like leaf nodes, and nodes are like interior nodes.<sup>[2](#2)</sup>
+4. **Trivia strategy**: [Explicit nodes](./resources/rust-analyzer/syntax_tree_and_parser.md#dealing-with-trivia) (whitespace/comments as sibling nodes).
+   - `rust-analyzer` chooses to not treats trivial and error nodes specially. Everything is uniform.
+   - Some (like `@dbml/parse`) attach trivia to the nearest semantic parents.
+   - Some use a hybrid approach.
+5. **Contextual keywords**: Parser checks actual text via `TokenSource::is_keyword()` for context-sensitive keywords like `union`, `default`<sup>[2](#2)</sup>.
+5. **Token ambiguity**: Intermediary layer (`TokenSource`/`TreeSink` traits) merges tokens (`>` + `>` → `>>`) based on context.<sup>[2](#2)</sup>.
+6. **Position computation**: Nodes store only `text_len` (not offset), tokens store text. SyntaxNode computes offset on-demand from parent. Enables incremental parsing without position invalidation<sup>[2](#2)</sup>.
+
+## Parsing
+
+1. **Three-layer tree architecture**<sup>[2](#2)</sup>:
+    - [**GreenNode (storage)**](./resources/rust-analyzer/syntax_tree_and_parser.md#layer-1-greennode-the-storage): Immutable, persistent. Optimizations: DST (single heap allocation), tagged pointers, token interning, `Arc`-sharing. Stores `text_len`, not offset.
+    - [**SyntaxNode (cursor/RedNode)**](./resources/rust-analyzer/syntax_tree_and_parser.md#layer-2-syntaxnode-the-cursor--rednode): Adds parent pointers and on-demand position computation. Memory scales with depth, not tree size. Transient (rebuild from GreenNode when needed).
+    - [**AST (typed API)**](./resources/rust-analyzer/syntax_tree_and_parser.md#layer-3-ast-the-api): Auto-generated typed wrappers (`FnDef`, `ParamList`) around `SyntaxNode` for ergonomic access.
+2. **Lossless representation**: Everything preserved (whitespace, comments, invalid tokens). Invalid input wrapped in `ERROR` nodes. Original text reconstructable by concatenating token text<sup>[2](#2)</sup>.
+3. **Error storage**: Errors live in separate `Vec<SyntaxError>`, not embedded in tree. Enables manual tree construction without error state management. Parser outputs `(green_node, errors)`<sup>[2](#2)</sup>.
+4. **Resilient parsing**<sup>[2](#2)</sup>:
+    - **Algorithm**: Recursive descent + Pratt parsing (expressions). Permissive (accepts invalid constructs, validated later).
+    - [**Event-based architecture**](./resources/rust-analyzer/syntax_tree_and_parser.md#parsing---the-token-sequence-transformer): Parser emits abstract events via `TokenSource` (input) and `TreeSink` (output) traits. Parser agnostic to tree structure.
+    - **Error recovery**: Panic mode (skip to sync points like `}`, `;`), implicit closing braces, early block termination, ERROR node wrapping.
+5. [**Incremental parsing**](./resources/rust-analyzer/syntax_tree_and_parser.md#incremental-reparse)<sup>[2](#2)</sup>:
+    - **Red-Green model**: Green = immutable storage, Red = cursors with positions. Separation enables cheap tree patches (swap GreenNode pointers).
+    - [**Block heuristic**](./resources/rust-analyzer/syntax_tree_and_parser.md#incremental-reparse): Reparse smallest `{}` block containing edit. Works because parser maintains structurally balanced braces (implicit `}` insertion, ERROR wrapping for extras).
+    - **Pragmatic note**: Often not worth it—full reparse is fast and simpler. Valuable for tree edit cheapness and subtree sharing.
+6. [**Error messages**](./resources/rust-analyzer/syntax_tree_and_parser.md#reporting-syntax-errors): Permissive parser + separate validation pass for "soft" errors. Parser focuses on structure recovery; validation uses semantic context for detailed diagnostics<sup>[2](#2)</sup>.
+
 ## Design Choices & General Architectures
 
 1. **Abstraction leakage prevention**: Avoid blind serialization of internal types, which implicitly couples public clients to private implementation details<sup>[1](#1)</sup>.
@@ -58,3 +90,4 @@
 ## References
 
 1. [`rust-analyzer` high-level architecture and conventions](https://www.google.com/search?q=../research/resources/rust-analyzer/high_level_architecture_and_conventions.md) <a id="1"></a>
+2. [`rust-analyzer` syntax tree and parser](./resources/rust-analyzer/syntax_tree_and_parser.md) <a id="2"></a>
