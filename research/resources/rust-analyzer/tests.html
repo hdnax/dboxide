@@ -37,7 +37,7 @@
             const path_to_root = "../../../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../../searchindex-16a64116.js";
+            window.path_to_searchindex_js = "../../../searchindex-ea9905ee.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../../../toc-490331af.js"></script>
@@ -182,7 +182,365 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="writing-tests"><a class="header" href="#writing-tests">Writing Tests</a></h1>
+                        <h1 id="testing"><a class="header" href="#testing">Testing</a></h1>
+<p>Official site: <a href="https://rust-analyzer.github.io/book/contributing/testing.html">Link</a>.</p>
+<h2 id="test-philosophy"><a class="header" href="#test-philosophy">Test Philosophy</a></h2>
+<p><code>rust-analyzer</code> employs <strong>snapshot testing</strong> as its core testing strategy (surprised LOL). The essence: <strong>“A test is a piece of input text, usually Rust code, and some output text.”</strong></p>
+<p>The testing helper compares the actual result against the expected output. When tests fail, you can review the diff and either fix the code or update the expectation if the new behavior is correct.</p>
+<h2 id="test-framework-components"><a class="header" href="#test-framework-components">Test Framework Components</a></h2>
+<p>The testing infrastructure combines two main elements:</p>
+<ol>
+<li><strong><code>expect-test</code> crate</strong>: A lightweight snapshot testing library that enables automated expectation updates.</li>
+<li><strong>Custom testing helpers</strong>: Purpose-built functions for specific <code>rust-analyzer</code> features (type inference, diagnostics, etc.).</li>
+</ol>
+<h2 id="common-test-helpers"><a class="header" href="#common-test-helpers">Common Test Helpers</a></h2>
+<h3 id="type-inference-tests"><a class="header" href="#type-inference-tests">Type Inference Tests</a></h3>
+<p>Located in <code>crates/hir-ty/src/tests</code>. Three main helper functions:</p>
+<h4 id="check_no_mismatches"><a class="header" href="#check_no_mismatches"><code>check_no_mismatches()</code></a></h4>
+<p>Validates that no type mismatches exist in the given code.</p>
+<pre class="playground"><code class="language-rust">#[test]
+fn simple_assignment() {
+    check_no_mismatches(
+        r#"
+fn main() {
+    let x: i32 = 42;
+    let y: i32 = x;
+}
+"#,
+    );
+}</code></pre>
+<p><strong>Note</strong>: This relies on <code>rust-analyzer</code>’s analysis, not the Rust compiler. The analyzer might miss errors the compiler would catch, or vice versa.</p>
+<h4 id="check_types"><a class="header" href="#check_types"><code>check_types()</code></a></h4>
+<p>Asserts specific expression types using inline annotations. Uses <code>^</code> markers under code to denote type assertions.</p>
+<pre class="playground"><code class="language-rust">#[test]
+fn type_annotations() {
+    check_types(
+        r#"
+fn main() {
+    let x = 1;
+     // ^ i32
+    let y = "hello";
+     // ^ &amp;str
+    let z = x + 2;
+     // ^ i32
+}
+"#,
+    );
+}</code></pre>
+<p>The <code>// ^ type</code> notation marks the expression on the line above and asserts its inferred type.</p>
+<h4 id="check_infer"><a class="header" href="#check_infer"><code>check_infer()</code></a></h4>
+<p>Uses <code>expect-test</code> to match complete type inference output against expected results. Displays byte ranges, source text, and inferred types for all expressions.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn infer_function_return() {
+    check_infer(
+        r#"
+fn foo() -&gt; i32 {
+    42
+}
+"#,
+        expect![[r#"
+        10..11 '{': expected i32, got ()
+        15..17 '42': i32
+    "#]],
+    );
+}
+<span class="boring">}</span></code></pre>
+<h2 id="annotation-conventions"><a class="header" href="#annotation-conventions">Annotation Conventions</a></h2>
+<p><code>rust-analyzer</code> tests use a special notation system for marking positions and ranges in code:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Notation</th><th style="text-align: left">Purpose</th><th style="text-align: left">Example</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>$0</code></td><td style="text-align: left">Cursor position (single point)</td><td style="text-align: left"><code>let x$0 = 1;</code></td></tr>
+<tr><td style="text-align: left"><code>$0...$0</code></td><td style="text-align: left">Range/selection</td><td style="text-align: left"><code>let $0x = 1$0;</code></td></tr>
+<tr><td style="text-align: left"><code>// ^^^^</code></td><td style="text-align: left">Type assertion label</td><td style="text-align: left"><code>x + 1</code><br><code>// ^^^ i32</code></td></tr>
+</tbody>
+</table>
+</div>
+<p>These annotations are processed by the fixture parser and removed before the code is analyzed.</p>
+<h2 id="fixture-system"><a class="header" href="#fixture-system">Fixture System</a></h2>
+<p>The fixture system is a mini-language for declaring multi-file, multi-crate test scenarios. It allows tests to simulate complex project structures without requiring actual file system operations.</p>
+<h3 id="basic-fixture-structure"><a class="header" href="#basic-fixture-structure">Basic Fixture Structure</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_cross_crate_reference() {
+    check_types(
+        r#"
+//- minicore: sized
+//- /lib.rs crate:foo
+pub struct Foo;
+
+//- /bar.rs crate:bar deps:foo
+use foo::Foo;
+fn use_foo(f: Foo) {
+           // ^^^ Foo
+}
+"#,
+    );
+}
+<span class="boring">}</span></code></pre>
+<h3 id="fixture-directives"><a class="header" href="#fixture-directives">Fixture Directives</a></h3>
+<h4 id="minicore-flags"><a class="header" href="#minicore-flags">Minicore Flags</a></h4>
+<p><code>//- minicore: flag1, flag2, ...</code></p>
+<p>Includes specific standard library components. This is the most commonly used directive.</p>
+<p><strong>Common minicore flags:</strong></p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Flag</th><th style="text-align: left">Provides</th><th style="text-align: left">When to Use</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>sized</code></td><td style="text-align: left"><code>Sized</code> trait</td><td style="text-align: left">Almost always; recommended when stuck</td></tr>
+<tr><td style="text-align: left"><code>fn</code></td><td style="text-align: left"><code>Fn</code>, <code>FnMut</code>, <code>FnOnce</code> traits</td><td style="text-align: left">Required for closures</td></tr>
+<tr><td style="text-align: left"><code>async_fn</code></td><td style="text-align: left"><code>AsyncFn*</code> traits</td><td style="text-align: left">Required for async closures</td></tr>
+<tr><td style="text-align: left"><code>iterator</code></td><td style="text-align: left"><code>Iterator</code> trait</td><td style="text-align: left">When testing iteration</td></tr>
+<tr><td style="text-align: left"><code>option</code></td><td style="text-align: left"><code>Option&lt;T&gt;</code> enum</td><td style="text-align: left">When using <code>Option</code></td></tr>
+<tr><td style="text-align: left"><code>result</code></td><td style="text-align: left"><code>Result&lt;T, E&gt;</code> enum</td><td style="text-align: left">When using <code>Result</code></td></tr>
+<tr><td style="text-align: left"><code>unsize</code></td><td style="text-align: left"><code>Unsize</code> trait</td><td style="text-align: left">For unsized types (<code>dyn Trait</code>, slices)</td></tr>
+<tr><td style="text-align: left"><code>coerce_unsized</code></td><td style="text-align: left"><code>CoerceUnsized</code> trait</td><td style="text-align: left">For unsized type coercions</td></tr>
+<tr><td style="text-align: left"><code>dispatch_from_dyn</code></td><td style="text-align: left"><code>DispatchFromDyn</code> trait</td><td style="text-align: left">For trait object dispatch</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Important</strong>: If your test mysteriously fails with type errors, try adding <code>sized</code> first. Many operations implicitly require the <code>Sized</code> trait.</p>
+<h4 id="file-declarations"><a class="header" href="#file-declarations">File Declarations</a></h4>
+<p><code>//- /path/to/file.rs crate:name deps:dep1,dep2 edition:2021</code></p>
+<p>Declares a file in the fixture with optional metadata:</p>
+<ul>
+<li><strong>Path</strong>: File path relative to project root</li>
+<li><strong>crate</strong>: Crate name (defaults to file name)</li>
+<li><strong>deps</strong>: Comma-separated dependency list</li>
+<li><strong>edition</strong>: Rust edition (defaults to 2021)</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>//- /lib.rs crate:mylib
+pub mod foo;
+
+//- /foo.rs
+pub struct Bar;
+
+//- /main.rs crate:main deps:mylib edition:2021
+use mylib::foo::Bar;
+<span class="boring">}</span></code></pre>
+<h3 id="complete-fixture-example"><a class="header" href="#complete-fixture-example">Complete Fixture Example</a></h3>
+<pre class="playground"><code class="language-rust">#[test]
+fn test_workspace_with_dependencies() {
+    check_types(
+        r#"
+//- minicore: sized, fn, iterator
+//- /workspace/utils/lib.rs crate:utils
+pub fn helper() -&gt; i32 { 42 }
+
+//- /workspace/core/lib.rs crate:core deps:utils
+use utils::helper;
+pub fn process() -&gt; i32 {
+    helper()
+ // ^^^^^^^^ fn helper() -&gt; i32
+}
+
+//- /workspace/app/main.rs crate:app deps:core
+use core::process;
+fn main() {
+    let x = process();
+     // ^ i32
+}
+"#,
+    );
+}</code></pre>
+<p>This fixture creates a workspace with three crates (<code>utils</code> → <code>core</code> → <code>app</code>) with proper dependency relationships.</p>
+<h2 id="fixture-system-architecture"><a class="header" href="#fixture-system-architecture">Fixture System Architecture</a></h2>
+<pre class="mermaid">%%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
+flowchart LR
+    A["Test Fixture String"]
+    B["Parse Directives"]
+    C["minicore Flags"]
+    D["File Declarations"]
+    E["Build In-Memory\nFile System"]
+    F["Create Crate Graph"]
+    G["Run rust-analyzer\nAnalysis"]
+    H["Extract Results"]
+
+    A --&gt; B
+    B --&gt; C
+    B --&gt; D
+    C --&gt; E
+    D --&gt; E
+    E --&gt; F
+    F --&gt; G
+    G --&gt; H
+
+    classDef inputNode fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a
+    classDef parseNode fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#78350f
+    classDef buildNode fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#064e3b
+    classDef outputNode fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
+
+    class A inputNode
+    class B,C,D parseNode
+    class E,F,G buildNode
+    class H outputNode
+</pre>
+
+<p>The fixture parser:</p>
+<ol>
+<li>Extracts directives (<code>minicore</code>, file paths, metadata).</li>
+<li>Builds an in-memory file system.</li>
+<li>Constructs a crate dependency graph.</li>
+<li>Initializes <code>rust-analyzer</code> with this synthetic project.</li>
+<li>Runs analysis and returns results for assertions.</li>
+</ol>
+<h2 id="update_expect-workflow"><a class="header" href="#update_expect-workflow">UPDATE_EXPECT Workflow</a></h2>
+<p>The <code>expect-test</code> crate supports automatic expectation updates via the <code>UPDATE_EXPECT=1</code> environment variable.</p>
+<h3 id="manual-update"><a class="header" href="#manual-update">Manual Update</a></h3>
+<pre><code class="language-bash">UPDATE_EXPECT=1 cargo test
+</code></pre>
+<p>This runs all tests and automatically updates any failing <code>expect![[...]]</code> blocks with the actual output.</p>
+<h3 id="ide-integration"><a class="header" href="#ide-integration">IDE Integration</a></h3>
+<p>Some IDEs (notably VSCode with the <code>rust-analyzer</code> extension) provide convenient UI buttons for updating expectations:</p>
+<ul>
+<li>“Update Expect” button in test function hover tooltips</li>
+<li>Inline code actions for specific <code>expect!</code> blocks</li>
+</ul>
+<h3 id="workflow-diagram"><a class="header" href="#workflow-diagram">Workflow Diagram</a></h3>
+<pre class="mermaid">%%{init: {'theme':'neutral', 'themeVariables': {'fontSize':'16px'}}}%%
+stateDiagram-v2
+    [*] --&gt; WriteTest: Write test with expect!
+    WriteTest --&gt; RunTest: cargo test
+    RunTest --&gt; TestPasses: Output matches
+    RunTest --&gt; TestFails: Output differs
+    TestPasses --&gt; [*]
+    TestFails --&gt; ReviewDiff: Examine actual vs expected
+    ReviewDiff --&gt; FixCode: Bug in code
+    ReviewDiff --&gt; UpdateExpect: Behavior is correct
+    FixCode --&gt; RunTest
+    UpdateExpect --&gt; RunWithUpdate: UPDATE_EXPECT=1 cargo test
+    RunWithUpdate --&gt; Verify: Check updated expectation
+    Verify --&gt; [*]
+</pre>
+
+<h2 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h2>
+<h3 id="1-import-required-types"><a class="header" href="#1-import-required-types">1. Import Required Types</a></h3>
+<p>The minicore system only includes explicitly requested components. If your test fails with “cannot find type” errors:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>//- minicore: sized, fn, iterator, option  // ← Add missing flags
+<span class="boring">}</span></code></pre>
+<h3 id="2-start-with-sized"><a class="header" href="#2-start-with-sized">2. Start with <code>sized</code></a></h3>
+<p>When stuck with mysterious type errors, add <code>sized</code> to minicore flags. Many operations implicitly require the <code>Sized</code> trait:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>//- minicore: sized  // ← Add this first when debugging
+<span class="boring">}</span></code></pre>
+<h3 id="3-use-semantic-highlighting-for-debugging"><a class="header" href="#3-use-semantic-highlighting-for-debugging">3. Use Semantic Highlighting for Debugging</a></h3>
+<p>If code looks wrong in the test, check its syntax highlighting. Incorrect highlighting often indicates:</p>
+<ul>
+<li>Missing minicore flags</li>
+<li>Syntax errors in the fixture</li>
+<li>Incorrect file path declarations</li>
+</ul>
+<h3 id="4-validate-with-real-ides"><a class="header" href="#4-validate-with-real-ides">4. Validate with Real IDEs</a></h3>
+<p>When test behavior seems suspicious, validate the code in an actual IDE with <code>rust-analyzer</code>. Sometimes tests simplify too much and miss real-world edge cases.</p>
+<h3 id="5-unsized-types-need-special-flags"><a class="header" href="#5-unsized-types-need-special-flags">5. Unsized Types Need Special Flags</a></h3>
+<p>Working with <code>dyn Trait</code>, slices, or other unsized types? Add these flags:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>//- minicore: sized, unsize, coerce_unsized, dispatch_from_dyn
+<span class="boring">}</span></code></pre>
+<h3 id="6-keep-tests-minimal"><a class="header" href="#6-keep-tests-minimal">6. Keep Tests Minimal</a></h3>
+<p>Follow the “Reproduction isolation” principle from <code>rust-analyzer</code> conventions: minimize test cases to the smallest code required to reproduce behavior. This reduces noise and debugging time.</p>
+<h2 id="common-test-patterns"><a class="header" href="#common-test-patterns">Common Test Patterns</a></h2>
+<h3 id="testing-completion"><a class="header" href="#testing-completion">Testing Completion</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn completes_struct_fields() {
+    check_edit(
+        "field",
+        r#"
+struct S { field: i32 }
+fn foo(s: S) {
+    s.$0
+}
+"#,
+        r#"
+struct S { field: i32 }
+fn foo(s: S) {
+    s.field$0
+}
+"#,
+    );
+}
+<span class="boring">}</span></code></pre>
+<p>The <code>$0</code> marker indicates cursor position before (trigger point) and after (expected position) completion.</p>
+<h3 id="testing-diagnostics"><a class="header" href="#testing-diagnostics">Testing Diagnostics</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn detects_type_mismatch() {
+    check_diagnostics(
+        r#"
+fn foo() -&gt; i32 {
+    "string"
+ // ^^^^^^^^ error: expected i32, found &amp;str
+}
+"#,
+    );
+}
+<span class="boring">}</span></code></pre>
+<p>Inline error annotations specify expected diagnostic messages at specific locations.</p>
+<h3 id="testing-quick-fixes"><a class="header" href="#testing-quick-fixes">Testing Quick Fixes</a></h3>
+<pre class="playground"><code class="language-rust">#[test]
+fn adds_missing_import() {
+    check_fix(
+        r#"
+//- /lib.rs crate:foo
+pub struct Foo;
+//- /main.rs crate:main deps:foo
+fn main() {
+    Foo$0 {};
+}
+"#,
+        r#"
+use foo::Foo;
+
+fn main() {
+    Foo {};
+}
+"#,
+    );
+}</code></pre>
+<p>Tests that the quick fix correctly adds the missing import.</p>
+<h2 id="test-organization"><a class="header" href="#test-organization">Test Organization</a></h2>
+<p><code>rust-analyzer</code> organizes tests close to implementation code:</p>
+<pre><code>crates/
+├── hir-ty/
+│   └── src/
+│       ├── infer.rs              # Type inference logic
+│       └── tests/
+│           ├── simple.rs         # Basic inference tests
+│           ├── traits.rs         # Trait-related tests
+│           └── coercion.rs       # Type coercion tests
+├── ide/
+│   └── src/
+│       ├── completion.rs         # Completion implementation
+│       └── completion/
+│           └── tests.rs          # Completion tests
+</code></pre>
+<p>This co-location makes it easy to find relevant tests when modifying code.</p>
+<h2 id="recap"><a class="header" href="#recap">Recap</a></h2>
+<p><code>rust-analyzer</code>’s testing philosophy emphasizes:</p>
+<ol>
+<li><strong>Data-driven testing</strong>: Tests defined by input/output pairs, resilient to refactoring.</li>
+<li><strong>Fixture-based isolation</strong>: Each test builds a complete in-memory project.</li>
+<li><strong>Snapshot automation</strong>: <code>UPDATE_EXPECT=1</code> eliminates manual expectation maintenance.</li>
+<li><strong>Minimal reproduction</strong>: Tests include only what’s necessary to trigger behavior.</li>
+<li><strong>Co-located tests</strong>: Tests live near implementation for easy discovery.</li>
+</ol>
 
                     </main>
 
