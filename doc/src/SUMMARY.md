@@ -11,6 +11,8 @@
       - [Syntax Tree & Parser](./research/resources/rust-analyzer/syntax_tree_and_parser.md)
       - [Writing Tests](./research/resources/rust-analyzer/tests.md)
     - [`libsyntax`](./research/resources/libsyntax/SUMMARY.md)
+    - [`salsa`](./research/resources/salsa/SUMMARY.md)
+      - [Overview](./research/resources/salsa/overview.md)
   - [Research Summary](./research/research_summary.md)
   - [Glossary](./research/glossary.md)
 - [High-Level Design](./high_level_design/SUMMARY.md)
